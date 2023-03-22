@@ -1,0 +1,29 @@
+# Configuration file for multiplePlotSingleCanvas function in plotter.py
+
+# input and output file options
+finPaths: []
+objNames: []
+ROOTobject: []
+
+foutPath: []
+outFormats: []
+
+lineColors: []
+lineWidths: []
+lineStyles: []
+fillColors: []
+fillStyles: []
+markerColors: []
+markerStyles: []
+
+xTitles: []
+xTitleSizes: []
+xTitleOffset: []
+yTitles: []
+yTitleSizes: []
+yTitleOffset: []
+drawOptions: []
+
+# canvas option
+axisTitles: []
+axisLimits: []

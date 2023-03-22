@@ -1,0 +1,27 @@
+#
+
+canvas:
+  title: "canvas"
+  width: 1000
+  height: 1000
+
+pad:
+  color: 0
+  border_mode: 0
+  border_size: 2
+  left_margin: 0.15
+  right_margin: 0.05
+  top_margin: 0.05
+  bottom_margin: 0.15
+
+legend:
+  isTrue: true
+  xmin: 0.7
+  ymin: 0.7
+  xmax: 0.9
+  ymax: 0.9
+  border_size: 0
+  fill_color: 0
+  bg_color: 0
+  size: 0.04
+  font: 42
