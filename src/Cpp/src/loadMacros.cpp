@@ -13,4 +13,5 @@ void loadMacros(TString myopt="")
     if (myopt.Contains("clean"))    gSystem->Exec("bash clean.sh");
 
     gSystem->CompileMacro("src/Cpp/src/hello.cpp",opt.Data(),"","src/Cpp/build");
+    gSystem->CompileMacro("src/Cpp/src/fileManager.cpp",opt.Data(),"","src/Cpp/build");
 }
