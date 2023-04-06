@@ -34,22 +34,22 @@ class FileManager
         void print() const;
 
     protected:
-        int nCommentLines() const;    // returns the number of comment lines
-        int nRows() const;            // returns the number of rows (non-comments)
-        int nColumns() const;         // returns the number of columns
+        int nCommentLines() const;      // returns the number of comment lines
+        int nRows() const;              // returns the number of rows (non-comments)
+        int nColumns() const;           // returns the number of columns
 
-        void fillNamesArray();              // initializes column names array
-        void uploadData();                  // upload data from file to fData matrix
+        void fillNamesArray();          // initializes column names array
+        void uploadData();              // upload data from file to fData matrix
 
     private:
-        std::string fFilePath;      // path to file
-        std::string fExtension;     // file extension
+        std::string fFilePath;          // path to file
+        std::string fExtension;         // file extension
 
         int fNCommentLines;
         int fNRows;
         int fNColumns;
-        std::string *fDataNames;    // column names
-        double **fData;             // stored data (2-dim array)
+        std::string *fDataNames;        // column names
+        double **fData;                 // stored data (2-dim array)
 
 };
 
