@@ -10,17 +10,98 @@
 
 #include "fileManager.hpp"
 
-FileManager::FileManager(const char * filePath)
+
+/*
+    PUBLIC
+*/
+
+/**
+ * @brief Return column of the dataset, selecting it by its column name.
+ * 
+ * @param columnName 
+ * @return double* 
+ */
+double * FileManager::getColumn(const char * columnName) const
 {
-    FileManager::fFilePath = std::string(filePath);
-    FileManager::fExtension = FileManager::fFilePath.substr(FileManager::fFilePath.find_last_of(".") + 1);
+    int index = 0;
+    while(index < FileManager::fNColumns)
+    {
+        if(FileManager::fDataNames[index] == columnName)   return FileManager::getColumn(index);
+        index++;
+    }
+    std::cerr << "Column not found." << std::endl;
+    return FileManager::getColumn(-1);
+}
 
-    FileManager::fNCommentLines = FileManager::nCommentLines();
-    FileManager::fNRows = FileManager::nRows();
-    FileManager::fNColumns = FileManager::nColumns();
+/**
+ * @brief Append a column to the existing dataset. This will NOT automatically added to the file.
+ * 
+ * @param column 
+ * @param columnName 
+ */
+void FileManager::addColumn(double * column, const char * columnName)
+{
+    // create backup
+    const int size = FileManager::fNColumns;
+    std::string tempName[size];
+    double temp[FileManager::fNColumns][FileManager::fNRows];
 
-    FileManager::fillNamesArray();
-    FileManager::uploadData();
+    for(int col=0; col<FileManager::fNColumns; col++)
+    {
+        tempName[col] = FileManager::fDataNames[col];
+        for(int row=0; row<FileManager::fNRows; row++)  temp[col][row] = FileManager::fData[col][row];
+    }
+
+    // update
+    FileManager::fNColumns++;
+    delete []FileManager::fDataNames;
+    FileManager::fDataNames = new std::string[FileManager::fNColumns];
+    
+    for(int i=0; i<size; i++)   FileManager::fDataNames[i] = tempName[i];
+    FileManager::fDataNames[size] = columnName;
+
+    for(int col=0; col<FileManager::fNColumns-1; col++) delete []FileManager::fData[col];
+    delete []FileManager::fData;
+    FileManager::fData = new double * [FileManager::fNColumns];
+    for(int col=0; col<FileManager::fNColumns; col++) FileManager::fData[col] = new double[FileManager::fNRows];
+
+    for(int col=0; col<size; col++) for(int row=0; row<FileManager::fNRows; row++)  fData[col][row] = temp[col][row];
+    for(int row=0; row<FileManager::fNRows; row++)  fData[size][row] = column[row];
+}
+
+/**
+ * @brief Append a column to the existing dataset. This will NOT automatically added to the file.
+ * 
+ * @param column 
+ * @param columnName 
+ */
+void FileManager::addColumn(std::vector<double>& column, const char * columnName)
+{
+    // create backup
+    const int size = FileManager::fNColumns;
+    std::string tempName[size];
+
+    double temp[FileManager::fNColumns][FileManager::fNRows];
+    for(int col=0; col<FileManager::fNColumns; col++)
+    {
+        for(int row=0; row<FileManager::fNRows; row++)  temp[col][row] = FileManager::fData[col][row];
+    }
+
+    // update
+    FileManager::fNColumns++;
+    delete []FileManager::fDataNames;
+    FileManager::fDataNames = new std::string[FileManager::fNColumns];
+    
+    for(int i=0; i<size; i++)   FileManager::fDataNames[i] = tempName[i];
+    FileManager::fDataNames[size] = columnName;
+
+    for(int col=0; col<FileManager::fNColumns-1; col++) delete []FileManager::fData[col];
+    delete []FileManager::fData;
+    FileManager::fData = new double * [FileManager::fNColumns];
+    for(int col=0; col<FileManager::fNColumns; col++) FileManager::fData[col] = new double[FileManager::fNRows];
+
+    for(int col=0; col<size; col++) for(int row=0; row<FileManager::fNRows; row++)  fData[col][row] = temp[col][row];
+    for(int row=0; row<FileManager::fNRows; row++)  fData[size][row] = column[row];
 }
 
 /**
@@ -41,6 +122,80 @@ void FileManager::print() const
         std::cout << std::endl;
     }
 }
+
+/**
+ * @brief Overloads the file and writes in all currently stored data (comments are not overloaded).
+ * 
+ */
+void FileManager::update() const
+{
+    std::string comments[FileManager::fNCommentLines];
+
+    std::fstream reader(FileManager::fFilePath, std::ios::in);
+    for(int i=0; i<FileManager::fNCommentLines; i++)    getline(reader, comments[i]);
+    reader.close();
+
+    std::fstream writer(FileManager::fFilePath, std::ios::out);
+    for(int i=0; i<FileManager::fNCommentLines; i++)    writer << comments[i] << "\n";
+
+    for(int col=0; col<FileManager::fNColumns; col++)   
+    {
+        if(col != FileManager::fNColumns-1) writer << FileManager::fDataNames[col] << " ";
+        else                                writer << FileManager::fDataNames[col] << "\n";
+    }
+
+    for(int row=0; row<FileManager::fNRows; row++)
+    {
+        for(int col=0; col<FileManager::fNColumns; col++)   
+        {
+            if(col != FileManager::fNColumns-1) writer << FileManager::fData[col][row] << " ";
+            else                                writer << FileManager::fData[col][row];
+        }
+        if(row != FileManager::fNRows-1)    writer << "\n";
+    }
+
+    writer.close();
+}
+
+/**
+ * @brief Initialize all data member with informations and content of a given file.
+ * 
+ * @param filePath 
+ */
+void FileManager::open(const char * filePath)
+{
+    FileManager::fFilePath = std::string(filePath);
+    FileManager::fExtension = FileManager::fFilePath.substr(FileManager::fFilePath.find_last_of(".") + 1);
+
+    FileManager::fNCommentLines = FileManager::nCommentLines();
+    FileManager::fNRows = FileManager::nRows();
+    FileManager::fNColumns = FileManager::nColumns();
+
+    FileManager::fillNamesArray();
+    FileManager::uploadData();
+}
+
+/**
+ * @brief Deletes all dynamically allocated variables and sets all data member to default values.
+ * 
+ */
+void FileManager::close()
+{
+    delete[] FileManager::fDataNames;
+    
+    for(int col=0; col<FileManager::fNColumns; col++)   delete[] FileManager::fData[col];
+    delete[] FileManager::fData;
+
+    FileManager::fNColumns = 0;
+    FileManager::fNRows = 0;
+    FileManager::fNCommentLines = 0;
+
+    FileManager::fFilePath = std::string("_no_file.txt");
+}
+
+/*
+    PROTECTED
+*/
 
 /**
  * @brief Upload data from file to a 2-dimensional array.

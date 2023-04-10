@@ -14,24 +14,27 @@
 class FileManager
 {
     public:
-        FileManager(const char * filePath);
-        FileManager(std::string filePath);
-        ~FileManager(){};
+        FileManager(const char * filePath)  {FileManager::open(filePath);};
+        FileManager(std::string filePath)   {FileManager::open(filePath.c_str());};
+        ~FileManager()                      {FileManager::close();};
         
-        // bool getNamesDefined() = 0; -> returns True if namesDefined is true: i.e. if the first line contains column names
-        // void appendColumn(vector<double>& columnVector, const char * columnName = "");
-        // void getColumn(int index, vector<double>& dataVector);   -> fill data vector with column values  
-        //
+        inline double * getColumn(const int column) const {return FileManager::fData[column];};
+        double * getColumn(const char * columnName) const;
 
-        // getColumn
-        // operator[] (with int and const char)
-        // addColumn
+        double * operator[](const int column) {return FileManager::getColumn(column);};
+        double * operator[](const char * columnName) {return FileManager::getColumn(columnName);};
 
-        int getNCommentLines() const  {return FileManager::fNCommentLines;};
-        int getNRows() const          {return FileManager::fNRows;};
-        int getNColumns() const       {return FileManager::fNColumns;};
+        void addColumn(double * column, const char * columnName);
+        void addColumn(std::vector<double>& column, const char * columnName);
+
+        inline int getNCommentLines() const  {return FileManager::fNCommentLines;};
+        inline int getNRows() const          {return FileManager::fNRows;};
+        inline int getNColumns() const       {return FileManager::fNColumns;};
 
         void print() const;
+        void update() const;
+        void open(const char * filePath);
+        void close();
 
     protected:
         int nCommentLines() const;      // returns the number of comment lines

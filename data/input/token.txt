@@ -1,9 +1,9 @@
 # comment
-# comment 
+# comment
 # comment
 
-a   b   c
-1   2   3
-1   2   4   
-4   5   6
-7   8   9
+a b c d e
+1 2 3 1 1
+1 2 4 2 2
+4 5 6 3 3
+7 8 9 4 4
