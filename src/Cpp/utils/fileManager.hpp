@@ -27,11 +27,11 @@ class FileManager
         void addColumn(double * column, const char * columnName);
         void addColumn(std::vector<double>& column, const char * columnName);
 
-        inline int getNCommentLines() const  {return FileManager::fNCommentLines;};
-        inline int getNRows() const          {return FileManager::fNRows;};
-        inline int getNColumns() const       {return FileManager::fNColumns;};
+        inline int getNCommentLines() const  {return FileManager::fNCommentLines;};     // returns the number of comment lines
+        inline int getNRows() const          {return FileManager::fNRows;};             // returns the number of rows (non-comments)
+        inline int getNColumns() const       {return FileManager::fNColumns;};          // returns the number of columns
 
-        void print() const;
+        void print() const;                                                             /
         void update() const;
         void open(const char * filePath);
         void close();
