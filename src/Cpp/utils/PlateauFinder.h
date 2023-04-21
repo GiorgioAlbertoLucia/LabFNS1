@@ -11,7 +11,6 @@
 #include <TCanvas.h>
 #include <string>
 #include <vector>
-#include <cctype>   // For tolower()
 
 /**
  * @brief Class for finding linear plateau based on chi^2 statistics
