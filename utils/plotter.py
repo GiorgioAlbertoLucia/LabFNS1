@@ -260,15 +260,11 @@ def multiplePlotsSingleCanvas(generalConfigPath, configPath):
     
     for outformat in outFormats:    custom_plot.save(f'{foutPath}.{outformat}')
     
+
+    
 # Run the multiplePlotsSingleCanvas function directily from this macro    
 if __name__ == '__main__':
 
     generalConfigPath = 'config_multiplot.yml'
     configPath = 'config_plotter.yml'
-    multiplePlotsSingleCanvas(generalConfigPath, configPath)
-        
-
-
-
-
-    
+    multiplePlotsSingleCanvas(generalConfigPath, configPath)    
