@@ -27,6 +27,7 @@ class Dumper
         void printSize() const;
         void testPrint(const int begin, const int end) const;
         void readToTxt() const;
+        void readData(int nbytes) const;
 
     protected:
         void findEvents();

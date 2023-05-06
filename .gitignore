@@ -4,3 +4,4 @@ src/Cpp/src/loadMacros_cpp.d
 src/Cpp/src/loadMacros_cpp.so
 
 settings.json
+__pycache__

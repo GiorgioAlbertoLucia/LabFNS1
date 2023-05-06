@@ -144,13 +144,33 @@ int Dumper::getSize() const
  */
 void Dumper::printSize() const
 {
-   std::fstream streamer(fFilePath.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
-   if(streamer)
-   {
-        std::fstream::pos_type size = streamer.tellg();
-        std::cout << fFilePath << " " << size << "\n";
-   } 
-   else perror(fFilePath.c_str());
+    std::vector<uint8_t> bytes;
+    std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
+    if(streamer.good())
+    {
+        std::vector<unsigned char> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+        bytes = vec_buffer;
+        streamer.close();
+    }
+    else    throw std::exception();
+
+    if(onFile)
+    {
+        std::ofstream outStreamer(outFile, std::ios::out);
+        for (unsigned int i = begin; i < end; ++i) 
+        {
+            outStreamer <<  bytes[i];
+            if(i%16 == 15)   outStreamer << "\n";
+        }
+    }
+    else
+    {
+        for (unsigned int i = begin; i < end; ++i) 
+        {
+            std::cout <<  bytes[i];
+            if(i%16 == 15)   std::cout << "\n";
+        }
+    }
 }
 
 /**
@@ -254,3 +274,163 @@ int Dumper::endOfEvent(const int event) const
     return 0;
 
 }
+
+void Dumper::readData(int nbytes) const
+{
+   std::fstream streamer(fFilePath.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
+   if(streamer)
+   {
+        std::fstream::pos_type size = streamer.tellg();
+        std::cout << fFilePath << " " << size << "\n";
+   } 
+   else perror(fFilePath.c_str());
+}
+
+    std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary); 
+
+    streamer.read((char*)&bytes[0], bytes.size());
+    if(nbytes==1)
+    {
+        vector<uint8_t> bytesvec(Dumper::getsize()/1);
+        for(int jj=0;jj<bytesvec.size(),j++)
+        {
+          bytesvec[jj]=atoi(bytes[jj]);
+        }
+    }
+    else 
+    {
+        if(nbytes==2)
+        {
+            vector<uint16_t*> bytesvec(Dumper::getsize()/2);
+            vector<unsigned char> twobytes(2);
+            int yy=0;
+            //unsigned char aa;
+            /*
+            la parte commentata è se vogliamo invertire direttamente dall'array di bytes, quella non commentata se vogliamo
+            lasciare l'array originale e solo storare i caratteri invertiti e convertiti in un altro array 
+            */
+            for(int uu=0;uu<bytesvec.size();uu++)
+            {
+                if((uu%2)==0)
+                {
+                    //aa=bytes[uu];
+                    //bytes[uu]=bytes[uu+1];
+                    //bytes[uu+1]=aa;
+                    twobytes[1]=bytes[uu];
+                    twobytes[0]=bytes[uu+1];
+                    bytesvec[yy]=(uint16_t*)twobytes;
+                    yy++;
+                }
+            }
+
+        }
+        else
+        {
+            vector<uint32_t> bytesvec(Dumper::getsize()/4);
+            vector<unsigned char> fourbytes(4);
+            //unsigned char aa;
+            int yy=0;
+            for(int uu=0;uu<bytesvec.size(),uu++)
+            {
+                if((uu%4)==0)
+                {
+                    /*int bb=0, cc=3;
+                    while(bb<cc)
+                    {
+                        aa=bytes[uu+bb];
+                        bytes[uu+bb]=bytes[uu+cc];
+                        bytes[uu+cc]=aa;
+                    }
+                    for(int hl=0;hl<4;hl++) fourbytes[hl]=bytes[uu+hl];
+                    */
+                    fourbytes[0]=bytes[uu+3];
+                    fourbytes[1]=bytes[uu+2];
+                    fourbytes[2]=bytes[uu+1];
+                    fourbytes[3]=bytes[uu];
+                    bytesvec[yy]=(uint32_t*)fourbytes;
+                    yy++;
+                }
+            }
+        }
+    }
+    for (int i = begin; i < end; ++i) {
+        std::cout <<  bytes[i];
+        if(i%16 == 15)   std::cout << "\n";
+    }
+}
+
+/**
+ * @brief Prints 16 bytes from the selected position (both in hexadecimal and in ascii)
+ * 
+ * @param pos 
+ */
+void Dumper::printLine(const int pos) const
+{
+    for(int i=0; i<16; i++)     std::cout << fDumpedBytes[pos+i];
+    std::cout << "\n";
+    for(int i=0; i<16; i++)     printf("%02X ", fDumpedBytes[pos+i]);
+    std::cout << "\n";
+}
+
+void Dumper::checkFirstEventSize() const 
+{
+    std::vector<uint8_t> bytes;
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+
+    if(streamer.good())
+    {
+        char buffer[2];
+        streamer.read(buffer, 2);
+        int firstEventSize = (buffer[0] << 8) | buffer[1];
+        std::cout << "The first event size is " << int(firstEventSize) << ".\n";
+
+        //std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+        //bytes = vec_buffer;
+        //streamer.close();
+    }
+    else    throw std::exception();
+
+    //uint8_t temp[2];
+    //for(int i=0; i<2; i++)  temp[i] = bytes[i];
+    //uint16_t firstEventSize = *((uint16_t*)temp);
+//
+    //std::cout << "The first event size is " << int(firstEventSize) << ".\n";
+    //for(int i=int(firstEventSize)-16; i<int(firstEventSize); i++) std::cout << bytes[i];
+    //std::cout << "\n";
+}
+
+/**
+ * @brief Returns the position for the end of the selected event.
+ * 
+ * @param event 
+ * @return const int 
+ */
+int Dumper::endOfEvent(const int event) const
+{
+    int current_event = 0;
+    std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
+
+    const int BUFFER_SIZE = 16;
+    char buffer[BUFFER_SIZE];
+    
+    while(streamer)
+    {
+        streamer.read(buffer, BUFFER_SIZE);
+        if(strncmp(buffer, "HHHHHHHHHHHHHHHH", BUFFER_SIZE) == 0)   
+        {
+            std::cout << "Event " << current_event << " ends at line " << streamer.tellg() << ".\n";
+            if(current_event == event)  
+            {
+                streamer.close();
+                return streamer.tellg();
+            }
+            current_event++;
+        }
+    }
+    streamer.close();
+    std::cerr << "\033[93mEvent not found\033[0m" << "\n";
+    return 0;
+
+}
+
+
