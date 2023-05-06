@@ -12,6 +12,7 @@ class Dumper
         void printSize() const;
         void testPrint() const;
         void readToTxt() const;
+        void readData(int nbytes) const;
 
 
     private:
