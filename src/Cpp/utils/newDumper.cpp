@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdint.h>
 #include <iterator>
+#include <variant>
 
 #include <TString.h>    /* to use Form */
 
@@ -230,7 +231,7 @@ void NewDumper::printModulesInfo(const int nModules, const bool onFile, const ch
     }
 }
 
-void NewDumper::readData(int nbytes) const
+Basevec NewDumper::readData(int nbytes) const
 {
     /*vector<unsigned char> bytes(Dumper::getSize(), 0);
 
@@ -243,6 +244,7 @@ void NewDumper::readData(int nbytes) const
     int sizeD=8;
     if(nbytes==1)
     {
+        Vec8 vet;
         unsigned char onebyte[1];
         uint8_t* bytesvec[sizeD];
         for(int jj=0;jj<sizeD;jj++)
@@ -250,12 +252,15 @@ void NewDumper::readData(int nbytes) const
           onebyte[0]=bytes[jj];
           bytesvec[jj]=(uint8_t*)onebyte;
         }
+        for(int ii=0;ii<sizeD;ii++) vet.vet8.push_back(*bytesvec[ii]);
+        return vet;
     }
+
     else 
     {
         if(nbytes==2)
         {
-    
+            Vec16 vet;
             uint16_t* bytesvec[int(sizeD/2.)];
             unsigned char twobytes[2];
             int yy=0;
@@ -278,11 +283,13 @@ void NewDumper::readData(int nbytes) const
                     yy++;
                 }
             }
-            
-
+            for(int ii=0;ii<sizeD;ii++) vet.vet16.push_back(*bytesvec[ii]);
+            return vet;
         }
+
         else
         {
+            Vec32 vet;
             uint32_t* bytesvec[int(sizeD/4.)];
             unsigned char fourbytes[4];
             //unsigned char aa;
@@ -309,6 +316,8 @@ void NewDumper::readData(int nbytes) const
                     yy++;
                 }
             }
+            for(int ii=0;ii<sizeD;ii++) vet.vet32.push_back(*bytesvec[ii]);
+            return vet;
         }
     }
 }
