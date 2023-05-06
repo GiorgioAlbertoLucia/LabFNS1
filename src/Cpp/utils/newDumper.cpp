@@ -232,32 +232,39 @@ void NewDumper::printModulesInfo(const int nModules, const bool onFile, const ch
 
 void NewDumper::readData(int nbytes) const
 {
-    vector<unsigned char> bytes(NewDumper::getSize(), 0);
+    /*vector<unsigned char> bytes(Dumper::getSize(), 0);
 
     std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary); 
 
-    streamer.read((char*)&bytes[0], bytes.size());
+    streamer.read((char*)&bytes[0], bytes.size());*/
+    std::vector<unsigned char> bytes={0x12,0x34,0x56,0x78,0x9a,0xbc,0xde,0x25};//esempio
+
+    //int sizeD=Dumper::getSize();
+    int sizeD=8;
     if(nbytes==1)
     {
-        vector<uint8_t> bytesvec(NewDumper::getSize()/1);
-        for(int jj=0;jj<bytesvec.size();jj++)
+        unsigned char onebyte[1];
+        uint8_t* bytesvec[sizeD];
+        for(int jj=0;jj<sizeD;jj++)
         {
-            //bytesvec[jj]=atoi(bytes[jj]);   // NOTE: check here
+          onebyte[0]=bytes[jj];
+          bytesvec[jj]=(uint8_t*)onebyte;
         }
     }
     else 
     {
         if(nbytes==2)
         {
-            vector<uint16_t*> bytesvec(NewDumper::getSize()/2);
-            vector<unsigned char> twobytes(2);
+    
+            uint16_t* bytesvec[int(sizeD/2.)];
+            unsigned char twobytes[2];
             int yy=0;
             //unsigned char aa;
             /*
             la parte commentata è se vogliamo invertire direttamente dall'array di bytes, quella non commentata se vogliamo
             lasciare l'array originale e solo storare i caratteri invertiti e convertiti in un altro array 
             */
-            for(int uu=0;uu<bytesvec.size();uu++)
+            for(int uu=0;uu<sizeD;uu++)
             {
                 if((uu%2)==0)
                 {
@@ -266,19 +273,21 @@ void NewDumper::readData(int nbytes) const
                     //bytes[uu+1]=aa;
                     twobytes[1]=bytes[uu];
                     twobytes[0]=bytes[uu+1];
-                    //bytesvec[yy]=*(uint16_t*)twobytes;
+                    bytesvec[yy]=(uint16_t*)twobytes;
+                    std::cout<<std::hex<<*bytesvec[yy]<<std::endl;
                     yy++;
                 }
             }
+            
 
         }
         else
         {
-            vector<uint32_t> bytesvec(NewDumper::getSize()/4);
-            vector<unsigned char> fourbytes(4);
+            uint32_t* bytesvec[int(sizeD/4.)];
+            unsigned char fourbytes[4];
             //unsigned char aa;
             int yy=0;
-            for(int uu=0;uu<bytesvec.size();uu++)
+            for(int uu=0;uu<sizeD;uu++)
             {
                 if((uu%4)==0)
                 {
@@ -295,7 +304,8 @@ void NewDumper::readData(int nbytes) const
                     fourbytes[1]=bytes[uu+2];
                     fourbytes[2]=bytes[uu+1];
                     fourbytes[3]=bytes[uu];
-                    //bytesvec[yy]=*(uint32_t*)fourbytes;
+                    bytesvec[yy]=(uint32_t*)fourbytes;
+                    std::cout<<std::hex<<*bytesvec[yy]<<std::endl;
                     yy++;
                 }
             }
