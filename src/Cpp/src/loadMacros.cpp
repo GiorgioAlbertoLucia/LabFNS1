@@ -13,6 +13,6 @@ void loadMacros(TString myopt="")
     if (myopt.Contains("clean"))    gSystem->Exec("bash clean.sh");
 
     gSystem->CompileMacro("src/Cpp/src/hello.cpp",opt.Data(),"","src/Cpp/build");
-    gSystem->CompileMacro("src/Cpp/utils/dumper.cpp",opt.Data(),"","src/Cpp/build");
+    gSystem->CompileMacro("src/Cpp/utils/newDumper.cpp",opt.Data(),"","src/Cpp/build");
     gSystem->CompileMacro("src/Cpp/utils/fileManager.cpp",opt.Data(),"","src/Cpp/build");
 }

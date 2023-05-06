@@ -8,7 +8,7 @@
 
 #include <TString.h>    /* to use Form */
 
-#include "dumper.hpp"
+#include "newDumper.hpp"
 
 /*  PROTECTED   */
 
@@ -17,7 +17,7 @@
  * of events in the file.
  * 
  */
-void Dumper::findEvents()
+void NewDumper::findEvents()
 {
     std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
 
@@ -39,22 +39,97 @@ void Dumper::findEvents()
 
 /*    PUBLIC    */
 
-Dumper::Dumper(const char * filePath, const char * outputPath):
+NewDumper::NewDumper(const char * filePath, const char * outputPath):
     fFilePath(filePath), fOutputPath(outputPath)
 {
-    Dumper::findEvents();
+    NewDumper::findEvents();
 
-    fBytesSize = Dumper::getSize();
+    fBytesSize = NewDumper::getSize();
     fDumpedBytes = new char[fBytesSize];
 
     std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
     streamer.read((char*)&fDumpedBytes[0], fBytesSize);
 }
 
-Dumper::~Dumper()
+NewDumper::~NewDumper()
 {
     if(fBytesSize > 0)  delete []fDumpedBytes;
 }
+
+
+/**
+ * @brief Returns the size of the file (number of bytes)
+ * 
+ * @return const int 
+ */
+unsigned int NewDumper::getSize() const
+{
+
+    std::fstream streamer(fFilePath.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
+    if(streamer)
+    {
+        streamer.seekg(0, std::ios::end);
+        std::streamsize size = streamer.tellg();
+        return size;
+    } 
+    else    throw std::exception();
+    return 0;
+}
+
+
+/**
+ * @brief Read the size of the event directly from the .dat file.
+ * 
+ * @param event 
+ * @return unsigned int 
+ */
+unsigned int NewDumper::readEventSize(const int event) const
+{
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+    int eventBeginPos = 0;
+
+    if(streamer.good())
+    {
+        for(int current_event = 0; current_event < fnEvents; current_event++)
+        {
+            std::vector<uint8_t> buffer(2, 0);
+            streamer.read(reinterpret_cast<char*>(buffer.data()), 2);
+            uint16_t eventSize = (buffer[0] << 8) | buffer[1];
+            if(current_event == event)  return (unsigned int)eventSize;
+
+            eventBeginPos += eventSize;
+            streamer.seekg(eventSize, std::ios::beg);
+        }
+        streamer.close();
+    }
+    else    throw std::exception();
+    return 0;
+}
+
+/**
+ * @brief Read the module status as a 16-bit variable. The module status information is stored in byte 6-7 of each event.
+ * 
+ * @param event 
+ * @return uint16_t 
+ */
+uint16_t NewDumper::readModulesStatus(const int event) const
+{
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+
+    if(streamer.good())
+    {
+        streamer.seekg(fEventPosition[event]+6, std::ios::beg);
+        std::vector<uint8_t> buffer(2, 0);
+        streamer.read(reinterpret_cast<char*>(buffer.data()), 2);
+        uint16_t moduleStatus = (buffer[0] << 8) | buffer[1];
+        streamer.close();
+
+        return moduleStatus;
+    }
+    else    throw std::exception();
+    return 0;
+}
+
 
 /**
  * @brief Prints an event in ASCII. Actual data will not be read correctly on terminal, but key information of detectors will
@@ -64,16 +139,16 @@ Dumper::~Dumper()
  * @param onFile whether to produce an output file
  * @param outFile path to the file to write the event to
  */
-void Dumper::printEvent(const unsigned int event, const bool onFile, const char * outFile) const
+void NewDumper::printEvent(const unsigned int event, const bool onFile, const char * outFile) const
 {
     std::string outFileStr(outFile);
-    if(outFile == "")   outFileStr = Form("data/output/dump_%devent.txt", event);
+    if(strcmp(outFile, "") == 0)   outFileStr = Form("data/output/dump_%devent.txt", event);
 
     const unsigned  int first_pos = fEventPosition[event];
     if(event >= fnEvents-1) throw std::exception();
     const unsigned int final_pos = fEventPosition[event+1];
 
-    Dumper::printSection(first_pos, final_pos, onFile, outFileStr.c_str());
+    NewDumper::printSection(first_pos, final_pos, onFile, outFileStr.c_str());
 }
 
 /**
@@ -85,13 +160,13 @@ void Dumper::printEvent(const unsigned int event, const bool onFile, const char 
  * @param onFile whether to produce and output file
  * @param outFile path to the file to write to
  */
-void Dumper::printSection(const unsigned int begin, const unsigned int end, const bool onFile, const char * outFile) const
+void NewDumper::printSection(const unsigned int begin, const unsigned int end, const bool onFile, const char * outFile) const
 {
     std::vector<uint8_t> bytes;
-    std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
     if(streamer.good())
     {
-        std::vector<unsigned char> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+        std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
         bytes = vec_buffer;
         streamer.close();
     }
@@ -117,23 +192,116 @@ void Dumper::printSection(const unsigned int begin, const unsigned int end, cons
 }
 
 /**
- * @brief Returns the size of the file (number of bytes)
+ * @brief Prints modules information (stored after the first 16 bytes, 64 bytes per module)
  * 
- * @return const int 
+ * @param nModules number of modules used 
+ * @param onFile whether the output should be save to a file
+ * @param outFile file to save the output to
  */
-int Dumper::getSize() const
+void NewDumper::printModulesInfo(const int nModules, const bool onFile, const char * outFile) const
 {
-   std::fstream streamer(fFilePath.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
-   if(streamer)
-   {
-        std::fstream::pos_type size = streamer.tellg();
-        return size;
-   } 
-   else perror(fFilePath.c_str());
-   return 0;
+    std::vector<uint8_t> bytes(64*nModules);
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+    streamer.seekg(16, std::ios::beg);
+
+    if(streamer.good())
+    {
+        streamer.read(reinterpret_cast<char*>(bytes.data()), 64*nModules);
+        streamer.close();
+    }
+    else    throw std::exception();
+
+    if(onFile)
+    {
+        std::ofstream outStreamer(outFile, std::ios::out);
+        for (unsigned int i = 0; i < bytes.size(); i++) 
+        {
+            outStreamer <<  bytes[i];
+            if(i%64 == 63)   outStreamer << "\n";
+        }
+    }
+    else
+    {
+        for (unsigned int i = 0; i < bytes.size(); i++) 
+        {
+            std::cout <<  bytes[i];
+            if(i%64 == 63)   std::cout << "\n";
+        }
+    }
 }
 
+void NewDumper::readData(int nbytes) const
+{
+    vector<unsigned char> bytes(NewDumper::getSize(), 0);
 
+    std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary); 
+
+    streamer.read((char*)&bytes[0], bytes.size());
+    if(nbytes==1)
+    {
+        vector<uint8_t> bytesvec(NewDumper::getSize()/1);
+        for(int jj=0;jj<bytesvec.size();jj++)
+        {
+            //bytesvec[jj]=atoi(bytes[jj]);   // NOTE: check here
+        }
+    }
+    else 
+    {
+        if(nbytes==2)
+        {
+            vector<uint16_t*> bytesvec(NewDumper::getSize()/2);
+            vector<unsigned char> twobytes(2);
+            int yy=0;
+            //unsigned char aa;
+            /*
+            la parte commentata è se vogliamo invertire direttamente dall'array di bytes, quella non commentata se vogliamo
+            lasciare l'array originale e solo storare i caratteri invertiti e convertiti in un altro array 
+            */
+            for(int uu=0;uu<bytesvec.size();uu++)
+            {
+                if((uu%2)==0)
+                {
+                    //aa=bytes[uu];
+                    //bytes[uu]=bytes[uu+1];
+                    //bytes[uu+1]=aa;
+                    twobytes[1]=bytes[uu];
+                    twobytes[0]=bytes[uu+1];
+                    //bytesvec[yy]=*(uint16_t*)twobytes;
+                    yy++;
+                }
+            }
+
+        }
+        else
+        {
+            vector<uint32_t> bytesvec(NewDumper::getSize()/4);
+            vector<unsigned char> fourbytes(4);
+            //unsigned char aa;
+            int yy=0;
+            for(int uu=0;uu<bytesvec.size();uu++)
+            {
+                if((uu%4)==0)
+                {
+                    /*int bb=0, cc=3;
+                    while(bb<cc)
+                    {
+                        aa=bytes[uu+bb];
+                        bytes[uu+bb]=bytes[uu+cc];
+                        bytes[uu+cc]=aa;
+                    }
+                    for(int hl=0;hl<4;hl++) fourbytes[hl]=bytes[uu+hl];
+                    */
+                    fourbytes[0]=bytes[uu+3];
+                    fourbytes[1]=bytes[uu+2];
+                    fourbytes[2]=bytes[uu+1];
+                    fourbytes[3]=bytes[uu];
+                    //bytesvec[yy]=*(uint32_t*)fourbytes;
+                    yy++;
+                }
+            }
+        }
+    }
+}
 
 
 ////////////////////////////////////// OLD FUNCTIONS //////////////////////////////////
@@ -142,35 +310,15 @@ int Dumper::getSize() const
  * @brief Prints the size of the file
  * 
  */
-void Dumper::printSize() const
+void NewDumper::printSize() const
 {
-    std::vector<uint8_t> bytes;
-    std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
-    if(streamer.good())
-    {
-        std::vector<unsigned char> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
-        bytes = vec_buffer;
-        streamer.close();
-    }
-    else    throw std::exception();
-
-    if(onFile)
-    {
-        std::ofstream outStreamer(outFile, std::ios::out);
-        for (unsigned int i = begin; i < end; ++i) 
-        {
-            outStreamer <<  bytes[i];
-            if(i%16 == 15)   outStreamer << "\n";
-        }
-    }
-    else
-    {
-        for (unsigned int i = begin; i < end; ++i) 
-        {
-            std::cout <<  bytes[i];
-            if(i%16 == 15)   std::cout << "\n";
-        }
-    }
+    std::fstream streamer(fFilePath.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
+   if(streamer)
+   {
+        std::fstream::pos_type size = streamer.tellg();
+        std::cout << fFilePath << " " << size << "\n";
+   } 
+   else perror(fFilePath.c_str());
 }
 
 /**
@@ -179,7 +327,7 @@ void Dumper::printSize() const
  * @param begin 
  * @param end 
  */
-void Dumper::testPrint(const int begin, const int end) const
+void NewDumper::testPrint(const int begin, const int end) const
 {
     std::vector<uint8_t> bytes;
     std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
@@ -206,25 +354,32 @@ void Dumper::testPrint(const int begin, const int end) const
  * 
  * @param pos 
  */
-void Dumper::printLine(const int pos) const
+void NewDumper::printLine(const int pos) const
 {
-    for(int i=0; i<16; i++)     std::cout << fDumpedBytes[pos+i];
+    const int size = NewDumper::getSize();
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+    std::vector<uint8_t> buffer(size, 0);
+
+    if(streamer.good())         streamer.read(reinterpret_cast<char*>(buffer.data()), 16);
+    else    throw std::exception();
+
+    for(int i=0; i<16; i++)     std::cout << buffer[pos+i];
     std::cout << "\n";
-    for(int i=0; i<16; i++)     printf("%02X ", fDumpedBytes[pos+i]);
+    for(int i=0; i<16; i++)     printf("%02X ", buffer[pos+i]);
     std::cout << "\n";
 }
 
-void Dumper::checkFirstEventSize() const 
+void NewDumper::checkFirstEventSize() const 
 {
-    std::vector<uint8_t> bytes;
     std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
 
     if(streamer.good())
     {
-        char buffer[2];
-        streamer.read(buffer, 2);
-        int firstEventSize = (buffer[0] << 8) | buffer[1];
-        std::cout << "The first event size is " << int(firstEventSize) << ".\n";
+        std::vector<uint8_t> buffer(2, 0);
+        streamer.read(reinterpret_cast<char*>(buffer.data()), 2);
+        uint16_t firstEventSize = (buffer[0] << 8) | buffer[1];
+        std::cout << "The first event size is " << std::hex << firstEventSize << " (in dec: ";
+        std::cout << std::dec << firstEventSize << ").\n";
 
         //std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
         //bytes = vec_buffer;
@@ -247,165 +402,7 @@ void Dumper::checkFirstEventSize() const
  * @param event 
  * @return const int 
  */
-int Dumper::endOfEvent(const int event) const
-{
-    int current_event = 0;
-    std::ifstream streamer(fFilePath.c_str(), std::ios::binary);
-
-    const int BUFFER_SIZE = 16;
-    char buffer[BUFFER_SIZE];
-    
-    while(streamer)
-    {
-        streamer.read(buffer, BUFFER_SIZE);
-        if(strncmp(buffer, "HHHHHHHHHHHHHHHH", BUFFER_SIZE) == 0)   
-        {
-            std::cout << "Event " << current_event << " ends at line " << streamer.tellg() << ".\n";
-            if(current_event == event)  
-            {
-                streamer.close();
-                return streamer.tellg();
-            }
-            current_event++;
-        }
-    }
-    streamer.close();
-    std::cerr << "\033[93mEvent not found\033[0m" << "\n";
-    return 0;
-
-}
-
-void Dumper::readData(int nbytes) const
-{
-   std::fstream streamer(fFilePath.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
-   if(streamer)
-   {
-        std::fstream::pos_type size = streamer.tellg();
-        std::cout << fFilePath << " " << size << "\n";
-   } 
-   else perror(fFilePath.c_str());
-}
-
-    std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary); 
-
-    streamer.read((char*)&bytes[0], bytes.size());
-    if(nbytes==1)
-    {
-        vector<uint8_t> bytesvec(Dumper::getsize()/1);
-        for(int jj=0;jj<bytesvec.size(),j++)
-        {
-          bytesvec[jj]=atoi(bytes[jj]);
-        }
-    }
-    else 
-    {
-        if(nbytes==2)
-        {
-            vector<uint16_t*> bytesvec(Dumper::getsize()/2);
-            vector<unsigned char> twobytes(2);
-            int yy=0;
-            //unsigned char aa;
-            /*
-            la parte commentata è se vogliamo invertire direttamente dall'array di bytes, quella non commentata se vogliamo
-            lasciare l'array originale e solo storare i caratteri invertiti e convertiti in un altro array 
-            */
-            for(int uu=0;uu<bytesvec.size();uu++)
-            {
-                if((uu%2)==0)
-                {
-                    //aa=bytes[uu];
-                    //bytes[uu]=bytes[uu+1];
-                    //bytes[uu+1]=aa;
-                    twobytes[1]=bytes[uu];
-                    twobytes[0]=bytes[uu+1];
-                    bytesvec[yy]=(uint16_t*)twobytes;
-                    yy++;
-                }
-            }
-
-        }
-        else
-        {
-            vector<uint32_t> bytesvec(Dumper::getsize()/4);
-            vector<unsigned char> fourbytes(4);
-            //unsigned char aa;
-            int yy=0;
-            for(int uu=0;uu<bytesvec.size(),uu++)
-            {
-                if((uu%4)==0)
-                {
-                    /*int bb=0, cc=3;
-                    while(bb<cc)
-                    {
-                        aa=bytes[uu+bb];
-                        bytes[uu+bb]=bytes[uu+cc];
-                        bytes[uu+cc]=aa;
-                    }
-                    for(int hl=0;hl<4;hl++) fourbytes[hl]=bytes[uu+hl];
-                    */
-                    fourbytes[0]=bytes[uu+3];
-                    fourbytes[1]=bytes[uu+2];
-                    fourbytes[2]=bytes[uu+1];
-                    fourbytes[3]=bytes[uu];
-                    bytesvec[yy]=(uint32_t*)fourbytes;
-                    yy++;
-                }
-            }
-        }
-    }
-    for (int i = begin; i < end; ++i) {
-        std::cout <<  bytes[i];
-        if(i%16 == 15)   std::cout << "\n";
-    }
-}
-
-/**
- * @brief Prints 16 bytes from the selected position (both in hexadecimal and in ascii)
- * 
- * @param pos 
- */
-void Dumper::printLine(const int pos) const
-{
-    for(int i=0; i<16; i++)     std::cout << fDumpedBytes[pos+i];
-    std::cout << "\n";
-    for(int i=0; i<16; i++)     printf("%02X ", fDumpedBytes[pos+i]);
-    std::cout << "\n";
-}
-
-void Dumper::checkFirstEventSize() const 
-{
-    std::vector<uint8_t> bytes;
-    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
-
-    if(streamer.good())
-    {
-        char buffer[2];
-        streamer.read(buffer, 2);
-        int firstEventSize = (buffer[0] << 8) | buffer[1];
-        std::cout << "The first event size is " << int(firstEventSize) << ".\n";
-
-        //std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
-        //bytes = vec_buffer;
-        //streamer.close();
-    }
-    else    throw std::exception();
-
-    //uint8_t temp[2];
-    //for(int i=0; i<2; i++)  temp[i] = bytes[i];
-    //uint16_t firstEventSize = *((uint16_t*)temp);
-//
-    //std::cout << "The first event size is " << int(firstEventSize) << ".\n";
-    //for(int i=int(firstEventSize)-16; i<int(firstEventSize); i++) std::cout << bytes[i];
-    //std::cout << "\n";
-}
-
-/**
- * @brief Returns the position for the end of the selected event.
- * 
- * @param event 
- * @return const int 
- */
-int Dumper::endOfEvent(const int event) const
+int NewDumper::endOfEvent(const int event) const
 {
     int current_event = 0;
     std::ifstream streamer(fFilePath.c_str(), std::ios::binary);

@@ -3,20 +3,25 @@
 #include <vector>
 #include <format>
 
-class Dumper
+class NewDumper
 {
     public:
-        Dumper(){};
-        Dumper(const char * filePath, const char * outputPath);
-        ~Dumper();
+        NewDumper(){};
+        NewDumper(const char * filePath, const char * outputPath);
+        ~NewDumper();
 
         std::vector<unsigned int> getEventPositions() const {return fEventPosition;};
         unsigned int getEventPosition(const unsigned int event) const {return fEventPosition[event];};
         unsigned int getNEvents() const {return fnEvents;};
-        int getSize() const;
+        unsigned int getSize() const;
+
+        unsigned int readEventSize(const int event) const;
+        uint16_t readModulesStatus(const int event) const;
 
         void printEvent(const unsigned int event, const bool onFile = false, const char * outFile = "") const;
         void printSection(const unsigned int begin, const unsigned int end, const bool onFile = false, const char * outFile = "") const;
+        void printModulesInfo(const int nModules, const bool onFile = false, const char * outFile = "data/output/modulesInfo.txt") const;
+        void readData(int nbytes) const;
 
         /////////////////////////////
 
@@ -27,7 +32,6 @@ class Dumper
         void printSize() const;
         void testPrint(const int begin, const int end) const;
         void readToTxt() const;
-        void readData(int nbytes) const;
 
     protected:
         void findEvents();
