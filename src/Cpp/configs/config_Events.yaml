@@ -1,8 +1,33 @@
+DataFileName: example_pedestal.dat
+
 NModules: 6
-DataTypes: 
-  - unsigned
-  - double
-  - unsigned
-  - double
-  - unsigned
-  - double
+
+Module 1
+  Bits: 64
+  Channels: 16
+  DataType: double
+  
+Module 2
+  Bits: 64
+  Channels: 16
+  DataType: unsigned
+  
+Module 3
+  Bits: 64
+  Channels: 16
+  DataType: double
+  
+Module 4
+  Bits: 64
+  Channels: 16
+  DataType: unsigned
+  
+Module 5
+  Bits: 64
+  Channels: 16
+  DataType: double
+  
+Module 6
+  Bits: 64
+  Channels: 16
+  DataType: unsigned

@@ -7,11 +7,12 @@
 class Module
 {
 public:
-    Module(/* args */);
+    Module(unsigned nbytes, unsigned nchannels);
     ~Module();
 
     unsigned GetBits()                  {return fBits;}
     unsigned GetChannels()              {return fChannels;}
+    
     template<typename T>
     T GetData();
     
