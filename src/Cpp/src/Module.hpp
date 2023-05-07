@@ -9,7 +9,8 @@
 class Module
 {
 public:
-    //Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<unsigned> data);
+    Module() = default;
+    Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<unsigned> data);
 
     Module& SetData(std::vector<unsigned>);
 
