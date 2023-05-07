@@ -1,12 +1,24 @@
 #include "Module.hpp"
 
-Module::Module(unsigned nbytes, unsigned nchannels):
-    fBits(nbytes), fChannels(nchannels)
+Module::Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<unsigned> data):
+fBits(nBits), 
+fChannels(nChannels),
+fActiveChannels(ActiveChannels)
 {
-    fDataUnsigned = {1,2,3}; 
-    fDataDouble = {2.,6.};
+    SetData(data);
 }
 
-Module::~Module()
+
+Module& Module::SetData(std::vector<unsigned> data)
 {
+    CheckData(data);
+    fData=data;
+    return *this;
+}
+
+
+void Module::CheckData(std::vector<unsigned> data)
+{
+    if (data.size()!=fActiveChannels)
+        throw runtime_error("The number of data is different from the one specified as ActiveChannels");
 }

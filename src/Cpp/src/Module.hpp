@@ -2,36 +2,30 @@
 #define MODULE_H
 
 #include <iostream>
+#include <vector>
 #include <typeinfo>
+#include <stdexcept>
 
 class Module
 {
 public:
-    Module(unsigned nbytes, unsigned nchannels);
-    ~Module();
+    //Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<unsigned> data);
+
+    Module& SetData(std::vector<unsigned>);
 
     unsigned GetBits()                  {return fBits;}
     unsigned GetChannels()              {return fChannels;}
     
-    template<typename T>
-    T GetData();
-    
+    std::vector<unsigned> GetData()     {return fData;}
+    std::vector<double> GetDataDouble() {return fDataDouble;}
 
 private:
-    unsigned fBits, fChannels;
-    std::vector<unsigned> fDataUnsigned;
+    unsigned fBits, fChannels, fActiveChannels;
+    std::vector<unsigned> fData;
     std::vector<double> fDataDouble;
 
+    void CheckData(std::vector<unsigned> data);
 };
-
-template<typename T>
-T Module::GetData()
-{
-    if (typeid(T).name()==typeid(std::vector<unsigned>).name())
-        return static_cast<T>(fDataUnsigned);
-    else if (typeid(T).name()==typeid(std::vector<double>).name())
-        return static_cast<T>(fDataDouble);
-}
 
 
 

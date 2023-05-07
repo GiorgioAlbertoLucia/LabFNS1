@@ -1,27 +1,34 @@
-#include "event.hpp"
-#include ".hpp"
+#include "Event.hpp"
+#include "Run.hpp"
 
 
-Run::Run(string cfgFileName):fConfigFile(YAML::LoadFile(cfgFileName.Data())),
-fDataFileName(fConfigFile["DataFileName"].as<std::string>()),
-fNmodules(fConfigFile["NModules"].as<unsigned int>()),
+Run::Run(std::string cfgFileName)
 {
+    Yaml::Parse(fConfigFile, cfgFileName.c_str());
+    fDataFileName = fConfigFile["DataFileName"].As<std::string>();
+    fNmodules = fConfigFile["NModules"].As<unsigned>();
 
-    for(int i=1; i<fNmodules; i++){
-        unsigned int nbits = fConfigFile["Module" + std::to_string(i)]["Bits"].as<unsigned int>();
-        unsigned int nchannels = fConfigFile["Module" + std::to_string(i)]["Channels"].as<unsigned int>();
-        Module module(nbytes, nchannels);
-        fModules.push_back(module);
+    Yaml::Node& item = fConfigFile["Modules"];
+    for(auto it = item.Begin(); it != item.End(); it++)
+    {
+        Yaml::Node& ModuleSetting = (*it).second;
+        std::cout<< ModuleSetting["DataType"].As<std::string>()<<std::endl;
     }
+    //for(int i=1; i<fNmodules; i++){
+    //    unsigned int nbits = fConfigFile["Module" + std::to_string(i)]["Bits"].as<unsigned int>();
+    //    unsigned int nchannels = fConfigFile["Module" + std::to_string(i)]["Channels"].as<unsigned int>();
+    //    Module module(nbytes, nchannels);
+    //    fModules.push_back(module);
+    //}
 
     std::string outpath = "../../../data/input/";
     std::string filepath = outpath + fDataFileName;
 
-    NewDumper dumper(filepath.c_str(), outpath.c_str());
+    //NewDumper dumper(filepath.c_str(), outpath.c_str());
 
-    for(unsigned i=0; i<dumper.getNEvents(); i++){
-        Event event(i, dumper);
-        fModules[i].fillData(event.fData[i]);
-    }
+    //for(unsigned i=0; i<dumper.getNEvents(); i++){
+    //    Event event(i, dumper);
+    //    fModules[i].fillData(event.fData[i]);
+    //}
     
 }

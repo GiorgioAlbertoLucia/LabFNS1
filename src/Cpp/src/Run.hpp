@@ -4,17 +4,19 @@
 #include <vector>
 #include <string>
 #include "Module.hpp"
- 
+#include "../../../utils/yaml/Yaml.hpp"
+
 class Run
 {
 
 public:
-    Run(string cfgFileName);
+    Run(std::string cfgFileName);
     
 private:
-    YAML::Node fConfigFile;
+    Yaml::Node fConfigFile;
     std::vector<Module> fModules;
-    unsigned int fNmodules;
+    std::string fDataFileName;
+    unsigned fNmodules;
 };
  
  
