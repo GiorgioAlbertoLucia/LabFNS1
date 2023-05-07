@@ -16,6 +16,33 @@ Event::Event(std::string cfgFileName)
     std::cout << GetNmodules() <<std::endl;
     for (auto& i: fDataTypesVector)
         std::cout << i<< std::endl;
+
+    //std::vector<uint8_t> eventbytes;
+    //std::ifstream streamer((dumper.fFilePath).c_str(), std::ios::in | std::ios::binary);
+    //if(streamer.good())
+    //{
+    //    streamer.seekg(dumper.getEventPosition(eventnumber), ios_base::beg);
+    //    std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+    //    eventbytes = vec_buffer;
+    //    streamer.close();
+    //}
+    //else    throw std::exception();
+//
+//
+    //SetStatus(((uint16_t)eventbytes[2] << 8) | eventbytes[1]);
+    //if(CheckStatus()){
+    //    
+    //    SetEventNumber(dumper.readData({eventbytes[0]}));
+//
+    //    for(unsigned channel = 0; channel<fNmodules; channel++){
+    //        unsigned int offset = 16;
+//
+    //        fData[channel].push_back(dumper.readData({eventbytes[offset+channel*64],eventbytes[offset+channel*64]+1,
+    //                                                  eventbytes[offset+channel*64]+2,eventbytes[offset+channel*64]+3}));
+    //    }
+//
+    //}    
+
 }
 
 
