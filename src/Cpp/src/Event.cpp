@@ -1,7 +1,13 @@
 #include "Event.h"
 
-Event::Event()
-{}
+Event::Event(std::string cfgFileName)
+{
+    Yaml::Parse(fConfigFile ,cfgFileName);
+    std::cout << fConfigFile["NModules"].As<int>() <<std::endl;
+
+}
+
+
 
 /**
  * @brief Function that checks the CAMAC Q state of the modules
