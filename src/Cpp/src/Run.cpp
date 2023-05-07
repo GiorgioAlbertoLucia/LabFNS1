@@ -1,4 +1,4 @@
-#include "Event.hpp"
+//#include "Event.hpp"
 #include "Run.hpp"
 
 
@@ -8,11 +8,14 @@ Run::Run(std::string cfgFileName)
     fDataFileName = fConfigFile["DataFileName"].As<std::string>();
     fNmodules = fConfigFile["NModules"].As<unsigned>();
 
-    Yaml::Node& item = fConfigFile["Modules"];
-    for(auto it = item.Begin(); it != item.End(); it++)
+    Yaml::Node& modules = fConfigFile["Modules"];
+    for(auto it = modules.Begin(); it != modules.End(); it++)
     {
         Yaml::Node& ModuleSetting = (*it).second;
         std::cout<< ModuleSetting["DataType"].As<std::string>()<<std::endl;
+        fModules.push_back(Module(ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
+            ModuleSetting["ActiveChannels"].As<unsigned>(), {1,2}));
+        std::cout<< fModules.back().GetChannels() << std::endl;
     }
     //for(int i=1; i<fNmodules; i++){
     //    unsigned int nbits = fConfigFile["Module" + std::to_string(i)]["Bits"].as<unsigned int>();
