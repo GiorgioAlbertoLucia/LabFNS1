@@ -49,7 +49,7 @@ class NewDumper
         char * fDumpedBytes;         // [fBytesSize] array containing entire file byte by byte
         int fBytesSize;
 };
- 
+
 //************************************************************
 
 class Basevec
@@ -64,20 +64,17 @@ class Vec8: public Basevec
 {
     public:
        std::vector<uint8_t> data;
-       void print(){} override;
 };
 
 class Vec16: public Basevec
 {
     public:
         std::vector<uint16_t> data;
-        void print(){} override;
 };
 
 class Vec32: public Basevec
 {
     public:
         std::vector<uint32_t> data;
-        void print(){} override;
 };
 
