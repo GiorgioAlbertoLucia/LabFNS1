@@ -1,6 +1,10 @@
 #include <Riostream.h>
 #include <string>
 #include <vector>
+#include <variant>
+#include <cstdint>
+#include <memory>
+
 
 class NewDumper
 {
@@ -20,7 +24,7 @@ class NewDumper
         void printEvent(const unsigned int event, const bool onFile = false, const char * outFile = "") const;
         void printSection(const unsigned int begin, const unsigned int end, const bool onFile = false, const char * outFile = "") const;
         void printModulesInfo(const int nModules, const bool onFile = false, const char * outFile = "data/output/modulesInfo.txt") const;
-        void readData(int nbytes) const;
+        Basevec readData(int nbytes) const;
 
         /////////////////////////////
 
@@ -44,4 +48,32 @@ class NewDumper
 
         char * fDumpedBytes;         // [fBytesSize] array containing entire file byte by byte
         int fBytesSize;
+}; 
+//************************************************************
+class Basevec
+{
+    public:
+        virtual ~Basevec()=default;
+        virtual void print()=0;
+
 };
+
+
+class Vec8: public Basevec
+{
+    public:
+       std::vector<uint8_t> data;
+};
+
+class Vec16: public Basevec
+{
+    public:
+        std::vector<uint16_t> data;
+};
+
+class Vec32: public Basevec
+{
+    public:
+        std::vector<uint32_t> data;
+};
+
