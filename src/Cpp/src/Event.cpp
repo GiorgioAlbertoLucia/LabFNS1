@@ -1,4 +1,4 @@
-#include "Event.h"
+#include "Event.hpp"
 
 /*    PUBLIC    */
 
@@ -8,14 +8,24 @@ Event::Event(std::string cfgFileName)
     SetNmodules(fConfigFile["NModules"].As<unsigned>());
 
     std::vector<std::string> datatypes;
-    Yaml::Node& item = fConfigFile["DataTypes"];
-    for(auto it = item.Begin(); it != item.End(); it++)
-        datatypes.push_back((*it).second.As<std::string>() );
+
+    Yaml::Node& modules = fConfigFile["Modules"];
+    //Creates vector of modules with the settings from config file
+    for(auto it = modules.Begin(); it != modules.End(); it++)
+    {
+        Yaml::Node& ModuleSetting = (*it).second;
+        fModules.push_back(Module(ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
+            ModuleSetting["ActiveChannels"].As<unsigned>()));
+        datatypes.push_back(ModuleSetting["DataType"].As<std::string>() );
+    }
+    //TODO: check consistency of Nmodules and size of fModules
 
     SetDataTypes(datatypes);
-    std::cout << GetNmodules() <<std::endl;
-    for (auto& i: fDataTypesVector)
-        std::cout << i<< std::endl;
+
+    //TODO: Fill events with dumper
+    SetEventsRandom();
+
+    Print();
 
     //std::vector<uint8_t> eventbytes;
     //std::ifstream streamer((dumper.fFilePath).c_str(), std::ios::in | std::ios::binary);
@@ -46,23 +56,6 @@ Event::Event(std::string cfgFileName)
 }
 
 
-std::vector<double> Event::GetModuleNDouble(unsigned n)      
-{
-    std::vector<double> vec;
-    for (auto i:fData[n])
-        vec.push_back(std::get<double>(i));
-    return vec;
-}
-
-std::vector<unsigned> Event::GetModuleNUnsigned(unsigned n)      
-{
-    std::vector<unsigned> vec;
-    for (auto i:fData[n])
-        vec.push_back(std::get<unsigned>(i));
-    return vec;
-}
-
-
 /**
  * @brief Function that checks the CAMAC Q state of the modules
  * 
@@ -77,14 +70,34 @@ bool Event::CheckStatus()
     return true;
 }
 
+Event& Event::SetEventsRandom()
+{
+    std::vector<uint64_t> vec;
+    for (auto& i: fModules)
+    {
+        for (unsigned j=0; j<i.GetActiveChannels(); j++)
+            vec.push_back(gRandom->Integer(100));
+        i.SetData(vec);
+        vec.clear();
+    }
+    return *this;        
+}
+
+Event& Event::Print()
+{
+    for (unsigned i=0; i<fModules.size(); i++)
+    {
+        std::cout<<"Module "<<i<<": ";
+        fModules[i].Print();
+        std::cout<<std::endl;
+    }
+    return *this;
+}
+
+
 Event& Event::SetNmodules(unsigned Nmodules)
 {
     fNmodules=Nmodules;
-    if (fData.size()>0)
-        std::cout<<"\033[93mChanging the number of modules deletes the existing data, be careful!\033[0m"<<std::endl;
-    fData.clear();
-    for (unsigned i=0; i<fNmodules; i++)
-        fData.push_back({});
     return *this;
 }
 
@@ -104,32 +117,22 @@ Event& Event::SetDataTypes(std::vector<std::string> DataTypes)
 Event& Event::SetModuleNDouble(unsigned n, std::vector<double> Data)
 {
     if (fDataTypesVector.size()>n && fDataTypesVector[n]==fDouble)
-    {
-        fDataVector newdata;
-        for (auto i: Data)
-            newdata.push_back(i);
-        SetModuleNData(n, newdata);
-    }
+        fModules[n].SetDataDouble(Data);
     else if (fDataTypesVector[n]!=fDouble)
-        std::cout<<"\033[93mThe "<<n<<" th module does not store double data\033[0m"<<std::endl;
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th module does not store double data"));
     else if (fDataTypesVector.size()<=n)
-        std::cout<<"\033[93mThe "<<n<<" th data type is not specified\033[0m"<<std::endl;    
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th data type is not specified"));
     return *this;
 }
 
-Event& Event::SetModuleNUnsigned(unsigned n, std::vector<unsigned> Data)
+Event& Event::SetModuleNUnsigned(unsigned n, std::vector<uint64_t> Data)
 {
     if (fDataTypesVector.size()>n && fDataTypesVector[n]==fUnsigned)
-    {
-        fDataVector newdata;
-        for (auto i: Data)
-            newdata.push_back(i);
-        SetModuleNData(n, newdata);
-    }
+        fModules[n].SetData(Data);
     else if (fDataTypesVector[n]!=fUnsigned)
-        std::cout<<"\033[93mThe "<<n<<" th module does not store unsigned data\033[0m"<<std::endl;
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th module does not store double data"));
     else if (fDataTypesVector.size()<=n)
-        std::cout<<"\033[93mThe "<<n<<" th data type is not specified\033[0m"<<std::endl;   
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th data type is not specified"));
     return *this;
 }
 
