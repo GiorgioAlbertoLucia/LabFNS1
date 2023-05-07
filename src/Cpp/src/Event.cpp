@@ -1,12 +1,39 @@
 #include "Event.h"
 
+/*    PUBLIC    */
+
 Event::Event(std::string cfgFileName)
 {
-    Yaml::Parse(fConfigFile ,cfgFileName);
-    std::cout << fConfigFile["NModules"].As<int>() <<std::endl;
+    Yaml::Parse(fConfigFile ,cfgFileName.c_str());
+    SetNmodules(fConfigFile["NModules"].As<unsigned>());
 
+    std::vector<std::string> datatypes;
+    Yaml::Node& item = fConfigFile["DataTypes"];
+    for(auto it = item.Begin(); it != item.End(); it++)
+        datatypes.push_back((*it).second.As<std::string>() );
+
+    SetDataTypes(datatypes);
+    std::cout << GetNmodules() <<std::endl;
+    for (auto& i: fDataTypesVector)
+        std::cout << i<< std::endl;
 }
 
+
+std::vector<double> Event::GetModuleNDouble(unsigned n)      
+{
+    std::vector<double> vec;
+    for (auto i:fData[n])
+        vec.push_back(std::get<double>(i));
+    return vec;
+}
+
+std::vector<unsigned> Event::GetModuleNUnsigned(unsigned n)      
+{
+    std::vector<unsigned> vec;
+    for (auto i:fData[n])
+        vec.push_back(std::get<unsigned>(i));
+    return vec;
+}
 
 
 /**
@@ -31,6 +58,19 @@ Event& Event::SetNmodules(unsigned Nmodules)
     fData.clear();
     for (unsigned i=0; i<fNmodules; i++)
         fData.push_back({});
+    return *this;
+}
+
+Event& Event::SetDataTypes(std::vector<std::string> DataTypes)
+{
+    CheckTypesConsistency(DataTypes);
+    for (auto& i:DataTypes)
+    {
+        if (i=="unsigned")
+            fDataTypesVector.push_back(fUnsigned);
+        else if (i=="double")
+            fDataTypesVector.push_back(fDouble);
+    }    
     return *this;
 }
 
@@ -66,19 +106,11 @@ Event& Event::SetModuleNUnsigned(unsigned n, std::vector<unsigned> Data)
     return *this;
 }
 
-
-std::vector<double> Event::GetModuleNDouble(unsigned n)      
+void Event::CheckTypesConsistency(std::vector<std::string> DataTypes)
 {
-    std::vector<double> vec;
-    for (auto i:fData[n])
-        vec.push_back(std::get<double>(i));
-    return vec;
-}
-
-std::vector<unsigned> Event::GetModuleNUnsigned(unsigned n)      
-{
-    std::vector<unsigned> vec;
-    for (auto i:fData[n])
-        vec.push_back(std::get<unsigned>(i));
-    return vec;
+    if (DataTypes.size()!=fNmodules)
+        throw runtime_error("The number of specified data types differs from the number of modules");
+    for (auto& i:DataTypes)
+        if (i!="double" && i!="unsigned")
+            throw runtime_error("Only double and unsigned types are allowed");
 }
