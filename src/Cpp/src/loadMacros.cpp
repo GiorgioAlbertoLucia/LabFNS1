@@ -1,8 +1,10 @@
 #include <TSystem.h>
 #include <TString.h>
+#include "../../Python/loader.hpp"
 
 void loadMacros(TString myopt="")
 {
+    loader();
     gSystem->AddIncludePath((string("-I ")+gSystem->GetWorkingDirectory()+"src/Cpp/build").c_str());
     
     TString opt;

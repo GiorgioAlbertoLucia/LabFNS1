@@ -94,6 +94,7 @@ unsigned int NewDumper::readEventSize(const int event) const
         {
             std::vector<uint8_t> buffer(2, 0);
             streamer.read(reinterpret_cast<char*>(buffer.data()), 2);
+
             uint16_t eventSize = (buffer[0] << 8) | buffer[1];
             if(current_event == event)  return (unsigned int)eventSize;
 
@@ -232,11 +233,14 @@ void NewDumper::printModulesInfo(const int nModules, const bool onFile, const ch
 
 void NewDumper::readData(int nbytes) const
 {
-    vector<unsigned char> bytes(NewDumper::getSize(), 0);
+    //vector<unsigned char> bytes(NewDumper::getSize(), 0);
+//
+    //std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary); 
+//
+    //streamer.read((char*)&bytes[0], bytes.size());
 
-    std::fstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary); 
+    std::vector<unsigned char> bytes={0x12,0x34,0x56,0x78,0x9a,0xbc};
 
-    streamer.read((char*)&bytes[0], bytes.size());
     if(nbytes==1)
     {
         vector<uint8_t> bytesvec(NewDumper::getSize()/1);
@@ -249,15 +253,15 @@ void NewDumper::readData(int nbytes) const
     {
         if(nbytes==2)
         {
-            vector<uint16_t*> bytesvec(NewDumper::getSize()/2);
-            vector<unsigned char> twobytes(2);
+            uint16_t* bytesvec[3];
+            uint8_t twobytes[2];
             int yy=0;
             //unsigned char aa;
             /*
             la parte commentata è se vogliamo invertire direttamente dall'array di bytes, quella non commentata se vogliamo
             lasciare l'array originale e solo storare i caratteri invertiti e convertiti in un altro array 
             */
-            for(int uu=0;uu<bytesvec.size();uu++)
+            for(int uu=0;uu<6;uu++)
             {
                 if((uu%2)==0)
                 {
@@ -266,7 +270,9 @@ void NewDumper::readData(int nbytes) const
                     //bytes[uu+1]=aa;
                     twobytes[1]=bytes[uu];
                     twobytes[0]=bytes[uu+1];
-                    //bytesvec[yy]=*(uint16_t*)twobytes;
+                    bytesvec[yy]=(uint16_t*)twobytes;
+                    
+                    std::cout<<std::hex<<*bytesvec[yy]<<std::endl;
                     yy++;
                 }
             }
