@@ -12,28 +12,37 @@ class Module
 public:
     Module() = default;
     Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels);
-    Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint64_t> data);
+    Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data);
+    Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint16_t> data);
+    Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data);
 
-    Module& SetData(std::vector<uint64_t>);
-    Module& SetDataDouble(std::vector<double>);
+
+    Module& SetData(std::vector<uint8_t>);
+    Module& SetData(std::vector<uint16_t>);
+    Module& SetData(std::vector<uint32_t>);
+
     Module& SetBits(unsigned bits)              {fBits = bits; return *this;}
 
     Module& Print();
 
-    unsigned GetBits()                  {return fBits;}
-    unsigned GetChannels()              {return fChannels;}
-    unsigned GetActiveChannels()        {return fActiveChannels;}
+    unsigned GetBits() const                    {return fBits;}
+    unsigned GetChannels() const                {return fChannels;}
+    unsigned GetActiveChannels() const          {return fActiveChannels;}
     
-    std::vector<uint64_t> GetData()     {return fData;}
-    std::vector<double> GetDataDouble() {return fDataDouble;}
+    std::vector<uint8_t> GetData8bit() const    {return fData;}
+    std::vector<uint16_t> GetData16bit() const  {return fData;}
+    std::vector<uint32_t> GetData32bit() const  {return fData;}
+    
 
 private:
     unsigned fBits, fChannels, fActiveChannels;
-    std::vector<uint64_t> fData;
-    std::vector<double> fDataDouble;
-
-    void CheckData(std::vector<uint64_t> data);
-    void CheckData(std::vector<double> data);
+    std::vector<uint8_t> fData8bit;
+    std::vector<uint16_t> fData16bit;
+    std::vector<uint32_t> fData32bit;
+    
+    void CheckData(std::vector<uint8_t> data);
+    void CheckData(std::vector<uint16_t> data);
+    void CheckData(std::vector<uint32_t> data);
 };
 
 

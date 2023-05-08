@@ -1,3 +1,6 @@
+#ifndef NEWDUMPER_H
+#define NEWDUMPER_H
+
 #include <Riostream.h>
 #include <string>
 #include <vector>
@@ -81,3 +84,4 @@ class Vec32: public Basevec
         void print(){} override;
 };
 
+#endif
