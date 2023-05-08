@@ -305,8 +305,19 @@ Basevec NewDumper::readData(int nbytes) const
                     std::cout<<std::hex<<*bytesvec[yy]<<std::endl;
                     yy++;
                 }
+                cout<<"yy vale "<<yy<<endl;
+                 std::cout<<std::hex<<*bytesvec[yy-1]<<std::endl;
             }
-            for(int ii=0;ii<sizeD;ii++) vet.data.push_back(*bytesvec[ii]);
+            cout<<"bbbb"<<endl;
+            for(int ii=0;ii<int(sizeD/2);ii++) 
+            {
+                std::cout<<std::hex<<*bytesvec[ii]<<std::endl;
+                std::cout<<"cc"<<std::endl;
+                vet.data.push_back(*bytesvec[ii]); 
+                std::cout<<std::hex<<*bytesvec[ii]<<std::endl;
+            }
+            std::cout<<"aaaaaaa"<<std::endl;
+            for(int ff=0;ff<sizeD/2;ff++) std::cout<<vet.data[ff]<<std::endl;
             return vet;
         }
 
