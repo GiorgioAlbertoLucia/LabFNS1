@@ -5,6 +5,31 @@
 #include <cstdint>
 #include <memory>
 
+class Basevec
+{
+    public:
+        virtual ~Basevec()=default;
+        
+
+};
+
+class Vec8: public Basevec
+{
+    public:
+       std::vector<uint8_t> data;
+};
+
+class Vec16: public Basevec
+{
+    public:
+        std::vector<uint16_t> data;
+};
+
+class Vec32: public Basevec
+{
+    public:
+        std::vector<uint32_t> data;
+};
 
 class NewDumper
 {
@@ -53,29 +78,5 @@ class NewDumper
 
 //************************************************************
 
-class Basevec
-{
-    public:
-        virtual ~Basevec()=default;
-        virtual void print()=0;
 
-};
-
-class Vec8: public Basevec
-{
-    public:
-       std::vector<uint8_t> data;
-};
-
-class Vec16: public Basevec
-{
-    public:
-        std::vector<uint16_t> data;
-};
-
-class Vec32: public Basevec
-{
-    public:
-        std::vector<uint32_t> data;
-};
 

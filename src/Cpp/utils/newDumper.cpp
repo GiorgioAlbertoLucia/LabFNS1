@@ -275,7 +275,7 @@ Basevec NewDumper::readData(int nbytes) const
           onebyte[0]=bytes[jj];
           bytesvec[jj]=(uint8_t*)onebyte;
         }
-        for(int ii=0;ii<sizeD;ii++) vet.vet8.push_back(*bytesvec[ii]);
+        for(int ii=0;ii<sizeD;ii++) vet.data.push_back(*bytesvec[ii]);
         return vet;
     }
 
@@ -306,7 +306,7 @@ Basevec NewDumper::readData(int nbytes) const
                     yy++;
                 }
             }
-            for(int ii=0;ii<sizeD;ii++) vet.vet16.push_back(*bytesvec[ii]);
+            for(int ii=0;ii<sizeD;ii++) vet.data.push_back(*bytesvec[ii]);
             return vet;
         }
 
@@ -339,7 +339,7 @@ Basevec NewDumper::readData(int nbytes) const
                     yy++;
                 }
             }
-            for(int ii=0;ii<sizeD;ii++) vet.vet32.push_back(*bytesvec[ii]);
+            for(int ii=0;ii<sizeD;ii++) vet.data.push_back(*bytesvec[ii]);
             return vet;
         }
     }
