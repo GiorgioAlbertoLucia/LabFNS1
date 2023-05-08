@@ -1,5 +1,9 @@
 #include "Module.hpp"
 
+/*
+    PUBLIC
+*/
+
 Module::Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data):
 fBits(nBits), 
 fChannels(nChannels),
@@ -52,6 +56,24 @@ Module& Module::SetData(std::vector<uint32_t> data)
     return *this;
 }
 
+Module& Module::Print()
+{
+    std::cout<<"[ ";
+    if (fType==fUnsigned)
+        for (auto& i:fData)
+            std::cout<<i<<" ";
+    else if (fType==fDouble)
+        for (auto& i:fDataDouble)
+            std::cout<<i<<" ";
+    std::cout<<"] ";
+    
+    return *this;
+}
+
+/*
+    PRIVATE
+*/
+
 
 void Module::CheckData(std::vector<uint8_t> data)
 {
@@ -72,16 +94,3 @@ void Module::CheckData(std::vector<uint32_t> data)
 }
 
 
-Module& Module::Print()
-{
-    std::cout<<"[ ";
-    if (fType==fUnsigned)
-        for (auto& i:fData)
-            std::cout<<i<<" ";
-    else if (fType==fDouble)
-        for (auto& i:fDataDouble)
-            std::cout<<i<<" ";
-    std::cout<<"] ";
-    
-    return *this;
-}

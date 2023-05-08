@@ -23,7 +23,7 @@ public:
     enum fDataTypes {fUnsigned, fDouble};
 
     Module& SetBits(unsigned bits)              {fBits = bits; return *this;}
-    Module& SetType(unsigned type)      {fType=type; return *this;}
+    Module& SetType(unsigned type)              {fType=type; return *this;}
 
     Module& Print();
 
