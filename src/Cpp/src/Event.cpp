@@ -104,21 +104,27 @@ Event& Event::SetNmodules(unsigned Nmodules)
 Event& Event::SetDataTypes(std::vector<std::string> DataTypes)
 {
     CheckTypesConsistency(DataTypes);
-    for (auto& i:DataTypes)
+    for (unsigned i=0; i<DataTypes.size(); i++)
     {
-        if (i=="unsigned")
-            fDataTypesVector.push_back(fUnsigned);
-        else if (i=="double")
-            fDataTypesVector.push_back(fDouble);
+        if (DataTypes[i]=="unsigned")
+        {
+            fModules[i].SetType(Module::fUnsigned);
+            fDataTypesVector.push_back(Module::fUnsigned);
+        }
+        else if (DataTypes[i]=="double")
+        {
+            fModules[i].SetType(Module::fDouble);
+            fDataTypesVector.push_back(Module::fDouble);
+        }
     }    
     return *this;
 }
 
 Event& Event::SetModuleNDouble(unsigned n, std::vector<double> Data)
 {
-    if (fDataTypesVector.size()>n && fDataTypesVector[n]==fDouble)
+    if (fDataTypesVector.size()>n && fDataTypesVector[n]==Module::fDouble)
         fModules[n].SetDataDouble(Data);
-    else if (fDataTypesVector[n]!=fDouble)
+    else if (fDataTypesVector[n]!=Module::fDouble)
         throw runtime_error(std::string("The") + std::to_string(n) +std::string("th module does not store double data"));
     else if (fDataTypesVector.size()<=n)
         throw runtime_error(std::string("The") + std::to_string(n) +std::string("th data type is not specified"));
@@ -127,9 +133,9 @@ Event& Event::SetModuleNDouble(unsigned n, std::vector<double> Data)
 
 Event& Event::SetModuleNUnsigned(unsigned n, std::vector<uint64_t> Data)
 {
-    if (fDataTypesVector.size()>n && fDataTypesVector[n]==fUnsigned)
+    if (fDataTypesVector.size()>n && fDataTypesVector[n]==Module::fUnsigned)
         fModules[n].SetData(Data);
-    else if (fDataTypesVector[n]!=fUnsigned)
+    else if (fDataTypesVector[n]!=Module::fUnsigned)
         throw runtime_error(std::string("The") + std::to_string(n) +std::string("th module does not store double data"));
     else if (fDataTypesVector.size()<=n)
         throw runtime_error(std::string("The") + std::to_string(n) +std::string("th data type is not specified"));

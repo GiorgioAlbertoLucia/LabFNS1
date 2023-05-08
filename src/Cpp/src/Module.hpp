@@ -20,8 +20,10 @@ public:
     Module& SetData(std::vector<uint8_t>);
     Module& SetData(std::vector<uint16_t>);
     Module& SetData(std::vector<uint32_t>);
+    enum fDataTypes {fUnsigned, fDouble};
 
     Module& SetBits(unsigned bits)              {fBits = bits; return *this;}
+    Module& SetType(unsigned type)      {fType=type; return *this;}
 
     Module& Print();
 
