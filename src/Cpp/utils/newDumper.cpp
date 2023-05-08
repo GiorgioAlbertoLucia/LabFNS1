@@ -132,6 +132,28 @@ uint16_t NewDumper::readModulesStatus(const int event) const
     return 0;
 }
 
+/**
+ * @brief Reads a section of the file between two given position into a vector of uint8_t.
+ * 
+ * @param begin first byte
+ * @param end last byte (not printed)
+ */
+std::vector<uint8_t> NewDumper::readSection(const unsigned int begin, const unsigned int end) const
+{
+    std::vector<uint8_t> bytes;
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+    if(streamer.good())
+    {
+        std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+        bytes = vec_buffer;
+        streamer.close();
+    }
+    else    throw std::exception();
+    
+    return bytes;
+}
+
+
 
 /**
  * @brief Prints an event in ASCII. Actual data will not be read correctly on terminal, but key information of detectors will
