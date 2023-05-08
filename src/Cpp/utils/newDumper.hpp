@@ -23,6 +23,7 @@ class NewDumper
 
         unsigned int readEventSize(const int event) const;
         uint16_t readModulesStatus(const int event) const;
+        std::vector<uint8_t> readSection(const unsigned int begin, const unsigned int end);
 
         void printEvent(const unsigned int event, const bool onFile = false, const char * outFile = "") const;
         void printSection(const unsigned int begin, const unsigned int end, const bool onFile = false, const char * outFile = "") const;
