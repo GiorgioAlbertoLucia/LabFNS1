@@ -19,7 +19,6 @@ public:
     Event() = default;
     Event(std::string cfgFileName);
     bool CheckStatus();                                                     // Checks CAMAC Q state for each module
-    enum fDataTypes {fUnsigned, fDouble};
 
     Event& SetEventsRandom();
 

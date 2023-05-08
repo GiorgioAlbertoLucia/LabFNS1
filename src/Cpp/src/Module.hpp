@@ -13,10 +13,12 @@ public:
     Module() = default;
     Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels);
     Module(unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint64_t> data);
+    enum fDataTypes {fUnsigned, fDouble};
 
     Module& SetData(std::vector<uint64_t>);
     Module& SetDataDouble(std::vector<double>);
     Module& SetBits(unsigned bits)              {fBits = bits; return *this;}
+    Module& SetType(unsigned type)      {fType=type; return *this;}
 
     Module& Print();
 
@@ -28,7 +30,7 @@ public:
     std::vector<double> GetDataDouble() {return fDataDouble;}
 
 private:
-    unsigned fBits, fChannels, fActiveChannels;
+    unsigned fBits, fChannels, fActiveChannels, fType;
     std::vector<uint64_t> fData;
     std::vector<double> fDataDouble;
 

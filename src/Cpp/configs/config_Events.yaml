@@ -6,7 +6,7 @@ Modules:
   - Bits: 64
     Channels: 16
     ActiveChannels: 2
-    DataType: double
+    DataType: unsigned
   - Bits: 64
     Channels: 16
     ActiveChannels: 2
@@ -14,7 +14,7 @@ Modules:
   - Bits: 64
     Channels: 16
     ActiveChannels: 2
-    DataType: double
+    DataType: unsigned
   - Bits: 64
     Channels: 16
     ActiveChannels: 2
@@ -22,7 +22,7 @@ Modules:
   - Bits: 64
     Channels: 16
     ActiveChannels: 2
-    DataType: double
+    DataType: unsigned
   - Bits: 64
     Channels: 16
     ActiveChannels: 2

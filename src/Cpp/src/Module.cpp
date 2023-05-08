@@ -46,8 +46,12 @@ void Module::CheckData(std::vector<double> data)
 Module& Module::Print()
 {
     std::cout<<"[ ";
-    for (auto& i:fData)
-        std::cout<<i<<" ";
+    if (fType==fUnsigned)
+        for (auto& i:fData)
+            std::cout<<i<<" ";
+    else if (fType==fDouble)
+        for (auto& i:fDataDouble)
+            std::cout<<i<<" ";
     std::cout<<"] ";
     
     return *this;
