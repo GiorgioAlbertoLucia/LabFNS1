@@ -132,6 +132,28 @@ uint16_t NewDumper::readModulesStatus(const int event) const
     return 0;
 }
 
+/**
+ * @brief Reads a section of the file between two given position into a vector of uint8_t.
+ * 
+ * @param begin first byte
+ * @param end last byte (not printed)
+ */
+std::vector<uint8_t> NewDumper::readSection(const unsigned int begin, const unsigned int end) const
+{
+    std::vector<uint8_t> bytes;
+    std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+    if(streamer.good())
+    {
+        std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+        bytes = vec_buffer;
+        streamer.close();
+    }
+    else    throw std::exception();
+    
+    return bytes;
+}
+
+
 
 /**
  * @brief Prints an event in ASCII. Actual data will not be read correctly on terminal, but key information of detectors will
@@ -283,8 +305,19 @@ Basevec NewDumper::readData(int nbytes) const
                     std::cout<<std::hex<<*bytesvec[yy]<<std::endl;
                     yy++;
                 }
+                cout<<"yy vale "<<yy<<endl;
+                 std::cout<<std::hex<<*bytesvec[yy-1]<<std::endl;
             }
-            for(int ii=0;ii<sizeD;ii++) vet.data.push_back(*bytesvec[ii]);
+            cout<<"bbbb"<<endl;
+            for(int ii=0;ii<int(sizeD/2);ii++) 
+            {
+                std::cout<<std::hex<<*bytesvec[ii]<<std::endl;
+                std::cout<<"cc"<<std::endl;
+                vet.data.push_back(*bytesvec[ii]); 
+                std::cout<<std::hex<<*bytesvec[ii]<<std::endl;
+            }
+            std::cout<<"aaaaaaa"<<std::endl;
+            for(int ff=0;ff<sizeD/2;ff++) std::cout<<vet.data[ff]<<std::endl;
             return vet;
         }
 
