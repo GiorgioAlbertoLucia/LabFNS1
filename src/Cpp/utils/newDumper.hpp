@@ -5,7 +5,31 @@
 #include <cstdint>
 #include <memory>
 
-//#include <format>
+class Basevec
+{
+    public:
+        virtual ~Basevec()=default;
+        
+
+};
+
+class Vec8: public Basevec
+{
+    public:
+       std::vector<uint8_t> data;
+};
+
+class Vec16: public Basevec
+{
+    public:
+        std::vector<uint16_t> data;
+};
+
+class Vec32: public Basevec
+{
+    public:
+        std::vector<uint32_t> data;
+};
 
 class NewDumper
 {
@@ -21,6 +45,7 @@ class NewDumper
 
         unsigned int readEventSize(const int event) const;
         uint16_t readModulesStatus(const int event) const;
+        std::vector<uint8_t> readSection(const unsigned int begin, const unsigned int end) const;
 
         void printEvent(const unsigned int event, const bool onFile = false, const char * outFile = "") const;
         void printSection(const unsigned int begin, const unsigned int end, const bool onFile = false, const char * outFile = "") const;
@@ -53,29 +78,5 @@ class NewDumper
 
 //************************************************************
 
-class Basevec
-{
-    public:
-        virtual ~Basevec()=default;
-        virtual void print()=0;
 
-};
-
-class Vec8: public Basevec
-{
-    public:
-       std::vector<uint8_t> data;
-};
-
-class Vec16: public Basevec
-{
-    public:
-        std::vector<uint16_t> data;
-};
-
-class Vec32: public Basevec
-{
-    public:
-        std::vector<uint32_t> data;
-};
 
