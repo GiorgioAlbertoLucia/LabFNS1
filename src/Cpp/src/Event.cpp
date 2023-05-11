@@ -59,7 +59,7 @@ fEventNumber(evenumb)
 bool Event::CheckStatus()
 {
     for (unsigned i=0; i<fNmodules; i++)
-        // Checks leftmost bit which has not been checked yet
+        // Checks if leftmost bit which has not been checked yet is equal to 1
         if (! (1 & fStatus>>(15-i)))
             return false;
     return true;
