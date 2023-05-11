@@ -6,41 +6,45 @@
 #include <vector>
 #include <typeinfo>
 #include <variant>
+#include "Module.hpp"
 
 class Event
 {
 public:
     Event();
+    Event(unsigned evennumb, unsigned nmodules, vector<unsigned> &vectortype, vector<unsigned>& nchan,  NewDumper &Newdumpy);
     bool CheckStatus();                                                     // Checks CAMAC Q state for each module
-    enum fDataTypes {fUnsigned, fDouble};
-    using fDataVector = std::vector<std::variant<unsigned, double>>;
+    //enum fDataTypes {fUnsigned, fDouble};
+    //using fDataVector = std::vector<std::variant<unsigned, double>>;
 
     Event& SetStatus(uint16_t status)                                       {fStatus=status;        return *this;}
     Event& SetNmodules(unsigned Nmodules);                                   
-    Event& SetEventNumber(unsigned EventNumber)                             {fEventNumber=EventNumber;    return *this;}
-    Event& SetDataTypes(std::vector<unsigned> DataTypes)                    {fDataTypesVector=DataTypes;    return *this;}
-    Event& SetModuleNDouble(unsigned n, std::vector<double> Data);
-    Event& SetModuleNUnsigned(unsigned n, std::vector<unsigned> Data);
+    Event& SetEventNumber(unsigned EventNumber)                           {fEventNumber=EventNumber;    return *this;}
+    Event& SetDataTypes(std::vector<unsigned>& DataTypes)                    {fDataTypesVector=DataTypes;    return *this;}
+    //Event& SetModuleNDouble(unsigned n, std::vector<double> Data);
+    //Event& SetModuleNUnsigned(unsigned n, std::vector<unsigned> Data);
 
     uint16_t GetStatus()                        {return fStatus;}
     unsigned GetNmodules()                      {return fNmodules;}
     unsigned GetEventNumber()                   {return fEventNumber;}
-    fDataVector GetModuleNData(unsigned n)      {return fData[n];}
-    std::vector<double> GetModuleNDouble(unsigned n);
-    std::vector<unsigned> GetModuleNUnsigned(unsigned n);
-       
+    //fDataVector GetModuleNData(unsigned n)      {return fData[n];}
+    //std::vector<double> GetModuleNDouble(unsigned n);
+    //std::vector<unsigned> GetModuleNUnsigned(unsigned n);
+    Module getModule(const int indexmod)         {return fmodulesvector[indexmod];}
+    std::vector<Module> getModules()         {return fmodulesvector;}
 
 private:
-    unsigned fEventNumber;
+    unsigned int fEventNumber;
     uint16_t fStatus;
-    unsigned fNmodules;
+    unsigned int  fNmodules;
 
 
     std::vector<unsigned> fDataTypesVector;
+    std::vector<Module> fmodulesvector;
 
-    std::vector<fDataVector> fData;
+    //std::vector<fDataVector> fData;
     
-    Event& SetModuleNData(unsigned n, fDataVector Data)                     {fData[n]=Data; return *this;}
+    //Event& SetModuleNData(unsigned n, fDataVector Data)                     {fData[n]=Data; return *this;}
 };
 
 
