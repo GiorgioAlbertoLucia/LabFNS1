@@ -4,7 +4,7 @@
 
 void loadMacros(TString myopt="")
 {
-    loader();
+    //loader();
     gSystem->AddIncludePath((string("-I ")+gSystem->GetWorkingDirectory()+"src/Cpp/build").c_str());
     
     TString opt;
@@ -17,4 +17,6 @@ void loadMacros(TString myopt="")
     gSystem->CompileMacro("src/Cpp/src/hello.cpp",opt.Data(),"","src/Cpp/build");
     gSystem->CompileMacro("src/Cpp/utils/newDumper.cpp",opt.Data(),"","src/Cpp/build");
     gSystem->CompileMacro("src/Cpp/utils/fileManager.cpp",opt.Data(),"","src/Cpp/build");
+    gSystem->CompileMacro("src/Cpp/src/Module.cpp",opt.Data(),"","src/Cpp/build");
+    gSystem->CompileMacro("src/Cpp/src/Event.cpp",opt.Data(),"","src/Cpp/build");
 }
