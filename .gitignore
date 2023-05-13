@@ -1,7 +1,9 @@
-src/Cpp/build/
-src/Cpp/src/loadMacros_cpp_ACLiC_dict_rdict.pcm
-src/Cpp/src/loadMacros_cpp.d
-src/Cpp/src/loadMacros_cpp.so
+Cpp/build/
+Cpp/src/loadMacros_cpp_ACLiC_dict_rdict.pcm
+Cpp/src/loadMacros_cpp.d
+Cpp/src/loadMacros_cpp.so
+
+data/input/thursday
 
 settings.json
 __pycache__
