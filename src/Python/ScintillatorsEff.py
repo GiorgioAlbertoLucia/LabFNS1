@@ -13,25 +13,65 @@ from StyleFormatter import SetGlobalStyle, SetObjectStyle
 from math import sqrt
 from ROOT import TGraphErrors, TCanvas, TFile, gPad, kAzure
 
-infilePath = "data/input/TestWorkingPointEff.csv"
+SetGlobalStyle(padleftmargin=0.19, padbottommargin=0.19, padtopmargin=0.1, titleoffsety=1.6, titleoffsetx=1.2, titleoffset= 0.7, opttitle=1)
 
-SetGlobalStyle(padleftmargin=0.09, padbottommargin=0.11, padtopmargin=0.1, titleoffsety=0.8, titleoffsetx=0.8, titleoffset= 0.7, opttitle=1)
+def scintEff(input_path, root_file, scint_name):
 
-df=pd.read_csv(infilePath)
-df['Counts err']=np.sqrt(df[[df.columns[0]]])
-canvas = TCanvas("c","c",1280,720)
-canvas.cd()
-canvas.SetLogy()
+    df = pd.read_csv(input_path)
+    df['HV err'] = df['HV[V*1000]']*0.008 + 0.002
+    df['Counts err']=np.sqrt(df['Counts'])
 
-histo = TGraphErrors(len(df),np.asarray(df[df.columns[0]],'d'),np.asarray(df[df.columns[1]],'d'),
-                     np.asarray(df[df.columns[2]],'d'),np.asarray(df[df.columns[3]],'d'))
-histo.SetTitle("S1 Counts")
-histo.GetXaxis().SetTitle("HV")
-histo.GetYaxis().SetTitle("Counts")
+    df['HV[V*1000]'] = df['HV[V*1000]'] * 1000
+    df['HV err'] = df['HV err'] * 1000
 
-SetObjectStyle(histo,color=kAzure+3)
-histo.Draw("APZ")
+    df['Rate'] = df['Counts'] / 300
+    df['Rate err'] = df['Counts err'] / 300
 
-gPad.Modified()
-gPad.Update()
-input('Press enter to continue')
+    histo = TGraphErrors(len(df),np.asarray(df['HV[V*1000]'],'d'),np.asarray(df['Counts'],'d'),
+                     np.asarray(df['HV err'],'d'),np.asarray(df['Counts err'],'d'))
+    histo.SetTitle(f"{scint_name} Counts")
+    histo.GetXaxis().SetTitle("HV [V]")
+    histo.GetYaxis().SetTitle("logN")
+
+    histo2 = TGraphErrors(len(df),np.asarray(df['HV[V*1000]'],'d'),np.asarray(df['Rate'],'d'),
+                     np.asarray(df['HV err'],'d'),np.asarray(df['Rate err'],'d'))
+    histo2.SetTitle(f"{scint_name} Rate")
+    histo2.GetXaxis().SetTitle("HV [V]")
+    histo2.GetYaxis().SetTitle("Rate [Hz]")
+
+    canvas = TCanvas(scint_name, "c" ,1280, 720)
+    canvas.cd()
+    canvas.SetLogy()
+    SetObjectStyle(histo,color=kAzure+3)
+    histo.Draw("APZL")
+
+    canvas2 = TCanvas(f'{scint_name}_rate', "c" ,1280, 720)
+    canvas2.cd()
+    SetObjectStyle(histo2,color=kAzure+3)
+    histo2.Draw("APZL")
+
+    gPad.Modified()
+    gPad.Update()
+
+    root_file.cd()
+    canvas.Write()
+    canvas2.Write()
+
+
+
+
+if __name__ == '__main__':
+    
+    outfilePath = 'data/output/HVwork.root'
+    root_file = TFile(outfilePath, 'recreate')
+
+    infilePaths = ['data/input/HVworkS1.csv',
+                   'data/input/HVworkSG.csv',
+                   'data/input/HVworkS2.csv',
+                   'data/input/HVworkS3.csv']
+    scintNames = ['S1', 'SG', 'S2', 'S3']
+
+    for input_path, scint_name in zip(infilePaths, scintNames):
+        scintEff(input_path, root_file, scint_name)
+
+
