@@ -3,8 +3,6 @@
 
 
 
-Event::Event()
-{}
 
 Event::Event(unsigned evenumb ,unsigned nmodules, vector<unsigned> &vectortype, std::vector<unsigned>& nchan, NewDumper &Newdumpy):
 fNmodules(nmodules),
@@ -65,6 +63,31 @@ bool Event::CheckStatus()
     return true;
 }
 
+Event& Event::SetEventsRandom()
+{
+    std::vector<uint64_t> vec;
+    for (auto& i: fModules)
+    {
+        for (unsigned j=0; j<i.GetActiveChannels(); j++)
+            vec.push_back(gRandom->Integer(100));
+        i.SetData(vec);
+        vec.clear();
+    }
+    return *this;        
+}
+
+Event& Event::Print()
+{
+    for (unsigned i=0; i<fModules.size(); i++)
+    {
+        std::cout<<"Module "<<i<<": ";
+        fModules[i].Print();
+        std::cout<<std::endl;
+    }
+    return *this;
+}
+
+
 Event& Event::SetNmodules(unsigned Nmodules)
 {
     fNmodules=Nmodules;
@@ -79,43 +102,33 @@ Event& Event::SetNmodules(unsigned Nmodules)
 /*
 Event& Event::SetModuleNDouble(unsigned n, std::vector<double> Data)
 {
-    if (fDataTypesVector.size()>n && fDataTypesVector[n]==fDouble)
-    {
-        fDataVector newdata;
-        for (auto i: Data)
-            newdata.push_back(i);
-        SetModuleNData(n, newdata);
-    }
-    else if (fDataTypesVector[n]!=fDouble)
-        std::cout<<"\033[93mThe "<<n<<" th module does not store double data\033[0m"<<std::endl;
+    if (fDataTypesVector.size()>n && fDataTypesVector[n]==Module::fDouble)
+        fModules[n].SetDataDouble(Data);
+    else if (fDataTypesVector[n]!=Module::fDouble)
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th module does not store double data"));
     else if (fDataTypesVector.size()<=n)
-        std::cout<<"\033[93mThe "<<n<<" th data type is not specified\033[0m"<<std::endl;    
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th data type is not specified"));
     return *this;
 }
 
-Event& Event::SetModuleNUnsigned(unsigned n, std::vector<unsigned> Data)
+Event& Event::SetModuleNUnsigned(unsigned n, std::vector<uint64_t> Data)
 {
-    if (fDataTypesVector.size()>n && fDataTypesVector[n]==fUnsigned)
-    {
-        fDataVector newdata;
-        for (auto i: Data)
-            newdata.push_back(i);
-        SetModuleNData(n, newdata);
-    }
-    else if (fDataTypesVector[n]!=fUnsigned)
-        std::cout<<"\033[93mThe "<<n<<" th module does not store unsigned data\033[0m"<<std::endl;
+    if (fDataTypesVector.size()>n && fDataTypesVector[n]==Module::fUnsigned)
+        fModules[n].SetData(Data);
+    else if (fDataTypesVector[n]!=Module::fUnsigned)
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th module does not store double data"));
     else if (fDataTypesVector.size()<=n)
-        std::cout<<"\033[93mThe "<<n<<" th data type is not specified\033[0m"<<std::endl;   
+        throw runtime_error(std::string("The") + std::to_string(n) +std::string("th data type is not specified"));
     return *this;
 }
 
-
-std::vector<double> Event::GetModuleNDouble(unsigned n)      
+void Event::CheckTypesConsistency(std::vector<std::string> DataTypes)
 {
-    std::vector<double> vec;
-    for (auto i:fData[n])
-        vec.push_back(std::get<double>(i));
-    return vec;
+    if (DataTypes.size()!=fNmodules)
+        throw runtime_error("The number of specified data types differs from the number of modules");
+    for (auto& i:DataTypes)
+        if (i!="double" && i!="unsigned")
+            throw runtime_error("Only double and unsigned types are allowed");
 }
 
 std::vector<unsigned> Event::GetModuleNUnsigned(unsigned n)      
