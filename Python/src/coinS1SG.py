@@ -5,7 +5,7 @@ Script for plotting the coincidence curve for S1 abd SG detectors
 import pandas as pd
 import numpy as np
 import sys
-sys.path.append("utils")
+sys.path.append("Python/utils")
 
 from StyleFormatter import SetGlobalStyle, SetObjectStyle
 from math import sqrt
