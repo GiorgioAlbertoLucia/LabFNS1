@@ -1,29 +1,30 @@
 DataFileName: example_pedestal.dat
+TTreeFileName: data/input/Test.root
 
 NModules: 6
 
 Modules:
-  - Bits: 64
+  - Bits: 16
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Bits: 64
+  - Bits: 16
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Bits: 64
+  - Bits: 16
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Bits: 64
+  - Bits: 16
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Bits: 64
+  - Bits: 16
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Bits: 64
+  - Bits: 16
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
