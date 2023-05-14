@@ -2,7 +2,8 @@
 #include "Run.hpp"
 
 
-Run::Run(std::string cfgFileName)
+Run::Run(std::string cfgFileName) :
+fTreeData("TreeData","TreeData")
 {
     Yaml::Parse(fConfigFile, cfgFileName.c_str());
     fDataFileName = fConfigFile["DataFileName"].As<std::string>();
@@ -12,26 +13,65 @@ Run::Run(std::string cfgFileName)
     for(auto it = modules.Begin(); it != modules.End(); it++)
     {
         Yaml::Node& ModuleSetting = (*it).second;
-        std::cout<< ModuleSetting["DataType"].As<std::string>()<<std::endl;
-        fModules.push_back(Module(ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
-            ModuleSetting["ActiveChannels"].As<unsigned>(), {1,2}));
-        std::cout<< fModules.back().GetChannels() << std::endl;
+        fModules.push_back(Module(fModules.size(),ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
+            ModuleSetting["ActiveChannels"].As<unsigned>(), std::vector<uint16_t>{1,2}));
     }
-    //for(int i=1; i<fNmodules; i++){
-    //    unsigned int nbits = fConfigFile["Module" + std::to_string(i)]["Bits"].as<unsigned int>();
-    //    unsigned int nchannels = fConfigFile["Module" + std::to_string(i)]["Channels"].as<unsigned int>();
-    //    Module module(nbytes, nchannels);
-    //    fModules.push_back(module);
-    //}
+
+    TFile outfile(fConfigFile["TTreeFileName"].As<std::string>().c_str(),"recreate");
+    fTreeData.SetDirectory(&outfile);
+    TreeSettings();
+    for (int i = 0; i < 40000; i++)
+    {
+        for (auto& i: fModules)
+            i.SetData(std::vector<uint16_t>{(uint16_t)gRandom->Integer(100),(uint16_t)gRandom->Integer(100)});
+        fTreeData.Fill();
+    }
+    
+    fTreeData.Write("fTreeData",1ULL << ( 2 ));     // 1ULL << ( 2 ) = TObject's kWriteDelete
+    //fTreeData.Write("fTreeData");     // 1ULL << ( 2 ) = TObject's kWriteDelete
+    outfile.Close();
 
     std::string outpath = "../../../data/input/";
     std::string filepath = outpath + fDataFileName;
 
-    //NewDumper dumper(filepath.c_str(), outpath.c_str());
-
-    //for(unsigned i=0; i<dumper.getNEvents(); i++){
-    //    Event event(i, dumper);
-    //    fModules[i].fillData(event.fData[i]);
-    //}
     
+}
+
+
+void Run::TreeSettings()
+{
+    uint8_t   ptr8bit;                  //used to define Branch type
+    uint16_t  ptr16bit;                 //used to define Branch type
+    uint32_t  ptr32bit;                 //used to define Branch type
+
+    for (std::vector<Module>::size_type idxModules = 0; idxModules<fModules.size(); idxModules++)
+    {
+        switch (fModules[idxModules].GetBits())
+        {
+        case 8:
+            for (unsigned idxChannel=0; idxChannel<fModules[idxModules].GetActiveChannels(); idxChannel++)
+                fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr8bit, 32000);
+
+            fModules[idxModules].SetBranchAddress(fTreeData,idxModules);
+            break;
+
+        case 16:
+            for (unsigned idxChannel=0; idxChannel<fModules[idxModules].GetActiveChannels(); idxChannel++)
+                fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr16bit, 32000);
+
+            fModules[idxModules].SetBranchAddress(fTreeData,idxModules);
+            break;
+
+        case 32:
+            for (unsigned idxChannel=0; idxChannel<fModules[idxModules].GetActiveChannels(); idxChannel++)
+                fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr32bit, 32000);
+
+            fModules[idxModules].SetBranchAddress(fTreeData,idxModules);
+            break;
+        
+        default:
+            throw runtime_error("Only 8, 16 and 32 bit data is supported");
+            break;
+        }
+    }
 }

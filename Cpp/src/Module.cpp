@@ -136,5 +136,43 @@ void Module::CheckData(std::vector<uint32_t> data)
 }
 
 
-
-
+void Module::SetBranchAddress(TTree& tree, unsigned countmodule)
+{
+/*
+ *  Function that sets the address of the branch of the output tree to the
+ *  vectors containing the intersections
+ *  -------------------------
+ *  Parameters:
+ *  tree: TTree&
+ *      Tree for data output
+ * 
+ *  countmodule: unsigned
+ *      running count of modules
+ * 
+ */
+    switch (fBits)
+    {
+    case 8:
+        for (unsigned i=0; i<fData8bit.size(); i++)
+        {
+            tree.SetBranchAddress((std::string("Module")+std::to_string(countmodule)+"_"+std::to_string(i)).c_str(), (uint8_t*) &fData8bit[i]);
+        }
+        break;
+    
+    case 16:
+        for (unsigned i=0; i<fData16bit.size(); i++)
+        {
+            tree.SetBranchAddress((std::string("Module")+std::to_string(countmodule)+"_"+std::to_string(i)).c_str(), (uint16_t*) &fData16bit[i]);
+        }
+        break;
+    
+    case 32:
+        for (unsigned i=0; i<fData32bit.size(); i++)
+        {
+            tree.SetBranchAddress((std::string("Module")+std::to_string(countmodule)+"_"+std::to_string(i)).c_str(), (uint32_t*) &fData32bit[i]);
+        }        break;
+    
+    default:
+        break;
+    }
+}
