@@ -79,8 +79,7 @@ def coinccurve(input_path):
     histo2.Write()
 
     # Linear fit on the plateau for fit parameters optimization
-
-    constant = TF1("f1", "[0]", 31, 91)
+    #constant = TF1("f1", "[0]", 31, 91)
 
     FitLowerBoundary = -5
     FitUpperBoundary = 120
