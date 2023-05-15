@@ -6,6 +6,7 @@
 #include <typeinfo>
 #include <stdexcept>
 #include <cstdint>
+#include "TTree.h"
 #include "../utils/newDumper.hpp"
 
 class Module
@@ -35,6 +36,7 @@ public:
     std::vector<uint32_t> GetData32bit() const  {return fData32bit;}
     //void setnModule(Event&);
     
+    void SetBranchAddress(TTree& tree, unsigned countdet);
 
 private:
     std::string fName;
@@ -50,6 +52,7 @@ private:
     void CheckData(std::vector<uint8_t> data);
     void CheckData(std::vector<uint16_t> data);
     void CheckData(std::vector<uint32_t> data);
+
 };
 
 

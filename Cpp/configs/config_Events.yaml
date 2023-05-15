@@ -1,4 +1,5 @@
 DataFileName: example_pedestal.dat
+TTreeFileName: data/input/Test.root
 
 NModules: 6
 
@@ -13,29 +14,23 @@ Modules:
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Name: "V560N - scaler inhibited"
-    Bits: 64
+  - Bits: 64
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Name: "2228A - tdc"
-    Bits: 64
+  - Bits: 64
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Name: "2249W - adc"
-    Bits: 64
+  - Bits: 64
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Name: "V259N - multi-hit patter unit"
-    Bits: 64
+  - Bits: 64
     Channels: 16
     ActiveChannels: 2
     DataType: unsigned
-  - Name: "C211 - programmable delay"
-    Bits: 64
+  - Bits: 64
     Channels: 16
     ActiveChannels: 2
-    DataType: unsigned
     
