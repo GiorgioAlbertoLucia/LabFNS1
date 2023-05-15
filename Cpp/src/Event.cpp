@@ -17,16 +17,16 @@ void Event::InitializeEvent(NewDumper& Newdumpy)
     {
         unsigned int start=0,stop=0,offset=0;
         
-        //if(ii>0)
-        //{
-        //    for(unsigned a=0;a<ii;a++)
-        //    {
-        //        offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
-        //    }
-        //}
+        if(ii>0)
+        {
+            for(unsigned a=0;a<ii;a++)
+            {
+                offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
+            }
+        }
         Module mod = fmodulesvector[ii];
-        //start=16+64*fNmodules+Newdumpy.getEventPosition(fEventNumber)+offset;
-        //stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
+        start=16+64*fNmodules+Newdumpy.getEventPosition(fEventNumber)+offset;
+        stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
         
         if(mod.GetBits()==8) 
         {
