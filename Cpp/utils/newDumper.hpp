@@ -12,8 +12,6 @@ class Basevec
 {
     public:
         virtual ~Basevec()=default;
-        
-
 };
 
 class Vec8: public Basevec
@@ -38,7 +36,7 @@ class NewDumper
 {
     public:
         NewDumper(){};
-        NewDumper(const char * filePath, const char * outputPath);
+        NewDumper(const char * filePath);
         ~NewDumper();
 
         std::vector<unsigned int> getEventPositions() const {return fEventPosition;};
@@ -53,17 +51,9 @@ class NewDumper
         void printEvent(const unsigned int event, const bool onFile = false, const char * outFile = "") const;
         void printSection(const unsigned int begin, const unsigned int end, const bool onFile = false, const char * outFile = "") const;
         void printModulesInfo(const int nModules, const bool onFile = false, const char * outFile = "data/output/modulesInfo.txt") const;
-        //Basevec readData(int nbytes) const;
         template<typename T>
         std::vector<T> readData(const unsigned int startpoint, const unsigned int stoppoint) const;
         
-        //template<typename T>
-        //std::vector<uint8_t> readData(const unsigned int startpoint, const unsigned int stoppoint) const;
-        //template<typename T>
-        //std::vector<uint16_t> readData(const unsigned int startpoint, const unsigned int stoppoint) const;
-        //template<typename T>
-        //std::vector<uint32_t> readData(const unsigned int startpoint, const unsigned int stoppoint) const;
-
         /////////////////////////////
 
         int endOfEvent(const int event) const;
@@ -79,13 +69,9 @@ class NewDumper
 
     private:
         std::string fFilePath;
-        std::string fOutputPath;
 
         std::vector<unsigned int> fEventPosition;       // vector containing the position of the beginning of each event
         unsigned int fnEvents;                          // total number of events stored in the file
-
-        char * fDumpedBytes;         // [fBytesSize] array containing entire file byte by byte
-        int fBytesSize;
 };
 
 

@@ -1,0 +1,26 @@
+DataFileName: example_pedestal.dat
+
+NModules: 4
+
+Modules:
+  - Name: "C257 - scaler"
+    Bits: 32
+    Channels: 16
+    ActiveChannels: 2
+    DataType: unsigned
+  - Name: "V560N - scaler"
+    Bits: 32
+    Channels: 16
+    ActiveChannels: 2
+    DataType: unsigned
+  - Name: "V560N - scaler inhibited"
+    Bits: 32
+    Channels: 16
+    ActiveChannels: 2
+    DataType: unsigned
+  - Name: "2228A - tdc"
+    Bits: 16
+    Channels: 8
+    ActiveChannels: 2
+    DataType: unsigned
+    

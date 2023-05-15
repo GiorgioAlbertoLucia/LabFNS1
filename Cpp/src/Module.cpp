@@ -5,38 +5,42 @@
     PUBLIC
 */
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
-fActiveChannels(ActiveChannels)
+fActiveChannels(ActiveChannels),
+fName(name)
 {
     SetData(data);
 }
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint16_t> data):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint16_t> data, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
-fActiveChannels(ActiveChannels)
+fActiveChannels(ActiveChannels),
+fName(name)
 {
     SetData(data);
 }
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
-fActiveChannels(ActiveChannels)
+fActiveChannels(ActiveChannels),
+fName(name)
 {
     SetData(data);
 }
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
-fActiveChannels(ActiveChannels)
+fActiveChannels(ActiveChannels),
+fName(name)
 {}
 
 /*
@@ -77,40 +81,56 @@ void Module::importData(NewDumper& dumpy, unsigned eventnumber, unsigned nmodule
 
 Module& Module::SetData(std::vector<uint8_t> data)
 {
-    CheckData(data);
+    //CheckData(data);
+    for(auto i: data)   std::cout << std::hex << i << " ";
+    std::cout << std::endl;
     fData8bit=data;
     return *this;
 }
 
 Module& Module::SetData(std::vector<uint16_t> data)
 {
-    CheckData(data);
+    //CheckData(data);
+    for(auto i: data)   std::cout << std::hex << i << " ";
+    std::cout << std::endl;
     fData16bit=data;
     return *this;
 }
 
 Module& Module::SetData(std::vector<uint32_t> data)
 {
-    CheckData(data);
+    //CheckData(data);
+    for(auto i: data)   std::cout << std::hex << i << " ";
+    std::cout << std::endl;
     fData32bit=data;
     return *this;
 }
 
-/*
+
 Module& Module::Print()
 {
+    std::cout << "Module " << nmodule << " : " << fName << "\n";
     std::cout<<"[ ";
-    if (fType==fUnsigned)
-        for (auto& i:fData)
-            std::cout<<i<<" ";
-    else if (fType==fDouble)
-        for (auto& i:fDataDouble)
-            std::cout<<i<<" ";
+    if(fBits == 8)  
+    {
+        std::cout << "fBits = " << fBits << std::endl;
+        for(uint8_t i: fData8bit) std::cout << i << " ";
+    }
+    else if(fBits == 16)  
+    {
+        std::cout << "fBits = " << fBits << std::endl;
+        for(uint16_t i: fData16bit) std::cout << i << " ";
+    }
+    else if(fBits == 32)
+    {
+        std::cout << "fBits = " << fBits << std::endl;
+        for(uint32_t i: fData32bit) std::cout << i << " ";
+    }
     std::cout<<"] ";
     
     return *this;
 }
-*/
+
 
 /*
     PRIVATE
