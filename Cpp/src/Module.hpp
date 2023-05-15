@@ -17,6 +17,7 @@ public:
     Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data, const char * name = " ");
     Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint16_t> data, const char * name = " ");
     Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data, const char * name = " ");
+    Module(const Module& mod);
 
 
     Module& SetData(std::vector<uint8_t>);

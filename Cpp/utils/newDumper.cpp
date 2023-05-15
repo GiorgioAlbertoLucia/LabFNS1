@@ -87,7 +87,7 @@ unsigned int NewDumper::readEventSize(const int event) const
 
     if(streamer.good())
     {
-        for(int current_event = 0; current_event < fnEvents; current_event++)
+        for(unsigned int current_event = 0; current_event < fnEvents; current_event++)
         {
             std::vector<uint8_t> buffer(2, 0);
             streamer.read(reinterpret_cast<char*>(buffer.data()), 2);
@@ -140,11 +140,17 @@ std::vector<uint8_t> NewDumper::readSection(const unsigned int begin, const unsi
     std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
     if(streamer.good())
     {
-        std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
-        bytes = {vec_buffer.begin() + begin, vec_buffer.begin()+end};
+        streamer.seekg(begin);
+        const unsigned int size = end - begin;
+        bytes.reserve(size);
+        streamer.read(reinterpret_cast<char*>(&bytes[0]), size);
         streamer.close();
     }
-    else    throw std::exception();
+    else    
+    {   
+        std::cerr << "NewDumper was unable to open the file" << std::endl;
+        throw std::exception();
+    }
     
     return bytes;
 }
@@ -197,7 +203,13 @@ void NewDumper::printSection(const unsigned int begin, const unsigned int end, c
         std::ofstream outStreamer(outFile, std::ios::out);
         for (unsigned int i = begin; i < end; ++i) 
         {
-            outStreamer <<  bytes[i];
+            outStreamer << bytes[i];
+            if(i%16 == 15)   outStreamer << "\n";
+        }
+
+        for (unsigned int i = begin; i < end; ++i) 
+        {
+            outStreamer << std::hex << bytes[i];
             if(i%16 == 15)   outStreamer << "\n";
         }
     }
@@ -205,7 +217,13 @@ void NewDumper::printSection(const unsigned int begin, const unsigned int end, c
     {
         for (unsigned int i = begin; i < end; ++i) 
         {
-            std::cout <<  bytes[i];
+            std::cout << bytes[i];
+            if(i%16 == 15)   std::cout << "\n";
+        }
+
+        for (unsigned int i = begin; i < end; ++i) 
+        {
+            printf("%02X ", bytes[i]);
             if(i%16 == 15)   std::cout << "\n";
         }
     }

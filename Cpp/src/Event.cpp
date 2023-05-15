@@ -47,6 +47,7 @@ void Event::InitializeEvent(NewDumper& Newdumpy)
             }
             else cout<<"something goes wrong"<<endl;
         }
+        fmodulesvector[ii] = mod;
     }
 }
 
@@ -83,8 +84,9 @@ fEventNumber(eventNumber)
     for(auto it = modules.Begin(); it != modules.End(); it++)
     {
         Yaml::Node& ModuleSetting = (*it).second;
-        fmodulesvector.push_back(Module(nmodule, ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
-            ModuleSetting["ActiveChannels"].As<unsigned>(), ModuleSetting["Name"].As<std::string>().c_str()));
+        Module mod(nmodule, ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
+            ModuleSetting["ActiveChannels"].As<unsigned>(), ModuleSetting["Name"].As<std::string>().c_str());
+        fmodulesvector.push_back(mod);
         nmodule++;
     }
 
