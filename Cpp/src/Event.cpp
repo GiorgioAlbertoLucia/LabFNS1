@@ -17,33 +17,48 @@ void Event::InitializeEvent(NewDumper& Newdumpy)
     {
         unsigned int start=0,stop=0,offset=0;
         
-        if(ii>0)
-        {
-            for(unsigned a=0;a<ii;a++)
-            {
-                offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
-            }
-        }
+        //if(ii>0)
+        //{
+        //    for(unsigned a=0;a<ii;a++)
+        //    {
+        //        offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
+        //    }
+        //}
         Module mod = fmodulesvector[ii];
-        start=16+64*fNmodules+Newdumpy.getEventPosition(fEventNumber)+offset;
-        stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
+        //start=16+64*fNmodules+Newdumpy.getEventPosition(fEventNumber)+offset;
+        //stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
         
         if(mod.GetBits()==8) 
         {
             std::vector<uint8_t> temp = Newdumpy.readData<uint8_t>(start,stop);
+            std::cout << "event init check\n";
+            for(const auto& i: temp)    std::cout << i << " ";
+            std::cout << "\n";
+            std::cout << mod << "\n";
             mod.SetData(temp);
+            std::cout << mod << "\n";
         }
         if(mod.GetBits()==16) 
         {
             std::vector<uint16_t> temp = Newdumpy.readData<uint16_t>(start,stop);
+            std::cout << "event init check\n";
+            for(const auto& i: temp)    std::cout << i << " ";
+            std::cout << "\n";
+            std::cout << mod << "\n";
             mod.SetData(temp);
+            std::cout << mod << "\n";
         }
         else
         {
             if(mod.GetBits()==32) 
             {
                 std::vector<uint32_t> temp = Newdumpy.readData<uint32_t>(start,stop);
+                std::cout << "event init check\n";
+                for(const auto& i: temp)    std::cout << i << " ";
+                std::cout << "\n";
+                std::cout << mod << "\n";
                 mod.SetData(temp);
+                std::cout << mod << "\n";
             }
             else cout<<"something goes wrong"<<endl;
         }

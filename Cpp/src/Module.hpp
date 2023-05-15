@@ -19,6 +19,9 @@ public:
     Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data, const char * name = " ");
     Module(const Module& mod);
 
+    Module& operator=(const Module& mod) noexcept;
+    friend std::ostream& operator<<(std::ostream& out, const Module& mod);
+
 
     Module& SetData(std::vector<uint8_t>);
     Module& SetData(std::vector<uint16_t>);
@@ -31,6 +34,8 @@ public:
     unsigned GetBits() const                    {return fBits;}
     unsigned GetChannels() const                {return fChannels;}
     unsigned GetActiveChannels() const          {return fActiveChannels;}
+    unsigned GetNmodule() const                 {return nmodule;}
+    std::string GetName() const                 {return fName;}
     
     std::vector<uint8_t> GetData8bit() const    {return fData8bit;}
     std::vector<uint16_t> GetData16bit() const  {return fData16bit;}

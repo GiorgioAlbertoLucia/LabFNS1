@@ -60,7 +60,6 @@ Module::Module(const Module& mod)
             std::cout << "copy const cout\n";
             for(auto i: mod.fData16bit)     printf("%02X ", i);
             std::cout << "\n";
-            std::cout << "copy const cout\n";
             for(auto i:fData16bit)          printf("%02X ", i);
             std::cout << "\n";
         }
@@ -70,12 +69,81 @@ Module::Module(const Module& mod)
             std::cout << "copy const cout\n";
             for(auto i: mod.fData16bit)     printf("%02X ", i);
             std::cout << "\n";
-            std::cout << "copy const cout\n";
             for(auto i:fData16bit)          printf("%02X ", i);
             std::cout << "\n";
         }
     }
 
+}
+
+
+Module& Module::operator=(const Module& mod) noexcept
+{
+    if(this == &mod)    return *this;
+
+    nmodule = mod.nmodule;
+    fBits = mod.fBits;
+    fChannels = mod.fChannels;
+    fActiveChannels = mod.fActiveChannels;
+    fName = mod.fName;
+
+    switch(fBits)
+    {
+        case 8:     fData8bit = mod.fData8bit;
+        case 16:    
+        {
+            fData16bit = mod.fData16bit;
+            std::cout << "= operator cout\n";
+            for(auto i: mod.fData16bit)     printf("%02X ", i);
+            std::cout << "\n";
+            for(auto i:fData16bit)          printf("%02X ", i);
+            std::cout << "\n";
+        }
+        case 32: 
+        {
+            fData32bit = mod.fData32bit;
+            std::cout << "= operator cout\n";
+            for(auto i: mod.fData16bit)     printf("%02X ", i);
+            std::cout << "\n";
+            for(auto i:fData16bit)          printf("%02X ", i);
+            std::cout << "\n";
+        }
+    }
+
+    return *this;
+}
+
+std::ostream& operator<<(std::ostream& out, const Module& mod)
+{
+    out << "Module " << mod.GetNmodule() << " : " << mod.GetName() << "\n";
+    out<<"[ ";
+    if(mod.GetBits() == 8)  
+    {
+        out << "fBits = " << mod.GetBits() << std::endl;
+        out << "vec size 8 bit = " << mod.GetData8bit().size() << "\n";
+        out << "vec size 16 bit = " << mod.GetData16bit().size() << "\n";
+        out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
+        for(uint8_t i: mod.GetData8bit()) out << std::hex << i << " ";
+    }
+    else if(mod.GetBits() == 16)  
+    {
+        out << "fBits = " << mod.GetBits() << std::endl;
+        out << "vec size 8 bit = " << mod.GetData8bit().size() << "\n";
+        out << "vec size 16 bit = " << mod.GetData16bit().size() << "\n";
+        out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
+        for(uint16_t i: mod.GetData16bit()) out << std::hex << i << " ";
+    }
+    else if(mod.GetBits() == 32)
+    {
+        out << "fBits = " << mod.GetBits() << std::endl;
+        out << "vec size 8 bit = " << mod.GetData8bit().size() << "\n";
+        out << "vec size 16 bit = " << mod.GetData16bit().size() << "\n";
+        out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
+        for(uint32_t i: mod.GetData32bit()) out << std::hex << i << " ";
+    }
+    out << "] ";
+
+    return out;
 }
 
 /*

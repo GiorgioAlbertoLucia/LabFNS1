@@ -136,12 +136,13 @@ uint16_t NewDumper::readModulesStatus(const int event) const
  */
 std::vector<uint8_t> NewDumper::readSection(const unsigned int begin, const unsigned int end) const
 {
-    std::vector<uint8_t> bytes;
+    const unsigned int size = end - begin;
+    std::vector<uint8_t> bytes(size, 0);
     std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+
     if(streamer.good())
     {
         streamer.seekg(begin);
-        const unsigned int size = end - begin;
         bytes.reserve(size);
         streamer.read(reinterpret_cast<char*>(&bytes[0]), size);
         streamer.close();
@@ -189,12 +190,18 @@ void NewDumper::printEvent(const unsigned int event, const bool onFile, const ch
 void NewDumper::printSection(const unsigned int begin, const unsigned int end, const bool onFile, const char * outFile) const
 {
     std::vector<uint8_t> bytes;
+    const unsigned int size = end - begin;
     std::ifstream streamer(fFilePath.c_str(), std::ios::in | std::ios::binary);
+    
     if(streamer.good())
     {
-        std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
-        bytes = vec_buffer;
+        streamer.seekg(begin);
+        bytes.reserve(size);
+        streamer.read(reinterpret_cast<char*>(&bytes[0]), size);
         streamer.close();
+        //std::vector<uint8_t> vec_buffer((std::istreambuf_iterator<char>(streamer)), (std::istreambuf_iterator<char>()));
+        //bytes = vec_buffer;
+        //streamer.close();
     }
     else    throw std::exception();
 
