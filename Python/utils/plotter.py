@@ -5,6 +5,8 @@
 from ROOT import TCanvas, TLegend, TFile
 import yaml
 
+from StyleFormatter import SetGlobalStyle
+
 class CustomizedPlot:
     '''
     Load and customize plot in a .root file. Options can be set in a YAML configuration file
@@ -39,8 +41,8 @@ class CustomizedPlot:
             self.legend.SetBorderSize(self.config['legend']['border_size'])
             self.legend.SetFillColor(self.config['legend']['fill_color'])
             self.legend.SetFillStyle(self.config['legend']['bg_color'])
-            self.legend.SetTextSize(self.config['legend']['text_size'])
-            self.legend.SetTextFont(self.config['legend']['text_font'])
+            #self.legend.SetTextSize(self.config['legend']['text_size'])
+            #self.legend.SetTextFont(self.config['legend']['text_font'])
 
     def setHist(self, hist, **kwargs):
         '''
@@ -57,6 +59,7 @@ class CustomizedPlot:
                 - fill_style: int
                 - marker_color: TColor       
                 - marker_style: int
+                - title: str
                 - x_title: str
                 - x_title_size: float
                 - x_title_offset: float
@@ -145,10 +148,10 @@ class CustomizedPlot:
             elif key == 'draw_options':  
                 # draw object on the canvas
                 self.canvas.cd()
-                graphs.Draw(f'{value} same')
+                graph.Draw(f'{value} same')
                 
                 # if a legend is present, add a voice to the label
-                if self.config['legend']['isTrue']:  self.legend.AddEntry(graphs, graphs.GetTitle(), value)
+                if self.config['legend']['isTrue']:  self.legend.AddEntry(graph, graph.GetTitle(), value)
 
                 self.canvas.Update()
 
@@ -172,9 +175,12 @@ class CustomizedPlot:
 
         for key, value in kwargs.items():
             if key == 'title':     self.canvas.SetTitle(value)
-            if key == 'grid':      if value:    self.canvas.SetGrid()
-            if key == 'logx':      if value:    self.canvas.SetLogx()
-            if key == 'logy':      if value:    self.canvas.SetLogy()
+            if key == 'grid':      
+                if value:    self.canvas.SetGrid()
+            if key == 'logx':      
+                if value:    self.canvas.SetLogx()
+            if key == 'logy':      
+                if value:    self.canvas.SetLogy()
             
     def save(self, filename):
         '''
@@ -209,13 +215,13 @@ def multiplePlotsSingleCanvas(generalConfigPath, configPath):
 
     # load all necessary information from yaml file
     with open(configPath, 'r') as configFile:
-        config = yaml.laod(configFile, yaml.FullLoader)
+        config = yaml.load(configFile, yaml.FullLoader)
 
     finPaths = config['finPaths']
     objNames = config['objNames']
     objTypes = config['ROOTobject']
 
-    foutPath = config['foutPath']       # only one output file
+    foutPaths = config['foutPaths']       # only one output file
     outFormats = config['outFormats']
 
     lineColors = config['lineColors']
@@ -233,17 +239,17 @@ def multiplePlotsSingleCanvas(generalConfigPath, configPath):
     yTitleOffset = config['yTitleOffset']
     drawOptions = config['drawOptions']
 
+    canvasTitles = config['canvasTitles']
     axisTitles = config['axisTitles']   # [x_title, y_title]
     axisLimits = config['axisLimits']   # [xmin, ymin, xmax, ymax]
 
-    custom_plot.setCanvas(xmin=axisLimits[0], ymin=axisLimits[1], xmax=axisLimits[2], ymax=axisLimits[3])
+    SetGlobalStyle(padleftmargin=0.18, padbottommargin=0.14, optstat=0)
 
 
-    for finPath, objName, objType, foutPath, outFormat, lineColor, lineWidth, lineStyle, fillColor, fillStyle, markerColor,
-        markerStyle, xTitle, xTitleSize, xTitleOffset, yTitle, yTitleSize, yTitleOffset, drawOption
-        in zip(finPaths, objNames, objTypes foutPaths, outFormats, lineColors, lineWidths, lineStyles, fillColors, fillStyles, markerColors,
-        markerStyles, xTitles, xTitleSizes, xTitleOffsets, yTitles, yTitleSizes, yTitleOffsets, drawOptions):
+    for finPath, objName, objType, foutPath, outFormat, lineColor, lineWidth, lineStyle, fillColor, fillStyle, markerColor, markerStyle, xTitle, xTitleSize, yTitle, yTitleSize, drawOption, canvasTitle, axisLimit in zip(finPaths, objNames, objTypes, foutPaths, outFormats, lineColors, lineWidths, lineStyles, fillColors, fillStyles, markerColors, markerStyles, xTitles, xTitleSizes, yTitles, yTitleSizes, drawOptions, canvasTitles, axisLimits):
     
+        custom_plot.setCanvas(title=canvasTitle, xmin=axisLimit[0], ymin=axisLimit[1], xmax=axisLimit[2], ymax=axisLimit[3])
+
         inFile = TFile.Open(finPath)
         obj = inFile.Get(objName)
         obj.SetMinimum(1.)
@@ -259,12 +265,13 @@ def multiplePlotsSingleCanvas(generalConfigPath, configPath):
 
     
     for outformat in outFormats:    custom_plot.save(f'{foutPath}.{outformat}')
+    input('Press enter to continue')
     
 
     
 # Run the multiplePlotsSingleCanvas function directily from this macro    
 if __name__ == '__main__':
 
-    generalConfigPath = 'config_multiplot.yml'
-    configPath = 'config_plotter.yml'
+    generalConfigPath = 'Python/utils/config_plotter.yml'
+    configPath = 'Python/utils/config_multiplot.yml'
     multiplePlotsSingleCanvas(generalConfigPath, configPath)    

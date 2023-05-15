@@ -281,7 +281,7 @@ std::vector<uint8_t> NewDumper::readData(const unsigned int startpoint, const un
     //static_assert(std::is_same_v<T, uint8_t>, "Invalid type parameter. Type parameter must be uint8_t.");
     std::vector<unsigned char> bytes=readSection(startpoint,stoppoint);//esempio
     int sizeD=bytes.size();
-    std::vector<uint8_t> vet(sizeD);
+    std::vector<uint8_t> vet(sizeD, 0);
     unsigned char onebyte[1];
     uint8_t bytesvec[sizeD];
     for(int jj=0;jj<sizeD;jj++)
@@ -289,7 +289,7 @@ std::vector<uint8_t> NewDumper::readData(const unsigned int startpoint, const un
         onebyte[0]=bytes[jj];
         bytesvec[jj]=*(uint8_t*)onebyte;
     }
-    for(int ii=0;ii<sizeD;ii++) vet.push_back(bytesvec[ii]);
+    for(int ii=0;ii<sizeD;ii++) vet[ii] = bytesvec[ii];
     return vet;
 }
 
@@ -297,9 +297,10 @@ template<>
 std::vector<uint16_t> NewDumper::readData(const unsigned int startpoint, const unsigned int stoppoint) const
 {
     //static_assert(std::is_same_v<T, uint16_t>, "Invalid type parameter. Type parameter must be uint16_t.");
-    std::vector<unsigned char> bytes=readSection(startpoint,stoppoint);//esempio
+    std::vector<unsigned char> bytes=readSection(startpoint,stoppoint);
+    std::cout << "vec size (from readSection in readData) = " << bytes.size() << "\n";
     int sizeD=bytes.size();
-    std::vector<uint16_t> vet(int(sizeD/2));
+    std::vector<uint16_t> vet(int(sizeD/2), 0);
     unsigned char twobytes[2];
     int yy=0;
     uint16_t bytesvec[int(sizeD/2)];
@@ -316,7 +317,7 @@ std::vector<uint16_t> NewDumper::readData(const unsigned int startpoint, const u
                     yy++;
                 }
     }
-    for(int ii=0;ii<int(sizeD/2);ii++) vet.push_back(bytesvec[ii]);
+    for(int ii=0;ii<int(sizeD/2);ii++) vet[ii] = bytesvec[ii];
     return vet;
 }
 
@@ -326,7 +327,7 @@ std::vector<uint32_t> NewDumper::readData(const unsigned int startpoint, const u
     //static_assert(std::is_same_v<T, uint32_t>, "Invalid type parameter. Type parameter must be uint32_t.");
     std::vector<unsigned char> bytes=readSection(startpoint,stoppoint);//esempio
     int sizeD=bytes.size();
-    std::vector<uint32_t> vet(int(sizeD/4));
+    std::vector<uint32_t> vet(int(sizeD/4), 0);
     unsigned char fourbytes[4];
     int yy=0;
     uint16_t bytesvec[int(sizeD/4)];
@@ -353,7 +354,7 @@ std::vector<uint32_t> NewDumper::readData(const unsigned int startpoint, const u
         }
             
     }
-    for(int ii=0;ii<int(sizeD/4);ii++) vet.push_back(bytesvec[ii]);
+    for(int ii=0;ii<int(sizeD/4);ii++) vet[ii] = bytesvec[ii];
     return vet;
 }
 

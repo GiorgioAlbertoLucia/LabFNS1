@@ -24,45 +24,34 @@ void Event::InitializeEvent(NewDumper& Newdumpy)
                 offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
             }
         }
-        Module mod = fmodulesvector[ii];
+        Module& mod = fmodulesvector[ii];
+        std::cout << "check bits: " << mod.GetBits() << "\n";
         start=16+64*fNmodules+Newdumpy.getEventPosition(fEventNumber)+offset;
         stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
+
+        printf("start = %d\n", start);
+        printf("stop = %d\n", stop);
+        printf("offset = %d\n", offset);
         
         if(mod.GetBits()==8) 
         {
             std::vector<uint8_t> temp = Newdumpy.readData<uint8_t>(start,stop);
-            std::cout << "event init check\n";
-            for(const auto& i: temp)    std::cout << i << " ";
-            std::cout << "\n";
-            std::cout << mod << "\n";
             mod.SetData(temp);
-            std::cout << mod << "\n";
         }
         if(mod.GetBits()==16) 
         {
             std::vector<uint16_t> temp = Newdumpy.readData<uint16_t>(start,stop);
-            std::cout << "event init check\n";
-            for(const auto& i: temp)    std::cout << i << " ";
-            std::cout << "\n";
-            std::cout << mod << "\n";
             mod.SetData(temp);
-            std::cout << mod << "\n";
         }
         else
         {
             if(mod.GetBits()==32) 
             {
                 std::vector<uint32_t> temp = Newdumpy.readData<uint32_t>(start,stop);
-                std::cout << "event init check\n";
-                for(const auto& i: temp)    std::cout << i << " ";
-                std::cout << "\n";
-                std::cout << mod << "\n";
                 mod.SetData(temp);
-                std::cout << mod << "\n";
             }
             else cout<<"something goes wrong"<<endl;
         }
-        fmodulesvector[ii] = mod;
     }
 }
 

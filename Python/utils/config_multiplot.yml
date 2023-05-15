@@ -1,29 +1,30 @@
 # Configuration file for multiplePlotSingleCanvas function in plotter.py
 
 # input and output file options
-finPaths: []
-objNames: []
-ROOTobject: []
+finPaths: ['data/output/coinS1SG.root']
+objNames: ['Graph;2']
+ROOTobject: ['TGraph'] #TGraph or TH1
 
-foutPath: []
-outFormats: []
+foutPaths: ['data/output/coincidence_curve']
+outFormats: ['png']
 
-lineColors: []
-lineWidths: []
-lineStyles: []
-fillColors: []
-fillStyles: []
-markerColors: []
-markerStyles: []
+lineColors: [797]
+lineWidths: [1]
+lineStyles: [1]
+fillColors: [0]
+fillStyles: [0]
+markerColors: [860]
+markerStyles: [2]
 
-xTitles: []
-xTitleSizes: []
-xTitleOffset: []
-yTitles: []
-yTitleSizes: []
-yTitleOffset: []
-drawOptions: []
+xTitles: ['#DeltaT [ns]']
+xTitleSizes: [1]
+xTitleOffset: 5.
+yTitles: ['Rate [Hz]']
+yTitleSizes: [1]
+yTitleOffset: 5.
+drawOptions: ['ap']
 
 # canvas option
-axisTitles: []
-axisLimits: []
+canvasTitles: ['Rate curve for S_{1} and S_{G}']
+axisTitles: [['#DeltaT [ns]', 'Rate [Hz]']]
+axisLimits: [[-10, 0, 125, 3]]

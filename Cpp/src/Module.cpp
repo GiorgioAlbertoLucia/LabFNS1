@@ -54,24 +54,8 @@ Module::Module(const Module& mod)
     switch(fBits)
     {
         case 8:     fData8bit = mod.fData8bit;
-        case 16:    
-        {
-            fData16bit = mod.fData16bit;
-            std::cout << "copy const cout\n";
-            for(auto i: mod.fData16bit)     printf("%02X ", i);
-            std::cout << "\n";
-            for(auto i:fData16bit)          printf("%02X ", i);
-            std::cout << "\n";
-        }
-        case 32: 
-        {
-            fData32bit = mod.fData32bit;
-            std::cout << "copy const cout\n";
-            for(auto i: mod.fData16bit)     printf("%02X ", i);
-            std::cout << "\n";
-            for(auto i:fData16bit)          printf("%02X ", i);
-            std::cout << "\n";
-        }
+        case 16:    fData16bit = mod.fData16bit;
+        case 32:    fData32bit = mod.fData32bit;
     }
 
 }
@@ -90,24 +74,8 @@ Module& Module::operator=(const Module& mod) noexcept
     switch(fBits)
     {
         case 8:     fData8bit = mod.fData8bit;
-        case 16:    
-        {
-            fData16bit = mod.fData16bit;
-            std::cout << "= operator cout\n";
-            for(auto i: mod.fData16bit)     printf("%02X ", i);
-            std::cout << "\n";
-            for(auto i:fData16bit)          printf("%02X ", i);
-            std::cout << "\n";
-        }
-        case 32: 
-        {
-            fData32bit = mod.fData32bit;
-            std::cout << "= operator cout\n";
-            for(auto i: mod.fData16bit)     printf("%02X ", i);
-            std::cout << "\n";
-            for(auto i:fData16bit)          printf("%02X ", i);
-            std::cout << "\n";
-        }
+        case 16:    fData16bit = mod.fData16bit;
+        case 32:    fData32bit = mod.fData32bit;
     }
 
     return *this;
@@ -123,7 +91,7 @@ std::ostream& operator<<(std::ostream& out, const Module& mod)
         out << "vec size 8 bit = " << mod.GetData8bit().size() << "\n";
         out << "vec size 16 bit = " << mod.GetData16bit().size() << "\n";
         out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
-        for(uint8_t i: mod.GetData8bit()) out << std::hex << i << " ";
+        for(const uint8_t& i: mod.GetData8bit()) printf("%02X ", i);
     }
     else if(mod.GetBits() == 16)  
     {
@@ -131,7 +99,7 @@ std::ostream& operator<<(std::ostream& out, const Module& mod)
         out << "vec size 8 bit = " << mod.GetData8bit().size() << "\n";
         out << "vec size 16 bit = " << mod.GetData16bit().size() << "\n";
         out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
-        for(uint16_t i: mod.GetData16bit()) out << std::hex << i << " ";
+        for(const uint16_t& i: mod.GetData16bit()) printf("%02X ", i);
     }
     else if(mod.GetBits() == 32)
     {
@@ -139,7 +107,7 @@ std::ostream& operator<<(std::ostream& out, const Module& mod)
         out << "vec size 8 bit = " << mod.GetData8bit().size() << "\n";
         out << "vec size 16 bit = " << mod.GetData16bit().size() << "\n";
         out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
-        for(uint32_t i: mod.GetData32bit()) out << std::hex << i << " ";
+        for(const uint32_t& i: mod.GetData32bit()) printf("%02X ", i);
     }
     out << "] ";
 
@@ -185,30 +153,21 @@ void Module::importData(NewDumper& dumpy, unsigned eventnumber, unsigned nmodule
 Module& Module::SetData(std::vector<uint8_t> data)
 {
     //CheckData(data);
-    for(auto i: data)  printf("%02X ", i);
-    std::cout << std::endl;
     fData8bit=data;
-    std::cout << "vec 8 bit size = " << fData8bit.size() << "\n";
     return *this;
 }
 
 Module& Module::SetData(std::vector<uint16_t> data)
 {
     //CheckData(data);
-    for(auto i: data)   printf("%02X ", i);
-    std::cout << std::endl;
     fData16bit=data;
-    std::cout << "vec 16 bit size = " << fData16bit.size() << "\n";
     return *this;
 }
 
 Module& Module::SetData(std::vector<uint32_t> data)
 {
     //CheckData(data);
-    for(auto i: data)   printf("%02X ", i);
-    std::cout << std::endl;
     fData32bit=data;
-    std::cout << "vec 32 bit size = " << fData32bit.size() << "\n";
     return *this;
 }
 
@@ -223,7 +182,7 @@ Module& Module::Print()
         std::cout << "vec size 8 bit = " << fData8bit.size() << "\n";
         std::cout << "vec size 16 bit = " << fData16bit.size() << "\n";
         std::cout << "vec size 32 bit = " << fData32bit.size() << "\n";
-        for(uint8_t i: fData8bit) std::cout << std::hex << i << " ";
+        for(const uint8_t& i: fData8bit) printf("%02X ", i);
     }
     else if(fBits == 16)  
     {
@@ -231,7 +190,7 @@ Module& Module::Print()
         std::cout << "vec size 8 bit = " << fData8bit.size() << "\n";
         std::cout << "vec size 16 bit = " << fData16bit.size() << "\n";
         std::cout << "vec size 32 bit = " << fData32bit.size() << "\n";
-        for(uint16_t i: fData16bit) std::cout << std::hex << i << " ";
+        for(const uint16_t& i: fData16bit) printf("%02X ", i);
     }
     else if(fBits == 32)
     {
@@ -239,7 +198,7 @@ Module& Module::Print()
         std::cout << "vec size 8 bit = " << fData8bit.size() << "\n";
         std::cout << "vec size 16 bit = " << fData16bit.size() << "\n";
         std::cout << "vec size 32 bit = " << fData32bit.size() << "\n";
-        for(uint32_t i: fData32bit) std::cout << std::hex << i << " ";
+        for(const uint32_t& i: fData32bit) printf("%02X ", i);
     }
     std::cout<<"] ";
     
