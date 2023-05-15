@@ -1,6 +1,6 @@
 DataFileName: example_pedestal.dat
 
-NModules: 4
+NModules: 7
 
 Modules:
   - Name: "C257 - scaler"
@@ -21,6 +21,21 @@ Modules:
   - Name: "2228A - tdc"
     Bits: 16
     Channels: 8
+    ActiveChannels: 2
+    DataType: unsigned
+  - Name: "2249W - adc"
+    Bits: 16
+    Channels: 16
+    ActiveChannels: 2
+    DataType: unsigned
+  - Name: "V259N - multi-hit patter unit"
+    Bits: 16
+    Channels: 8
+    ActiveChannels: 2
+    DataType: unsigned
+  - Name: "C211 - programmable delay"
+    Bits: 8
+    Channels: 16
     ActiveChannels: 2
     DataType: unsigned
     
