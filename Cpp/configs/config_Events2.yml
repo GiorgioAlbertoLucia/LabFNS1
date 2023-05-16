@@ -1,4 +1,4 @@
-DataFileName: data/input/example_pedestal.dat
+DataFileName: /home/fabrizio/Documents/Lectures/Lab1/LabFNS1/data/input/20230512_194044.dat
 TTreeFileName: data/input/Test.root
 
 NModules: 7
@@ -7,36 +7,36 @@ Modules:
   - Name: "C257 - scaler"
     Bits: 32
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     DataType: unsigned
   - Name: "V560N - scaler"
     Bits: 32
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     DataType: unsigned
   - Name: "V560N - scaler inhibited"
     Bits: 32
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     DataType: unsigned
   - Name: "2228A - tdc"
     Bits: 16
     Channels: 8
-    ActiveChannels: 2
+    ActiveChannels: 8
     DataType: unsigned
   - Name: "2249W - adc"
     Bits: 16
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     DataType: unsigned
   - Name: "V259N - multi-hit patter unit"
     Bits: 16
     Channels: 8
-    ActiveChannels: 2
+    ActiveChannels: 8
     DataType: unsigned
   - Name: "C211 - programmable delay"
     Bits: 8
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     DataType: unsigned
     
