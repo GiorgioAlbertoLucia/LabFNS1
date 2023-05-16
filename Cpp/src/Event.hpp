@@ -19,7 +19,9 @@ public:
 
     Event& SetStatus(uint16_t status)                                       {fStatus=status;        return *this;}
     Event& SetNmodules(unsigned Nmodules);                                   
-    Event& SetEventNumber(unsigned EventNumber)                           {fEventNumber=EventNumber;    return *this;}
+    Event& SetEventNumber(unsigned EventNumber)                             {fEventNumber=EventNumber;    return *this;}
+
+    Event& Next();                                           
 
     uint16_t GetStatus()                        {return fStatus;}
     unsigned GetNmodules()                      {return fNmodules;}
@@ -31,7 +33,7 @@ public:
     Event& Print();
 
 protected:
-    void InitializeEvent(NewDumper& dumpy);
+    void InitializeEvent();
 
 private:
     Yaml::Node fConfigFile;
@@ -39,6 +41,7 @@ private:
     unsigned int fEventNumber;
     uint16_t fStatus;
     unsigned int fNmodules;
+    NewDumper fDumpy;
 
     std::vector<Module> fmodulesvector;
 

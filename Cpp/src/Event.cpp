@@ -1,4 +1,4 @@
-#include "Event.h"
+#include "Event.hpp"
 #include "vector"
 
 /*
@@ -11,46 +11,49 @@
  * @param vectortype 
  * @param nchan 
  */
-void Event::InitializeEvent(NewDumper& Newdumpy)
+void Event::InitializeEvent()
 {
     for(unsigned ii=0;ii<fNmodules;ii++)
     {
         unsigned int start=0,stop=0,offset=0;
         
-        if(ii>0)
-        {
-            for(unsigned a=0;a<ii;a++)
-            {
-                offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
-            }
-        }
+        for(unsigned a=0;a<ii;a++)
+            offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
+
         Module& mod = fmodulesvector[ii];
-        std::cout << "check bits: " << mod.GetBits() << "\n";
-        start=16+64*fNmodules+Newdumpy.getEventPosition(fEventNumber)+offset;
+        //std::cout << "check bits: " << mod.GetBits() << "\n";
+        start=16+64*fNmodules+fDumpy.getEventPosition(fEventNumber)+offset;
         stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
 
-        printf("start = %d\n", start);
-        printf("stop = %d\n", stop);
-        printf("offset = %d\n", offset);
+        //printf("start = %d\n", start);
+        //printf("stop = %d\n", stop);
+        //printf("offset = %d\n", offset);
         
-        if(mod.GetBits()==8) 
+        switch (mod.GetBits())
         {
-            std::vector<uint8_t> temp = Newdumpy.readData<uint8_t>(start,stop);
+        case 8:
+        {
+            std::vector<uint8_t> temp = fDumpy.readData<uint8_t>(start,stop);
             mod.SetData(temp);
+            break;
         }
-        if(mod.GetBits()==16) 
+        
+        case 16: 
         {
-            std::vector<uint16_t> temp = Newdumpy.readData<uint16_t>(start,stop);
+            std::vector<uint16_t> temp = fDumpy.readData<uint16_t>(start,stop);
             mod.SetData(temp);
+            break;
         }
-        else
+
+        case 32:
         {
-            if(mod.GetBits()==32) 
-            {
-                std::vector<uint32_t> temp = Newdumpy.readData<uint32_t>(start,stop);
-                mod.SetData(temp);
-            }
-            else cout<<"something goes wrong"<<endl;
+            std::vector<uint32_t> temp = fDumpy.readData<uint32_t>(start,stop);
+            mod.SetData(temp);
+            break;
+        }
+        default:
+            std::cout<<"something goes wrong"<<std::endl;
+            break;
         }
     }
 }
@@ -64,7 +67,8 @@ Event::Event()
 
 Event::Event(unsigned evenumb ,unsigned nmodules, std::vector<unsigned> &vectortype, std::vector<unsigned>& nchan, NewDumper& Newdumpy):
 fNmodules(nmodules),
-fEventNumber(evenumb)
+fEventNumber(evenumb),
+fDumpy(*(&Newdumpy))
 {
     for(unsigned ii=0;ii<fNmodules;ii++) 
     {
@@ -72,11 +76,12 @@ fEventNumber(evenumb)
         fmodulesvector.push_back(mod);
     }
 
-    InitializeEvent(Newdumpy);
+    InitializeEvent();
 }
 
 Event::Event(unsigned eventNumber, std::string cfgFileName, NewDumper& dumpy):
-fEventNumber(eventNumber)
+fEventNumber(eventNumber),
+fDumpy(*(&dumpy))
 {
     Yaml::Parse(fConfigFile ,cfgFileName.c_str());
     fNmodules = fConfigFile["NModules"].As<unsigned>();
@@ -94,8 +99,8 @@ fEventNumber(eventNumber)
         nmodule++;
     }
 
-    InitializeEvent(dumpy);
-    Print();
+    InitializeEvent();
+    //Print();
 }
 
 /**
@@ -120,6 +125,15 @@ Event& Event::SetNmodules(unsigned Nmodules)
     //fData.clear();
     //for (unsigned i=0; i<fNmodules; i++)
     //    fData.push_back({});
+    return *this;
+}
+
+Event& Event::Next()
+{
+    for (auto& i: fmodulesvector)
+        i.Clear();
+    fEventNumber++;
+    InitializeEvent();
     return *this;
 }
 
