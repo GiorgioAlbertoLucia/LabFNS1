@@ -44,7 +44,7 @@ public:
     std::vector<uint32_t> GetData32bit() const  {return fData32bit;}
     //void setnModule(Event&);
     
-    void SetBranchAddress(TTree& tree, unsigned countdet);
+    void SetBranchAddress(TTree& tree);
 
 private:
     std::string fName;

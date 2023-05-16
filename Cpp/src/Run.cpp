@@ -62,6 +62,7 @@ void Run::TreeSettings()
     uint16_t  ptr16bit;                 //used to define Branch type
     uint32_t  ptr32bit;                 //used to define Branch type
 
+    std::cout<<"Nmodules: "<<fEv.GetNmodules()<<std::endl;
     for (unsigned idxModules = 0; idxModules<fEv.GetNmodules(); idxModules++)
     {
         switch (fEv.getModule(idxModules).GetBits())
@@ -70,21 +71,18 @@ void Run::TreeSettings()
             for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
                 fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr8bit, 32000);
 
-            fEv.getModule(idxModules).SetBranchAddress(fTreeData,idxModules);
             break;
 
         case 16:
             for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
                 fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr16bit, 32000);
 
-            fEv.getModule(idxModules).SetBranchAddress(fTreeData,idxModules);
             break;
 
         case 32:
             for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
                 fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr32bit, 32000);
 
-            fEv.getModule(idxModules).SetBranchAddress(fTreeData,idxModules);
             break;
         
         default:
@@ -92,4 +90,6 @@ void Run::TreeSettings()
             break;
         }
     }
+
+    fEv.SetBranchAddress(fTreeData);
 }

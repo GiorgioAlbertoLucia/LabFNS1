@@ -21,6 +21,8 @@ public:
     Event& SetNmodules(unsigned Nmodules);                                   
     Event& SetEventNumber(unsigned EventNumber)                             {fEventNumber=EventNumber;    return *this;}
 
+    Event& SetBranchAddress(TTree& tree)                                    {for (auto& i: fmodulesvector) i.SetBranchAddress(tree); return *this;}
+
     Event& Next();                                           
 
     uint16_t GetStatus()                        {return fStatus;}
