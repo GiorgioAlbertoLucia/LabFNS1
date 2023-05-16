@@ -4,11 +4,12 @@
 #include <vector>
 #include <string>
 #include "Module.hpp"
+#include "Event.hpp"
 #include "TTree.h"
 #include "TFile.h"
 #include "TObject.h"
 #include "TRandom3.h"
-#include "../yaml/Yaml.cpp"
+//#include "../yaml/Yaml.cpp"
 
 class Run
 {
@@ -22,6 +23,8 @@ private:
     std::string fDataFileName;
     unsigned fNmodules;
     TTree fTreeData;
+    Event fEv;
+
     void TreeSettings();
 };
  

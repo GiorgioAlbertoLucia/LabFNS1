@@ -6,6 +6,24 @@ Run::Run(std::string cfgFileName) :
 fTreeData("TreeData","TreeData")
 {
     Yaml::Parse(fConfigFile, cfgFileName.c_str());
+    NewDumper dumpy(fConfigFile["DataFileName"].As<std::string>().c_str());
+    fEv = Event(0,cfgFileName,dumpy);
+    TFile outfile(fConfigFile["TTreeFileName"].As<std::string>().c_str(),"recreate");
+    fTreeData.SetDirectory(&outfile);
+    TreeSettings();
+    std::cout<<dumpy.getNEvents()<<std::endl;
+    for (unsigned i=0; i<dumpy.getNEvents(); i++)
+    {
+        if (i!=0)
+            fEv.Next();
+        fEv.Print();
+        fTreeData.Fill();
+    }
+    fTreeData.Write("fTreeData",1ULL << ( 2 ));
+    outfile.Close();
+
+    /*
+    Yaml::Parse(fConfigFile, cfgFileName.c_str());
     fDataFileName = fConfigFile["DataFileName"].As<std::string>();
     fNmodules = fConfigFile["NModules"].As<unsigned>();
 
@@ -34,7 +52,7 @@ fTreeData("TreeData","TreeData")
     std::string outpath = "../../../data/input/";
     std::string filepath = outpath + fDataFileName;
 
-    
+    */
 }
 
 
@@ -44,29 +62,29 @@ void Run::TreeSettings()
     uint16_t  ptr16bit;                 //used to define Branch type
     uint32_t  ptr32bit;                 //used to define Branch type
 
-    for (std::vector<Module>::size_type idxModules = 0; idxModules<fModules.size(); idxModules++)
+    for (unsigned idxModules = 0; idxModules<fEv.GetNmodules(); idxModules++)
     {
-        switch (fModules[idxModules].GetBits())
+        switch (fEv.getModule(idxModules).GetBits())
         {
         case 8:
-            for (unsigned idxChannel=0; idxChannel<fModules[idxModules].GetActiveChannels(); idxChannel++)
+            for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
                 fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr8bit, 32000);
 
-            fModules[idxModules].SetBranchAddress(fTreeData,idxModules);
+            fEv.getModule(idxModules).SetBranchAddress(fTreeData,idxModules);
             break;
 
         case 16:
-            for (unsigned idxChannel=0; idxChannel<fModules[idxModules].GetActiveChannels(); idxChannel++)
+            for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
                 fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr16bit, 32000);
 
-            fModules[idxModules].SetBranchAddress(fTreeData,idxModules);
+            fEv.getModule(idxModules).SetBranchAddress(fTreeData,idxModules);
             break;
 
         case 32:
-            for (unsigned idxChannel=0; idxChannel<fModules[idxModules].GetActiveChannels(); idxChannel++)
+            for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
                 fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr32bit, 32000);
 
-            fModules[idxModules].SetBranchAddress(fTreeData,idxModules);
+            fEv.getModule(idxModules).SetBranchAddress(fTreeData,idxModules);
             break;
         
         default:
