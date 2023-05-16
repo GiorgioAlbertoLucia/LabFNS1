@@ -1,4 +1,5 @@
-DataFileName: example_pedestal.dat
+DataFileName: data/input/example_pedestal.dat
+TTreeFileName: data/input/Test.root
 
 NModules: 7
 
