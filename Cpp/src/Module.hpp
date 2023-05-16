@@ -29,6 +29,8 @@ public:
 
     Module& SetBits(unsigned bits)              {fBits = bits; return *this;}
 
+    Module& Clear()                             {fData8bit.clear(); fData16bit.clear(); fData32bit.clear(); return *this;}
+
     Module& Print();
 
     unsigned GetBits() const                    {return fBits;}

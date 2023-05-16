@@ -83,7 +83,7 @@ Module& Module::operator=(const Module& mod) noexcept
 
 std::ostream& operator<<(std::ostream& out, const Module& mod)
 {
-    out << "Module " << mod.GetNmodule() << " : " << mod.GetName() << "\n";
+    out << "\033[93mModule " << mod.GetNmodule() << " : " << mod.GetName() << "\n";
     out<<"[ ";
     if(mod.GetBits() == 8)  
     {
@@ -109,7 +109,7 @@ std::ostream& operator<<(std::ostream& out, const Module& mod)
         out << "vec size 32 bit = " << mod.GetData32bit().size() << "\n";
         for(const uint32_t& i: mod.GetData32bit()) printf("%02X ", i);
     }
-    out << "] ";
+    out << "] \033[0m";
 
     return out;
 }
@@ -174,7 +174,7 @@ Module& Module::SetData(std::vector<uint32_t> data)
 
 Module& Module::Print()
 {
-    std::cout << "Module " << nmodule << " : " << fName << "\n";
+    std::cout << "\033[91mModule " << nmodule << " : " << fName << "\n";
     std::cout<<"[ ";
     if(fBits == 8)  
     {
@@ -200,7 +200,7 @@ Module& Module::Print()
         std::cout << "vec size 32 bit = " << fData32bit.size() << "\n";
         for(const uint32_t& i: fData32bit) printf("%02X ", i);
     }
-    std::cout<<"] ";
+    std::cout<<"] \033[0m";
     
     return *this;
 }
@@ -247,21 +247,21 @@ void Module::SetBranchAddress(TTree& tree, unsigned countmodule)
     switch (fBits)
     {
     case 8:
-        for (unsigned i=0; i<fData8bit.size(); i++)
+        for (unsigned i=0; i<fActiveChannels; i++)
         {
             tree.SetBranchAddress((std::string("Module")+std::to_string(countmodule)+"_"+std::to_string(i)).c_str(), (uint8_t*) &fData8bit[i]);
         }
         break;
     
     case 16:
-        for (unsigned i=0; i<fData16bit.size(); i++)
+        for (unsigned i=0; i<fActiveChannels; i++)
         {
             tree.SetBranchAddress((std::string("Module")+std::to_string(countmodule)+"_"+std::to_string(i)).c_str(), (uint16_t*) &fData16bit[i]);
         }
         break;
     
     case 32:
-        for (unsigned i=0; i<fData32bit.size(); i++)
+        for (unsigned i=0; i<fActiveChannels; i++)
         {
             tree.SetBranchAddress((std::string("Module")+std::to_string(countmodule)+"_"+std::to_string(i)).c_str(), (uint32_t*) &fData32bit[i]);
         }        break;
