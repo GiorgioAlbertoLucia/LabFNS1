@@ -1,9 +1,9 @@
+#include <Riostream.h>
+#include <vector>
+
 #include "Event.hpp"
 #include "../utils/newDumper.hpp"
 #include "Module.hpp"
-
-#include <Riostream.h>
-#include <vector>
 
 void event_test()
 {

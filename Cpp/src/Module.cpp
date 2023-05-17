@@ -1,5 +1,6 @@
+#include <vector>
+
 #include "Module.hpp"
-#include "vector"
 
 /*
     PUBLIC
@@ -235,21 +236,14 @@ void Module::CheckData(std::vector<uint32_t> data)
         throw runtime_error("The number of data is different from the one specified as ActiveChannels");
 }
 
-
+/**
+ * @brief Function that sets the address of the branch of the output tree to the
+ *  vectors containing the intersections
+ * 
+ * @param tree Tree for data output
+ */
 void Module::SetBranchAddress(TTree& tree)
 {
-/*
- *  Function that sets the address of the branch of the output tree to the
- *  vectors containing the intersections
- *  -------------------------
- *  Parameters:
- *  tree: TTree&
- *      Tree for data output
- * 
- *  countmodule: unsigned
- *      running count of modules
- * 
- */
     switch (fBits)
     {
     case 8:

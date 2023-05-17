@@ -6,7 +6,9 @@
 #include <typeinfo>
 #include <stdexcept>
 #include <cstdint>
-#include "TTree.h"
+
+#include <TTree.h>
+
 #include "../utils/newDumper.hpp"
 
 class Module

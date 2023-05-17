@@ -1,5 +1,5 @@
-DataFileName: /home/fabrizio/Documents/Lectures/Lab1/LabFNS1/data/input/20230512_194044.dat
-TTreeFileName: data/input/Test.root
+DataFileName: data/input/overnight/20230512_194044.dat
+TTreeFileName: data/preprocessed/data_tree.root
 
 NModules: 7
 

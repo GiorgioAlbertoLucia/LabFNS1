@@ -24,5 +24,5 @@ void loadMacros(TString myopt="")
     //gROOT->ProcessLine(".x /home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Cpp/src/event_test.cpp");
     //gROOT->ProcessLine("NewDumper dumpy(\"data/input/example_pedestal.dat\");");
     //gROOT->ProcessLine("Event b(0, \"Cpp/configs/config_Events2.yml\", dumpy);");
-    //gROOT->ProcessLine("Run a(\"Cpp/configs/config_Events2.yml\");");
+    gROOT->ProcessLine("Run a(\"Cpp/configs/config_Events2.yml\");");
 }

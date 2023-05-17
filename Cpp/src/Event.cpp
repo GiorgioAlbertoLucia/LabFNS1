@@ -1,5 +1,6 @@
+#include <vector>
+
 #include "Event.hpp"
-#include "vector"
 
 /*
     PROTECTED
@@ -24,10 +25,6 @@ void Event::InitializeEvent()
         
         start=16+64*fNmodules+fDumpy.getEventPosition(fEventNumber)+offset;
         stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
-
-        printf("start = %d\n", start);
-        printf("stop = %d\n", stop);
-        printf("offset = %d\n", offset);
         
         switch (mod.GetBits())
         {
@@ -101,7 +98,7 @@ fDumpy(*(&dumpy))
     }
 
     InitializeEvent();
-    Print();
+    //Print();
 }
 
 /**
