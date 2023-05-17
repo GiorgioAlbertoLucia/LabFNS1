@@ -1,4 +1,4 @@
-DataFileName: data/input/example_pedestal.dat
+DataFileName: /home/fabrizio/Documents/Lectures/Lab1/LabFNS1/data/input/20230512_194044.dat
 TTreeFileName: data/input/Test.root
 
 NModules: 7

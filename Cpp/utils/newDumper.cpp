@@ -298,7 +298,7 @@ std::vector<uint16_t> NewDumper::readData(const unsigned int startpoint, const u
 {
     //static_assert(std::is_same_v<T, uint16_t>, "Invalid type parameter. Type parameter must be uint16_t.");
     std::vector<unsigned char> bytes=readSection(startpoint,stoppoint);
-    std::cout << "vec size (from readSection in readData) = " << bytes.size() << "\n";
+    //std::cout << "vec size (from readSection in readData) = " << bytes.size() << "\n";
     int sizeD=bytes.size();
     std::vector<uint16_t> vet(int(sizeD/2), 0);
     unsigned char twobytes[2];
