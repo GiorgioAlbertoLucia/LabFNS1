@@ -1,42 +1,49 @@
-DataFileName: /home/fabrizio/Documents/Lectures/Lab1/LabFNS1/data/input/20230512_194044.dat
-TTreeFileName: data/input/Test.root
+DataFileName: data/input/overnight/20230512_194044.dat
+TTreeFileName: data/preprocessed/data_tree.root
 
 NModules: 7
 
 Modules:
-  - Name: "C257 - scaler"
+  - Name: "C257_scaler"
     Bits: 32
     Channels: 16
-    ActiveChannels: 16
+    ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
-  - Name: "V560N - scaler"
+  - Name: "V560N_scaler"
     Bits: 32
     Channels: 16
-    ActiveChannels: 16
+    ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
-  - Name: "V560N - scaler inhibited"
+  - Name: "V560N_scaler_inhibited"
     Bits: 32
     Channels: 16
-    ActiveChannels: 16
+    ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
-  - Name: "2228A - tdc"
+  - Name: "2228A_tdc"
     Bits: 16
     Channels: 8
-    ActiveChannels: 8
+    ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
-  - Name: "2249W - adc"
+  - Name: "2249W_adc"
     Bits: 16
-    Channels: 16
-    ActiveChannels: 16
+    Channels: 12
+    ActiveChannels: 2
+    PaddingBytes: 8
     DataType: unsigned
-  - Name: "V259N - multi-hit patter unit"
+  - Name: "V259N_multi-hit_pattern_unit"
     Bits: 16
-    Channels: 8
-    ActiveChannels: 8
+    Channels: 2
+    ActiveChannels: 2
+    PaddingBytes: 12
     DataType: unsigned
   - Name: "C211 - programmable delay"
     Bits: 8
     Channels: 16
-    ActiveChannels: 16
+    ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
     

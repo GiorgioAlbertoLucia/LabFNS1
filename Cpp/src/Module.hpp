@@ -6,17 +6,19 @@
 #include <typeinfo>
 #include <stdexcept>
 #include <cstdint>
-#include "TTree.h"
+
+#include <TTree.h>
+
 #include "../utils/newDumper.hpp"
 
 class Module
 {
 public:
     Module() = default;
-    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, const char * name = " ");
-    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data, const char * name = " ");
-    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint16_t> data, const char * name = " ");
-    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data, const char * name = " ");
+    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, const char * name = " ");
+    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, std::vector<uint8_t> data, const char * name = " ");
+    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, std::vector<uint16_t> data, const char * name = " ");
+    Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, std::vector<uint32_t> data, const char * name = " ");
     Module(const Module& mod);
 
     Module& operator=(const Module& mod) noexcept;
@@ -36,6 +38,7 @@ public:
     unsigned GetBits() const                    {return fBits;}
     unsigned GetChannels() const                {return fChannels;}
     unsigned GetActiveChannels() const          {return fActiveChannels;}
+    unsigned GetPaddingBytes() const            {return fPaddingBytes;}
     unsigned GetNmodule() const                 {return nmodule;}
     std::string GetName() const                 {return fName;}
     
@@ -50,7 +53,8 @@ private:
     std::string fName;
 
     unsigned fBits, fChannels, fActiveChannels;
-    int nmodule;                                // module number 
+    int nmodule;                                    // module number 
+    unsigned fPaddingBytes;                         // n. of bytes to skip after reading data
 
     std::vector<uint8_t> fData8bit;
     std::vector<uint16_t> fData16bit;
