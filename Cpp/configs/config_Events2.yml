@@ -8,35 +8,42 @@ Modules:
     Bits: 32
     Channels: 16
     ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
   - Name: "V560N - scaler"
     Bits: 32
     Channels: 16
     ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
   - Name: "V560N - scaler inhibited"
     Bits: 32
     Channels: 16
     ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
   - Name: "2228A - tdc"
     Bits: 16
     Channels: 8
     ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
   - Name: "2249W - adc"
     Bits: 16
-    Channels: 16
+    Channels: 12
     ActiveChannels: 2
+    PaddingBytes: 8
     DataType: unsigned
   - Name: "V259N - multi-hit patter unit"
     Bits: 16
-    Channels: 8
+    Channels: 2
     ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
   - Name: "C211 - programmable delay"
     Bits: 8
     Channels: 16
     ActiveChannels: 2
+    PaddingBytes: 0
     DataType: unsigned
     

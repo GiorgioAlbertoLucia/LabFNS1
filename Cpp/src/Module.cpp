@@ -5,41 +5,45 @@
     PUBLIC
 */
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint8_t> data, const char * name):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, std::vector<uint8_t> data, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
 fActiveChannels(ActiveChannels),
+fPaddingBytes(PaddingBytes),
 fName(name)
 {
     SetData(data);
 }
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint16_t> data, const char * name):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, std::vector<uint16_t> data, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
 fActiveChannels(ActiveChannels),
+fPaddingBytes(PaddingBytes),
 fName(name)
 {
     SetData(data);
 }
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, std::vector<uint32_t> data, const char * name):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, std::vector<uint32_t> data, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
 fActiveChannels(ActiveChannels),
+fPaddingBytes(PaddingBytes),
 fName(name)
 {
     SetData(data);
 }
 
-Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, const char * name):
+Module::Module(const int nmodule, unsigned nBits, unsigned nChannels, unsigned ActiveChannels, unsigned PaddingBytes, const char * name):
 nmodule(nmodule),
 fBits(nBits), 
 fChannels(nChannels),
 fActiveChannels(ActiveChannels),
+fPaddingBytes(PaddingBytes),
 fName(name)
 {}
 
@@ -49,6 +53,7 @@ Module::Module(const Module& mod)
     fBits = mod.fBits;
     fChannels = mod.fChannels;
     fActiveChannels = mod.fActiveChannels;
+    fPaddingBytes = mod.fPaddingBytes;
     fName = mod.fName;
 
     switch(fBits)
@@ -69,6 +74,7 @@ Module& Module::operator=(const Module& mod) noexcept
     fBits = mod.fBits;
     fChannels = mod.fChannels;
     fActiveChannels = mod.fActiveChannels;
+    fPaddingBytes = mod.fPaddingBytes;
     fName = mod.fName;
 
     switch(fBits)
