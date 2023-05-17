@@ -4,6 +4,7 @@ Cpp/src/loadMacros_cpp.d
 Cpp/src/loadMacros_cpp.so
 
 data/input/thursday
+data/processed/*
 
 settings.json
 __pycache__

@@ -14,7 +14,7 @@ void loadMacros(TString myopt="")
     // clean build directory
     if (myopt.Contains("clean"))    gSystem->Exec("bash clean.sh");
 
-    gSystem->CompileMacro("Cpp/yaml/Yaml.cpp",opt.Data(),"","Cpp/build");
+    //gSystem->CompileMacro("Cpp/yaml/Yaml.cpp",opt.Data(),"","Cpp/build");
     //gSystem->CompileMacro("Cpp/src/hello.cpp",opt.Data(),"","Cpp/build");
     gSystem->CompileMacro("Cpp/utils/newDumper.cpp",opt.Data(),"","Cpp/build");
     //gSystem->CompileMacro("Cpp/utils/fileManager.cpp",opt.Data(),"","Cpp/build");

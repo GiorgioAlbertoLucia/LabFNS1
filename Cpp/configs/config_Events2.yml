@@ -1,49 +1,49 @@
 DataFileName: data/input/overnight/20230512_194044.dat
-TTreeFileName: data/preprocessed/data_tree.root
+TTreeFileName: data/processed/data_tree.root
 
 NModules: 7
 
 Modules:
-  - Name: "C257_scaler"
+  - Name: "C257_-_scaler"
     Bits: 32
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     PaddingBytes: 0
     DataType: unsigned
-  - Name: "V560N_scaler"
+  - Name: "V560N_-_scaler"
     Bits: 32
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     PaddingBytes: 0
     DataType: unsigned
-  - Name: "V560N_scaler_inhibited"
+  - Name: "V560N_-_scaler_inhibited"
     Bits: 32
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     PaddingBytes: 0
     DataType: unsigned
-  - Name: "2228A_tdc"
+  - Name: "2228A_-_tdc"
     Bits: 16
     Channels: 8
-    ActiveChannels: 2
+    ActiveChannels: 8
     PaddingBytes: 0
     DataType: unsigned
-  - Name: "2249W_adc"
+  - Name: "2249W_-_adc"
     Bits: 16
     Channels: 12
-    ActiveChannels: 2
+    ActiveChannels: 12
     PaddingBytes: 8
     DataType: unsigned
-  - Name: "V259N_multi-hit_pattern_unit"
+  - Name: "V259N_-_multi-hit_patter_unit"
     Bits: 16
     Channels: 2
     ActiveChannels: 2
     PaddingBytes: 12
     DataType: unsigned
-  - Name: "C211 - programmable delay"
+  - Name: "C211_-_programmable_delay"
     Bits: 8
     Channels: 16
-    ActiveChannels: 2
+    ActiveChannels: 16
     PaddingBytes: 0
     DataType: unsigned
     

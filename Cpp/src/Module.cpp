@@ -248,19 +248,19 @@ void Module::SetBranchAddress(TTree& tree)
     {
     case 8:
         for (unsigned i=0; i<fActiveChannels; i++)
-            tree.SetBranchAddress((std::string("Module")+std::to_string(nmodule)+"_"+std::to_string(i)).c_str(), (uint8_t*) &fData8bit[i]);
+            tree.SetBranchAddress((fName+"__ch"+std::to_string(i)).c_str(), (uint8_t*) &fData8bit[i]);
 
         break;
     
     case 16:
         for (unsigned i=0; i<fActiveChannels; i++)
-            tree.SetBranchAddress((std::string("Module")+std::to_string(nmodule)+"_"+std::to_string(i)).c_str(), (uint16_t*) &fData16bit[i]);
+            tree.SetBranchAddress((fName+"__ch"+std::to_string(i)).c_str(), (uint16_t*) &fData16bit[i]);
 
         break;
     
     case 32:
         for (unsigned i=0; i<fActiveChannels; i++)
-            tree.SetBranchAddress((std::string("Module")+std::to_string(nmodule)+"_"+std::to_string(i)).c_str(), (uint32_t*) &fData32bit[i]);
+            tree.SetBranchAddress((fName+"__ch"+std::to_string(i)).c_str(), (uint32_t*) &fData32bit[i]);
         
         break;
     
