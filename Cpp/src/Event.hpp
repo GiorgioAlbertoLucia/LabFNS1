@@ -14,7 +14,7 @@ class Event
 public:
     Event();
     Event(unsigned eventNumber, std::string cfgFileName, NewDumper& dumpy);
-    Event(unsigned evennumb, unsigned nmodules, vector<unsigned> &vectortype, vector<unsigned>& nchan,  NewDumper &Newdumpy);
+    Event(unsigned evennumb, unsigned nmodules, vector<unsigned> &vectortype, vector<unsigned>& nchan, vector<unsigned>& paddingbytesvec, NewDumper &Newdumpy);
     bool CheckStatus();                                                     // Checks CAMAC Q state for each module
 
     Event& SetStatus(uint16_t status)                                       {fStatus=status;        return *this;}

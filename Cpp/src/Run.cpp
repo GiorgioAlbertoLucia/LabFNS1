@@ -69,19 +69,19 @@ void Run::TreeSettings()
         {
         case 8:
             for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
-                fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr8bit, 32000);
+                fTreeData.Branch((fEv.getModule(idxModules).GetName()+"__ch"+std::to_string(idxChannel)).c_str(), &ptr8bit, 32000);
 
             break;
 
         case 16:
             for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
-                fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr16bit, 32000);
+                fTreeData.Branch((fEv.getModule(idxModules).GetName()+"__ch"+std::to_string(idxChannel)).c_str(), &ptr16bit, 32000);
 
             break;
 
         case 32:
             for (unsigned idxChannel=0; idxChannel<fEv.getModule(idxModules).GetActiveChannels(); idxChannel++)
-                fTreeData.Branch((std::string("Module")+std::to_string(idxModules)+"_"+std::to_string(idxChannel)).c_str(), &ptr32bit, 32000);
+                fTreeData.Branch((fEv.getModule(idxModules).GetName()+"__ch"+std::to_string(idxChannel)).c_str(), &ptr32bit, 32000);
 
             break;
         

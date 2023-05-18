@@ -1,5 +1,6 @@
+#include <vector>
+
 #include "Event.hpp"
-#include "vector"
 
 /*
     PROTECTED
@@ -18,16 +19,12 @@ void Event::InitializeEvent()
         unsigned int start=0,stop=0,offset=0;
         
         for(unsigned a=0;a<ii;a++)
-            offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8);
+            offset=offset+unsigned(fmodulesvector[a].GetChannels()*fmodulesvector[a].GetBits()/8)+fmodulesvector[a].GetPaddingBytes();
 
         Module& mod = fmodulesvector[ii];
-        //std::cout << "check bits: " << mod.GetBits() << "\n";
+        
         start=16+64*fNmodules+fDumpy.getEventPosition(fEventNumber)+offset;
         stop=start+unsigned(mod.GetChannels()*mod.GetBits()/8);
-
-        //printf("start = %d\n", start);
-        //printf("stop = %d\n", stop);
-        //printf("offset = %d\n", offset);
         
         switch (mod.GetBits())
         {
@@ -65,14 +62,14 @@ void Event::InitializeEvent()
 Event::Event()
 {}
 
-Event::Event(unsigned evenumb ,unsigned nmodules, std::vector<unsigned> &vectortype, std::vector<unsigned>& nchan, NewDumper& Newdumpy):
+Event::Event(unsigned evenumb ,unsigned nmodules, std::vector<unsigned> &vectortype, std::vector<unsigned>& nchan, std::vector<unsigned>& paddingbytesvec, NewDumper& Newdumpy):
 fNmodules(nmodules),
 fEventNumber(evenumb),
 fDumpy(*(&Newdumpy))
 {
     for(unsigned ii=0;ii<fNmodules;ii++) 
     {
-        Module mod(ii,vectortype[ii],nchan[ii], 0);
+        Module mod(ii,vectortype[ii],nchan[ii], 0, paddingbytesvec[ii]);
         fmodulesvector.push_back(mod);
     }
 
@@ -94,7 +91,8 @@ fDumpy(*(&dumpy))
     {
         Yaml::Node& ModuleSetting = (*it).second;
         Module mod(nmodule, ModuleSetting["Bits"].As<unsigned>(), ModuleSetting["Channels"].As<unsigned>(), 
-            ModuleSetting["ActiveChannels"].As<unsigned>(), ModuleSetting["Name"].As<std::string>().c_str());
+            ModuleSetting["ActiveChannels"].As<unsigned>(), ModuleSetting["PaddingBytes"].As<unsigned>(),
+            ModuleSetting["Name"].As<std::string>().c_str());
         fmodulesvector.push_back(mod);
         nmodule++;
     }

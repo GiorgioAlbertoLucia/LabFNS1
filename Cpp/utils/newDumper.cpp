@@ -171,11 +171,9 @@ void NewDumper::printEvent(const unsigned int event, const bool onFile, const ch
     std::string outFileStr(outFile);
     if(strcmp(outFile, "") == 0)   outFileStr = Form("data/output/dump_%devent.txt", event);
 
-    const unsigned  int first_pos = fEventPosition[event];
-    if(event >= fnEvents-1) throw std::exception();
-    const unsigned int final_pos = fEventPosition[event+1];
+    if(event >= fnEvents) throw std::exception();
 
-    NewDumper::printSection(first_pos, final_pos, onFile, outFileStr.c_str());
+    NewDumper::printSection(fEventPosition[event], fEventPosition[event+1], onFile, outFileStr.c_str());
 }
 
 /**
@@ -222,13 +220,13 @@ void NewDumper::printSection(const unsigned int begin, const unsigned int end, c
     }
     else
     {
-        for (unsigned int i = begin; i < end; ++i) 
+        for (unsigned int i = 0; i < size; ++i) 
         {
             std::cout << bytes[i];
             if(i%16 == 15)   std::cout << "\n";
         }
 
-        for (unsigned int i = begin; i < end; ++i) 
+        for (unsigned int i = 0; i < size; ++i) 
         {
             printf("%02X ", bytes[i]);
             if(i%16 == 15)   std::cout << "\n";
