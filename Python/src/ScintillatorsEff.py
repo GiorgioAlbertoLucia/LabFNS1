@@ -148,6 +148,34 @@ def AdjustFigures(root_file):
 
     cS3new.SaveAs('data/output/Figures/S3WorkingPoint.pdf')
     
+    cSG = root_file.Get('SG')
+    gSG=cSG.GetPrimitive("Graph")
+    SetObjectStyle(gSG,color=kAzure+3, markersize=1.5)
+
+    cSGnew=TCanvas("Canvas","Canvas",1300,1300)
+    cSGnew.DrawFrame(1100,.8,2100,9.e+7,"SG Counts; HV [V]; Counts")
+    cSGnew.Modified()
+    cSGnew.Update()
+    cSGnew.SetLogy()
+    gSG.Draw("PZ")
+
+    text =TLatex(0.4, 0.42,"SG Scintillator + PMXP2020")
+    text.SetNDC()
+    text.SetTextSize(gStyle.GetTextSize())
+    text.SetTextFont(42)
+    text.Draw()
+    text2 =TLatex(0.4, 0.37,"Acquisition time: 300 s")
+    text2.SetNDC()
+    text2.SetTextSize(gStyle.GetTextSize()*0.7)
+    text2.SetTextFont(42)
+    text2.Draw()
+    text3 =TLatex(0.4, 0.32,"Discriminator threshold value: (-10.2 #pm 0.2) mV")
+    text3.SetNDC()
+    text3.SetTextSize(gStyle.GetTextSize()*0.7)
+    text3.SetTextFont(42)
+    text3.Draw()
+
+    cSGnew.SaveAs('data/output/Figures/SGWorkingPoint.pdf')
 
 
 
