@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 DataFileName: data/input/overnight/20230512_194044.dat
 TTreeFileName: data/processed/data_tree.root
+=======
+DataFileName: data/input/20230512_194044.dat
+TTreeFileName: data/input/Test.root
+>>>>>>> Stashed changes
 
 NModules: 7
 
