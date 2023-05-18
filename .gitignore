@@ -2,6 +2,7 @@ Cpp/build/
 Cpp/src/loadMacros_cpp_ACLiC_dict_rdict.pcm
 Cpp/src/loadMacros_cpp.d
 Cpp/src/loadMacros_cpp.so
+Cpp/configs/config_Events2.yml
 
 data/input/thursday
 data/processed/*

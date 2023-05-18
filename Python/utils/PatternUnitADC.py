@@ -1,9 +1,11 @@
+import sys
 import pandas as pd
 import numpy as np
 import uproot
 from ROOT import TH1D, TCanvas, kAzure, kRed, kGreen, kSpring, TLegend, TLatex, gStyle
 
-from StyleFormatter import SetGlobalStyle, SetObjectStyle
+sys.append
+from ..utils.StyleFormatter import SetGlobalStyle, SetObjectStyle
 
 SetGlobalStyle(padleftmargin=0.12, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1.2, titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
 
