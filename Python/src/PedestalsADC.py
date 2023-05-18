@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import uproot
-from ROOT import TH1D, TCanvas, kAzure, kRed, kGreen, kSpring, TLegend, TLatex, gStyle, TFitResultPtr
+from ROOT import TH1D, TCanvas, kAzure, kRed, kGreen, kSpring, TLegend, TLatex, gStyle, TFitResultPtr, TF1, kBlack
 
 import sys
 sys.path.append('Python/utils')
@@ -59,6 +59,8 @@ hCh10pedInpSix.FillN(len(tInpSix["Module4_10"]),np.asarray(tInpSix["Module4_10"]
 hCh10pedInpSix.Scale(1/len(tInpSix))
 hCh10pedInpSix.Rebin(2)
 hCh10pedInpSix.Fit("gaus")
+f1 = TF1("f1","gaus(0)",180,300)
+hCh10pedInpSix.Fit(f1,"l")
 print('Pedestal Gate 6 mu s channel 10: ', hCh10pedInpSix.GetMean(), ' RMS: ', hCh10pedInpSix.GetRMS())
 
 hCh11pedInpSix = TH1D("hCh11pedInpSix","hCh11pedInpSix",2048,0,2048)
@@ -267,6 +269,7 @@ SetObjectStyle(hCh10pedInpSix,color=kRed,fillalpha=0.5,linewidth=1)
 hCh10pedInpSix.Scale(1*hCh10pedSix.GetMaximum()/hCh10pedInpSix.GetMaximum())
 hCh10pedInpSix.Draw("hist,same")
 hCh10pedSix.Draw("hist,same")
+SetObjectStyle(f1,color=kBlack)
 leg1 = TLegend(0.7, 0.7, 0.9, 0.8)
 leg1.SetTextFont(42)
 leg1.SetTextSize(gStyle.GetTextSize()*0.7)
