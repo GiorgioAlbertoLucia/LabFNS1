@@ -7,6 +7,13 @@ Cpp/configs/config_Events2.yml
 data/input/thursday
 data/processed/*
 
+data/input/measures
+data/input/measurestrees
+data/input/overnight
+data/input/pedestals_files
+data/input/pedestals_trees
+data/thursday
+
 settings.json
 __pycache__
 

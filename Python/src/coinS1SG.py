@@ -9,7 +9,7 @@ sys.path.append("Python/utils")
 
 from StyleFormatter import SetGlobalStyle, SetObjectStyle
 from math import sqrt
-from ROOT import TGraphErrors, TCanvas, TFile, gPad, kAzure, TF1, TMath, gStyle, TFitResult, TFitResultPtr
+from ROOT import TGraphErrors, TCanvas, TFile, gPad, kAzure, TF1, TMath, gStyle, TFitResult, TFitResultPtr, TLegend
 
 SetGlobalStyle(padleftmargin=0.19, padbottommargin=0.19, padtopmargin=0.1, titleoffsety=1.6, titleoffsetx=1.2, titleoffset= 0.7, opttitle=1)
 
@@ -56,8 +56,7 @@ def coinccurve(input_path):
     histo.GetXaxis().SetTitle("#Delta T")
     histo.GetYaxis().SetTitle("Counts")
 
-    #canvas = TCanvas("coincidence_curve", "c" ,1280, 720)
-    #canvas.cd()
+    
     #SetObjectStyle(histo,color=kAzure+3)
     #histo.Draw("APZ")
 
@@ -77,13 +76,17 @@ def coinccurve(input_path):
 
     root_file.cd()
     histo2.Write()
+    root_file.Close()
 
     # Linear fit on the plateau for fit parameters optimization
     #constant = TF1("f1", "[0]", 31, 91)
 
+    canvas = TCanvas("coincidence_curve", "c" ,1280, 720)
+    canvas.cd()
+
     FitLowerBoundary = -5
     FitUpperBoundary = 120
-    histo2.SetTitle("Fit # p_{0} + p_{1}(1/[1+exp(-#frac{x-p_{2}}{p_{3}})]}) + p_{4}(1/[1+exp(-#frac{x-p_{5}}{p_{6}})]})")
+    histo2.SetTitle("Coincidence curve")
     gStyle.SetTitleSize(3)
     sigmoidsum = TF1("f1","[0] + [1]*((1/(1+TMath::Exp(-(x-[2])/[3])))) + [4]*((1/(1+TMath::Exp(-(x-[5])/[6]))))", FitLowerBoundary, FitUpperBoundary)
     sigmoidsum.SetParameters(0, 0.13)
@@ -95,36 +98,16 @@ def coinccurve(input_path):
     FWHMright = sigmoidsum.GetX(sigmoidsum.GetMaximum()/2, sigmoidsum.GetMaximumX(), FitUpperBoundary)
     print('Chi Square: ', Chisquaresum, ' Degrees of freedom: ', NDegFreedom, ' Fit Probability: ', FitProb, ' Resolution: ', FWHMright - FWHMleft, 'ns')
 
+    histo2.SetMarkerColor(4)
+    histo2.Draw("ap")
+    leg1 = TLegend(0.4, 0.3, 0.7, 0.45)
+    leg1.SetTextFont(42)
+    leg1.SetTextSize(gStyle.GetTextSize()*0.5)
+    leg1.SetFillStyle(0)
+    leg1.AddEntry(sigmoidsum, 'p_{0} + p_{1}(1/[1+exp(-#frac{x-p_{2}}{p_{3}})]}) + p_{4}(1/[1+exp(-#frac{x-p_{5}}{p_{6}})]})', 'lf')
+    leg1.Draw("same")
 
-    root_file.cd()
-    histo2.Write()
-
-    #histo2.SetTitle("Rate curve S_1S_G")
-    #singlesigmoid = TF1("f1","[0] + [1]*( (1 / ( 1 + TMath::Exp( - (x - [2]) / [3]) ) ) + (1 / (1 + TMath::Exp(- (x - [4]) / [5]))))", -5, 120)
-    #histo2.Fit(singlesigmoid,"RM","", -5, 120)
-    #
-    #root_file.cd()
-    #histo2.Write()
-    #
-    #histo2.SetTitle("Rate curve S_1S_G")
-    #abssigmoid = TF1("f1","[0] + [1]*( (1 / ( 1 + TMath::Exp( TMath::Abs( (x - [2]) / [3]) ) ) ) )", -5, 120)
-    #histo2.Fit(abssigmoid,"RM","", -5, 120)
-    #
-    #root_file.cd()
-    #histo2.Write()
-    #
-    #canvas2 = TCanvas("Rate_coincidence_curve", "c" ,1280, 720)
-    #canvas2.cd()
-    #SetObjectStyle(histo,color=kAzure+3)
-    #histo2.Draw("APZ")
-
-    #gPad.Modified()
-    #gPad.Update()
-
-    #root_file.cd()
-    #histo2.Write()
-    #canvas2.Write()
-    root_file.Close()
+    canvas.SaveAs('data/output/CoincidenceCurve.pdf')
 
     ## Rate acc
     R1 = df['rate s1'].mean()
