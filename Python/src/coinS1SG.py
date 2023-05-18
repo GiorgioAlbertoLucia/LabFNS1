@@ -86,7 +86,7 @@ def coinccurve(input_path):
     histo2.SetTitle("Fit # p_{0} + p_{1}(1/[1+exp(-#frac{x-p_{2}}{p_{3}})]}) + p_{4}(1/[1+exp(-#frac{x-p_{5}}{p_{6}})]})")
     gStyle.SetTitleSize(3)
     sigmoidsum = TF1("f1","[0] + [1]*((1/(1+TMath::Exp(-(x-[2])/[3])))) + [4]*((1/(1+TMath::Exp(-(x-[5])/[6]))))", FitLowerBoundary, FitUpperBoundary)
-    #sigmoidsum.SetParameters(1, constant.GetParameter(0))
+    sigmoidsum.SetParameters(0, 0.13)
     histo2.Fit(sigmoidsum,"RM+","", FitLowerBoundary, FitUpperBoundary)
     Chisquaresum = sigmoidsum.GetChisquare()
     NDegFreedom = sigmoidsum.GetNDF()
