@@ -44,7 +44,7 @@ if __name__ == '__main__':
     legCaptions = config['legCaptions']
     
     canvas = TCanvas(config['canvas']['name'], config['canvas']['name'], config['canvas']['height'], config['canvas']['width'])
-    canvas.SetTitle(config['canvas']['title'])
+    
     leg = TLegend(config['legend']['pos'][0], config['legend']['pos'][1], config['legend']['pos'][2], config['legend']['pos'][3])
     leg.SetTextFont(config['legend']['font'])
     leg.SetTextSize(gStyle.GetTextSize()*0.7)
@@ -55,7 +55,16 @@ if __name__ == '__main__':
         addHistToCanvas(canvas, leg, inputRootPath, inputHistName, styleOptions, legCaption)
 
     leg.Draw('same')
+
+    canvas.SetTitle(config['canvas']['title'])
+    canvas.RangeAxis(config['canvas']['xmin'], config['canvas']['xmax'], config['canvas']['ymin'], config['canvas']['ymax'])
+    if config['canvas']['logx']:        canvas.SetLogx()
+    if config['canvas']['logy']:        canvas.SetLogy()
+
     canvas.SaveAs(config['outputPath'])
+    canvas.Draw()
+    input('Press enter to continue')
+
         
 
 #text =TLatex(0.45, 0.73,"S1 Scintillator + PMXP2020")

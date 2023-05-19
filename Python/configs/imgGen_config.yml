@@ -1,17 +1,25 @@
 #canvas options
 canvas:
   name:     'SG_comparison'
-  title:    'S_{G} comparison; CHN (a.u.); Counts (a.u.)'
+  title:    'S_{G} comparison;CHN (a.u.);Counts (a.u.)'
   height:   1500
   width:    1500
+  
+  xmin:     0
+  xmax:     2048
+  ymin:     0
+  ymax:     1600
+
+  logx:     false
+  logy:     false
 
 legend:
   pos: [0.435, 0.71, 0.85, 0.59]
   font: 42
   fillstyle: 0
 
-inputRootPaths: ['data/output/ADC_TDC_comparison.root', 'data/output/S1SG_peakComparison.root']
-inputHistNames: ['ADCproj_3_3', 'SG_with_peakSelection_on_S1']
+inputRootPaths: ['data/output/S1SG_peakComparison.root', 'data/output/S1SG_peakComparison.root']
+inputHistNames: ['SG', 'SG_with_peakSelection_on_S1']
 outputPath: 'data/output/SGcomparisons.pdf'
 
 colors: [863, 797]

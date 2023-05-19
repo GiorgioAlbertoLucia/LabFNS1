@@ -68,6 +68,11 @@ if __name__ == '__main__':
     rootFilePath = 'data/output/S1SG_peakComparison.root'
     rootFile = TFile(rootFilePath, 'recreate')
 
+    plotSpec = ['CHN (a.u.)', 2048, 0, 2048]
+    addHist(df, rootFile, '2249W_-_adc__ch10', plotSpec, 'S1')
+    addHist(df, rootFile, '2249W_-_adc__ch11', plotSpec, 'SG')
+    
+
     # select events in the first peak
     dfSgPeak = df.query('0 < `2249W_-_adc__ch11` < 574', inplace=False)
     plotSpec = ['CHN (a.u.)', 2048, 0, 2048]
@@ -79,8 +84,11 @@ if __name__ == '__main__':
     addHist(dfS1Peak, rootFile, '2249W_-_adc__ch10', plotSpec, 'S1_with_peakSelection_on_S1')
     addHist(dfS1Peak, rootFile, '2249W_-_adc__ch11', plotSpec, 'SG_with_peakSelection_on_S1')
 
+    # th2 with and without pattern unit selections
+    dfPU = df.query('`V259N_-_multi-hit_patter_unit__ch0` == 1', inplace=False)
     scatSpec = ['S1 CHN (a.u.)', 2048, 0, 2048, 'SG CHN (a.u.)', 2048, 0, 2048]
     addTH2(df, rootFile, '2249W_-_adc__ch10', '2249W_-_adc__ch11', scatSpec, 'S1_and_SG')
+    addTH2(dfPU, rootFile, '2249W_-_adc__ch10', '2249W_-_adc__ch11', scatSpec, 'S1_and_SG_PUselections')
 
     rootFile.Close()
 
