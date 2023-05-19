@@ -272,6 +272,6 @@ def multiplePlotsSingleCanvas(generalConfigPath, configPath):
 # Run the multiplePlotsSingleCanvas function directily from this macro    
 if __name__ == '__main__':
 
-    generalConfigPath = 'Python/utils/config_plotter.yml'
-    configPath = 'Python/utils/config_multiplot.yml'
+    generalConfigPath = 'Python/configs/config_plotter.yml'
+    configPath = 'Python/configs/config_multiplot.yml'
     multiplePlotsSingleCanvas(generalConfigPath, configPath)    

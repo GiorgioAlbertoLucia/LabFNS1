@@ -1,10 +1,12 @@
+import sys
 import pandas as pd
 import numpy as np
 import uproot
 from ROOT import TH1D, TH2D, TCanvas, kAzure, kRed, kGreen, kSpring, kBlack, kDarkBodyRadiator, TLegend, TLatex, TLine, TText, gStyle, gPad, gROOT
 
-from Pedestal import DrawPedestral
-from StyleFormatter import SetGlobalStyle, SetObjectStyle
+
+sys.append
+from ..utils.StyleFormatter import SetGlobalStyle, SetObjectStyle
 
 #gROOT.SetBatch()
 
