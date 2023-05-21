@@ -3,10 +3,9 @@ import pandas as pd
 import numpy as np
 import uproot
 from ROOT import TH1D, TH2D, TCanvas, kAzure, kRed, kGreen, kSpring, kBlack, kDarkBodyRadiator, TLegend, TLatex, TLine, TText, gStyle, gPad, gROOT
-
-
-sys.append
-from ..utils.StyleFormatter import SetGlobalStyle, SetObjectStyle
+sys.path.append('Python/utils')
+from Pedestal import DrawPedestral
+from StyleFormatter import SetGlobalStyle, SetObjectStyle
 
 #gROOT.SetBatch()
 
@@ -72,13 +71,13 @@ text4.SetTextSize(gStyle.GetTextSize()*0.7)
 text4.SetTextFont(42)
 text4.Draw()
 
-lineAtPedestal = TLine(245, gPad.GetUymax(), 245, gPad.GetUymin())
+lineAtPedestal = TLine(300, gPad.GetUymax(), 300, gPad.GetUymin())
 lineAtPedestal.SetLineColor(kBlack)
 lineAtPedestal.SetLineWidth(1)
 lineAtPedestal.SetLineStyle(7)
 lineAtPedestal.Draw("same")
 
-pedestal= TText(0.21,0.7,"Pedestal")
+pedestal= TText(0.23,0.7,"Pedestal")
 pedestal.SetNDC()
 pedestal.SetTextSize(gStyle.GetTextSize()*0.7)
 pedestal.SetTextAngle(90)
@@ -132,7 +131,7 @@ text4.SetTextSize(gStyle.GetTextSize()*0.7)
 text4.SetTextFont(42)
 text4.Draw()
 
-lineAtPedestal = TLine(245, gPad.GetUymax(), 245, gPad.GetUymin())
+lineAtPedestal = TLine(300, gPad.GetUymax(), 300, gPad.GetUymin())
 lineAtPedestal.SetLineColor(kBlack)
 lineAtPedestal.SetLineWidth(1)
 lineAtPedestal.SetLineStyle(7)
@@ -198,6 +197,19 @@ text4.SetNDC()
 text4.SetTextSize(gStyle.GetTextSize()*0.7)
 text4.SetTextFont(42)
 text4.Draw()
+
+lineAtPedestal = TLine(320, gPad.GetUymax(), 320, gPad.GetUymin())
+lineAtPedestal.SetLineColor(kBlack)
+lineAtPedestal.SetLineWidth(1)
+lineAtPedestal.SetLineStyle(7)
+lineAtPedestal.Draw("same")
+
+pedestal= TText(0.24,0.7,"Pedestal")
+pedestal.SetNDC()
+pedestal.SetTextSize(gStyle.GetTextSize()*0.7)
+pedestal.SetTextAngle(90)
+pedestal.SetTextFont(42)
+pedestal.Draw("same")
 
 
 cSG.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cSG.pdf')
@@ -279,6 +291,21 @@ gStyle.SetPalette(kDarkBodyRadiator, 0)
 hComp.Draw("COLZ")
 gPad.Modified()
 gPad.Update()
+
+lineAtPedestal = TLine(245, gPad.GetUymax(), 245, gPad.GetUymin())
+lineAtPedestal.SetLineColor(kBlack)
+lineAtPedestal.SetLineWidth(1)
+lineAtPedestal.SetLineStyle(7)
+lineAtPedestal.Draw("same")
+
+pedestal= TText(0.195,0.7,"Pedestal")
+pedestal.SetNDC()
+pedestal.SetTextSize(gStyle.GetTextSize()*0.7)
+pedestal.SetTextAngle(90)
+pedestal.SetTextFont(42)
+pedestal.Draw("same")
+
+print("Correlation:" , DfPassed["Module4_10"].corr(DfPassed["Module4_11"]))
 
 cCompS1SG.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cCompS1SG.root')
 cCompS1SG.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cCompS1SG.pdf')
