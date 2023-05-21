@@ -26,9 +26,9 @@ def fitHist(inFilePath, histName, formula, outFile):
     for i in range(hist.GetNbinsX()):   hist.SetBinError(i+1, np.sqrt(hist.GetBinContent(i+1)))
 
     fitFunc = TF1('fitFunc', formula, 266, 1600)
-    fitFunc.SetParameters(0, 470, 90, 0, 760, 120)
+    fitFunc.SetParameters(0, 300, 90, 0, 450, 120)
     fitFunc.SetLineColor(2)
-    hist.Fit(fitFunc, 'e')
+    hist.Fit(fitFunc, 'eb')
     print('Chi2 = ', fitFunc.GetChisquare())
     print('NDF = ', fitFunc.GetNDF())
     print('p-value = ', fitFunc.GetProb())
@@ -69,7 +69,8 @@ if __name__ == '__main__':
     rootFilePath = 'data/output/fits.root'
     rootFile = TFile(rootFilePath, 'recreate')
 
-    formula = 'landau(0) + landau(3) + [6]+x*[7]+exp([8]*x)'# + gaus(6)'
+    formula = 'landau(0) + landau(3)'# + [6]+x*[7]+exp([8]*x)'# + gaus(6)'
+    #formula = 'landau(0) + gaus(3)'
     inFilePath = 'data/output/S1SG_peakComparison.root'
     histName = 'SG'
 
