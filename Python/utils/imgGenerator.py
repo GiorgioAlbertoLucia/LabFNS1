@@ -10,7 +10,7 @@ SetGlobalStyle(padleftmargin=0.12, padbottommargin=0.12, padrightmargin=0.05, pa
 
 
 
-def addHistToCanvas(canvas, legend, inputRootPath, inputHistName, styleOptions, legendCaption):
+def addHistToCanvas(canvas, legend, inputRootPath, inputHistName, styleOptions, legendCaption, normalize):
     '''
 
     Parameters
@@ -25,6 +25,7 @@ def addHistToCanvas(canvas, legend, inputRootPath, inputHistName, styleOptions, 
 
     [color, fillalpha, linewidth] = styleOptions
     SetObjectStyle(hist, color=color, fillalpha=fillalpha, linewidth=linewidth)
+    if normalize:   hist.Scale(1./hist.Integral())
     hist.Draw("hist,same")
     leg.AddEntry(hist, legendCaption, 'lf')
 
@@ -32,19 +33,29 @@ def addHistToCanvas(canvas, legend, inputRootPath, inputHistName, styleOptions, 
 
 if __name__ == '__main__':
 
+    #load configurations
     configPath = 'Python/configs/imgGen_config.yml'
     with open(configPath, 'r') as configFile:
         config = yaml.load(configFile, yaml.FullLoader)
 
-    inputRootPaths = config['inputRootPaths']
-    inputHistNames = config['inputHistNames']
-    colors = config['colors']
-    fillalphas = config['fillalphas']
-    linewidths = config['linewidths']
-    legCaptions = config['legCaptions']
+    inputRootPaths = config['th1']['inputRootPaths']
+    inputHistNames = config['th1']['inputHistNames']
+
+    colors = config['th1']['colors']
+    fillalphas = config['th1']['fillalphas']
+    linewidths = config['th1']['linewidths']
+    legCaptions = config['th1']['legCaptions']
+    normalize = config['th1']['normalize']
+
+    xmin = config['canvas']['xmin'] 
+    ymin = config['canvas']['ymin'] 
+    xmax = config['canvas']['xmax'] 
+    ymax = config['canvas']['ymax']
+    title = config['canvas']['title']
     
     canvas = TCanvas(config['canvas']['name'], config['canvas']['name'], config['canvas']['height'], config['canvas']['width'])
-    
+    hFrame = canvas.cd().DrawFrame(xmin, ymin, xmax, ymax, title)
+
     leg = TLegend(config['legend']['pos'][0], config['legend']['pos'][1], config['legend']['pos'][2], config['legend']['pos'][3])
     leg.SetTextFont(config['legend']['font'])
     leg.SetTextSize(gStyle.GetTextSize()*0.7)
@@ -52,16 +63,27 @@ if __name__ == '__main__':
 
     for inputRootPath, inputHistName, color, fillalpha, linewidth, legCaption in zip(inputRootPaths, inputHistNames, colors, fillalphas, linewidths, legCaptions):
         styleOptions = [color, fillalpha, linewidth]
-        addHistToCanvas(canvas, leg, inputRootPath, inputHistName, styleOptions, legCaption)
+        addHistToCanvas(canvas, leg, inputRootPath, inputHistName, styleOptions, legCaption, normalize)
 
     leg.Draw('same')
 
-    canvas.SetTitle(config['canvas']['title'])
-    canvas.RangeAxis(config['canvas']['xmin'], config['canvas']['xmax'], config['canvas']['ymin'], config['canvas']['ymax'])
+    latexLines = []
+    lines = config['latex']['lines']
+    linePos = config['latex']['linePos']
+
+    for line, linePosition in zip(lines, linePos):
+        text = TLatex(linePosition[0], linePosition[1], line)
+        text.SetNDC()
+        text.SetTextSize(gStyle.GetTextSize())
+        text.SetTextFont(42)
+        latexLines.append(text)
+    for line in latexLines: line.Draw()
+
     if config['canvas']['logx']:        canvas.SetLogx()
     if config['canvas']['logy']:        canvas.SetLogy()
+    canvas.Update()
 
-    canvas.SaveAs(config['outputPath'])
+    canvas.SaveAs(config['th1']['outputPath'])
     canvas.Draw()
     input('Press enter to continue')
 
