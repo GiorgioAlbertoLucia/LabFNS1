@@ -11,7 +11,7 @@ from StyleFormatter import SetGlobalStyle, SetObjectStyle
 
 SetGlobalStyle(padleftmargin=0.12, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1.2, titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
 
-Tree=uproot.open("/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/data/input/DataFullRun.root")["fTreeData"]
+Tree=uproot.open("data/input/DataFullRun.root")["fTreeData"]
 
 ##########
 #   S1   #
@@ -84,7 +84,7 @@ pedestal.SetTextAngle(90)
 pedestal.SetTextFont(42)
 pedestal.Draw("same")
 
-cS1.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cS1.pdf')
+cS1.SaveAs('data/output/Figures/cS1.pdf')
 
 cS1NotPassed = TCanvas("S1","S1",1500,1500)
 hFrame = cS1NotPassed.DrawFrame(Df["Module4_10"].min()*0.9,0.0001,Df["Module4_10"].max()*1.02,0.01,"ADC Normalised counts; Channel; Counts")
@@ -144,7 +144,7 @@ pedestal.SetTextAngle(90)
 pedestal.SetTextFont(42)
 pedestal.Draw("same")
 
-cS1NotPassed.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cS1All.pdf')
+cS1NotPassed.SaveAs('data/output/Figures/cS1All.pdf')
 
 
 ##########
@@ -212,7 +212,7 @@ pedestal.SetTextFont(42)
 pedestal.Draw("same")
 
 
-cSG.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cSG.pdf')
+cSG.SaveAs('data/output/Figures/cSG.pdf')
 
 cSGNotPassed = TCanvas("SG","SG",1500,1500)
 hFrame = cSGNotPassed.DrawFrame(Df["Module4_11"].min()*0.9,0.0001,Df["Module4_11"].max()*1.02,0.006,"ADC Normalised counts; Channel; Counts")
@@ -258,7 +258,7 @@ text4.SetTextSize(gStyle.GetTextSize()*0.7)
 text4.SetTextFont(42)
 text4.Draw()
 
-cSGNotPassed.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cSGAll.pdf')
+cSGNotPassed.SaveAs('data/output/Figures/cSGAll.pdf')
 
 
 ##############
@@ -278,8 +278,8 @@ hComp.Draw("COLZ")
 gPad.Modified()
 gPad.Update()
 
-cComp.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cCompSG.root')
-cComp.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cCompSG.pdf')
+cComp.SaveAs('data/output/Figures/cCompSG.root')
+cComp.SaveAs('data/output/Figures/cCompSG.pdf')
 
 cCompS1SG = TCanvas("ComparisonS1SG","ComparisonS1SG",1500,1500)
 cCompS1SG.SetLogz()
@@ -292,20 +292,32 @@ hComp.Draw("COLZ")
 gPad.Modified()
 gPad.Update()
 
-lineAtPedestal = TLine(245, gPad.GetUymax(), 245, gPad.GetUymin())
+lineAtPedestal = TLine(300, gPad.GetUymax(), 300, gPad.GetUymin())
 lineAtPedestal.SetLineColor(kBlack)
 lineAtPedestal.SetLineWidth(1)
 lineAtPedestal.SetLineStyle(7)
 lineAtPedestal.Draw("same")
 
-pedestal= TText(0.195,0.7,"Pedestal")
+pedestal= TText(0.21,0.7,"Pedestal")
 pedestal.SetNDC()
 pedestal.SetTextSize(gStyle.GetTextSize()*0.7)
 pedestal.SetTextAngle(90)
 pedestal.SetTextFont(42)
 pedestal.Draw("same")
 
+lineAtPedestalSG = TLine(gPad.GetUxmax(), 320 , gPad.GetUxmin(), 320)
+lineAtPedestalSG.SetLineColor(kBlack)
+lineAtPedestalSG.SetLineWidth(1)
+lineAtPedestalSG.SetLineStyle(7)
+lineAtPedestalSG.Draw("same")
+
+pedestalSG= TText(0.7,0.21,"Pedestal")
+pedestalSG.SetNDC()
+pedestalSG.SetTextSize(gStyle.GetTextSize()*0.7)
+pedestalSG.SetTextFont(42)
+pedestalSG.Draw("same")
+
 print("Correlation:" , DfPassed["Module4_10"].corr(DfPassed["Module4_11"]))
 
-cCompS1SG.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cCompS1SG.root')
-cCompS1SG.SaveAs('/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/Python/utils/cCompS1SG.pdf')
+cCompS1SG.SaveAs('data/output/Figures/cCompS1SG.root')
+cCompS1SG.SaveAs('data/output/Figures/cCompS1SG.pdf')
