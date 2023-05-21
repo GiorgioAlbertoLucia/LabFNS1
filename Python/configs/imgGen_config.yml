@@ -1,7 +1,7 @@
 #canvas options
 canvas:
-  name:           'SGcomp'
-  title:          'S_{G} comparison; Energy (chn);Counts (a.u.)'
+  name:           'ADCprojS1'
+  title:          'S1 comparison; Energy (chn);Counts (a.u.)'
   height:         1500
   width:          1500
   
@@ -20,7 +20,7 @@ legend:
   fillstyle:      0
 
 latex:
-  lines:          ['ADC S_{G} comparison', 'Using V259 Pattern Unit', 'Acquisition time: 236985 s']
+  lines:          ['ADC S1 comparison', 'Acquisition time: 236985 s']
   linePos:        [[0.505, 0.64], [0.505, 0.58], [0.505, 0.52]] # xmin, ymin
   box:            false        # whether the text should be put in a box
   boxPos:         [0.1, 0.1, 0.9, 0.9] # xmin, ymin, xmax, ymax
