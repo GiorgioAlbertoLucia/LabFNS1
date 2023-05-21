@@ -1,5 +1,5 @@
-DataFileName: data/input/overnight/20230512_194044.dat
-TTreeFileName: data/processed/data_tree.root
+DataFileName: data/input/thursday/20230511_201216.dat
+TTreeFileName: data/processed/thursday_tree.root
 
 NModules: 7
 
