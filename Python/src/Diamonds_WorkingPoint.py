@@ -37,11 +37,12 @@ def diamondsWP(input_path,root_file):
     cR.cd()
     #SetObjectStyle(graphResolution,color=kAzure+3)
     graphResolution.Draw("AP")
-
+    input("press enter to to close")
     cC = TCanvas("cC", "cC" ,1280, 720)
     cC.cd()
     #SetObjectStyle(graphCentr,color=kAzure+3)
     graphCentr.Draw("AP")
+    input("press enter to to close2")
     gPad.Modified()
     gPad.Update()
 
