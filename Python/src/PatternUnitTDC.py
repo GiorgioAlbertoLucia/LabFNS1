@@ -1,8 +1,9 @@
+import sys
 import pandas as pd
 import numpy as np
 import uproot
 from ROOT import TH1D, TCanvas, kAzure, kRed, kGreen, kSpring, kBlack, TLegend, TLatex, TLine, TText, gStyle, gPad
-
+sys.path.append('Python/utils')
 from Pedestal import DrawPedestral
 from StyleFormatter import SetGlobalStyle, SetObjectStyle
 

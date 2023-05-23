@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import sys 
 
-from ROOT import TH2D, gStyle, TFile, TH1D
+from ROOT import TH2D, gStyle, TFile, TH1D, TCanvas, TGraph
 import uproot
 
 from Python.utils.StyleFormatter import SetGlobalStyle, SetObjectStyle
@@ -31,6 +31,37 @@ def addHist(df, outputFile, column, plotSpec, histName=''):
 
     outputFile.cd()
     hist.Write()
+
+def performHistTest(series1, series2, histSpec, rootFile):
+    '''
+        Perform Chi2 and Kolmogorov-Smirnov test on histograms from two pandas.Series
+    '''
+
+    [nBinsX, Xmin, Xmax] = histSpec
+    hist1 = TH1D('hist1', 'hist1', nBinsX, Xmin, Xmax)
+    for x in series1:   hist1.Fill(x)
+    hist1.Scale(1./hist1.Integral())
+    
+    hist2 = TH1D('hist2', 'hist2', nBinsX, Xmin, Xmax)
+    for x in series2:   hist2.Fill(x)
+    hist2.Scale(1./hist2.Integral())
+
+    residual = np.zeros(nBinsX)
+    chi2 = hist1.Chi2Test(hist2, 'p', residual)
+    #print('Kolmogorov test: ', hist1.Chi2Test(hist2, 'n'))
+
+    
+    x = np.arange(Xmin, Xmax)
+    resGraph = TGraph(nBinsX, np.asarray(x, dtype='f'), np.asarray(residual, dtype='f'))
+    resGraph.SetName('residual_graph')
+    resGraph.SetTitle('Residual; Energy (chn); Residual')
+    
+    rootFile.cd()
+    resGraph.Write()
+
+    return resGraph
+    
+
 
 def addTH2(df, outputFile, columnX, columnY, scatSpec, histName=''):
     '''
@@ -86,9 +117,15 @@ if __name__ == '__main__':
 
     # th2 with and without pattern unit selections
     dfPU = df.query('`V259N_-_multi-hit_patter_unit__ch0` == 1', inplace=False)
+    addHist(dfPU, rootFile, '2249W_-_adc__ch10', plotSpec, 'S1_PUselections')
+    addHist(dfPU, rootFile, '2249W_-_adc__ch11', plotSpec, 'SG_PUselections')
     scatSpec = ['S1 CHN (a.u.)', 2048, 0, 2048, 'SG CHN (a.u.)', 2048, 0, 2048]
     addTH2(df, rootFile, '2249W_-_adc__ch10', '2249W_-_adc__ch11', scatSpec, 'S1_and_SG')
     addTH2(dfPU, rootFile, '2249W_-_adc__ch10', '2249W_-_adc__ch11', scatSpec, 'S1_and_SG_PUselections')
+
+    # KS test
+    histSpec = [732, 254, 986]
+    performHistTest(df['2249W_-_adc__ch10'], dfSgPeak['2249W_-_adc__ch10'], histSpec, rootFile)
 
     rootFile.Close()
 

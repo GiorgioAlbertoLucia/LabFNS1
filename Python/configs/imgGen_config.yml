@@ -1,29 +1,47 @@
 #canvas options
 canvas:
-  name:     'SG_comparison'
-  title:    'S_{G} comparison;CHN (a.u.);Counts (a.u.)'
-  height:   1500
-  width:    1500
+  name:           'ADCprojS1'
+  title:          'S1 comparison; Energy (chn);Counts (a.u.)'
+  height:         1500
+  width:          1500
   
-  xmin:     0
-  xmax:     2048
-  ymin:     0
-  ymax:     1600
+  xmin:           0
+  xmax:           2048
+  ymin:           0.000
+  ymax:           0.003
 
-  logx:     false
-  logy:     false
+  logx:           false
+  logy:           false
+  logz:           true
 
 legend:
-  pos: [0.435, 0.71, 0.85, 0.59]
-  font: 42
-  fillstyle: 0
+  pos:            [0.5, 0.69, 0.85, 0.8]
+  font:           42
+  fillstyle:      0
 
-inputRootPaths: ['data/output/S1SG_peakComparison.root', 'data/output/S1SG_peakComparison.root']
-inputHistNames: ['SG', 'SG_with_peakSelection_on_S1']
-outputPath: 'data/output/SGcomparisons.pdf'
+latex:
+  lines:          ['ADC S1 comparison', 'Acquisition time: 236985 s']
+  linePos:        [[0.505, 0.64], [0.505, 0.58], [0.505, 0.52]] # xmin, ymin
+  box:            false        # whether the text should be put in a box
+  boxPos:         [0.1, 0.1, 0.9, 0.9] # xmin, ymin, xmax, ymax
 
-colors: [863, 797]
-fillalphas: [0.5, 0.9]
-linewidths: [1, 1]
+# options for the TH2 version
+th2:
+  inputRootPath:  'data/output/ADC_TDC_Comparison.root'
+  inputHistName:  'tdc_vs_adc'
+  outputPath:     'data/output/ADC_TDC_comparison.pdf'
 
-legCaptions: ['S_{G} signal', 'S_{G} signal: first ADC S_{1} peak selected']
+  palette:        53
+
+# options for the TH1 version
+th1:
+  inputRootPaths: ['data/output/S1SG_peakComparison.root', 'data/output/S1SG_peakComparison.root', 'data/output/ADC_TDC_Comparison.root']
+  inputHistNames: ['SG', 'SG_PUselections']
+  outputPath:     'data/output/SG_PUcomp.pdf'
+
+  colors:         [863, 797, 418]
+  fillalphas:     [0.5, 0.9, 0.5]
+  linewidths:     [2, 2, 2]
+  normalize:      true
+
+  legCaptions:    ['ADC S_{G} signal: trigger without S_{2} coincidence', 'ADC S_{G} signal: trigger with S_{2} coincidence', 'TDC: 1521 < ADC (S_{G} signal) < 1540 chn']
