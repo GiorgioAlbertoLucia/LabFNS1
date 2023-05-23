@@ -140,7 +140,7 @@ def AdjustFigures(root_file):
     text2.SetTextSize(gStyle.GetTextSize()*0.7)
     text2.SetTextFont(42)
     text2.Draw()
-    text3 =TLatex(0.4, 0.32,"Discriminator threshold value: (-20.1 #pm 0.4) mV")
+    text3 =TLatex(0.4, 0.32,"Discriminator threshold value: (-29.8 #pm 0.4) mV")
     text3.SetNDC()
     text3.SetTextSize(gStyle.GetTextSize()*0.7)
     text3.SetTextFont(42)
@@ -159,7 +159,7 @@ def AdjustFigures(root_file):
     cSGnew.SetLogy()
     gSG.Draw("PZ")
 
-    text =TLatex(0.4, 0.42,"SG Scintillator + PMXP2020")
+    text =TLatex(0.4, 0.42,"SG Scintillator + PMT R1513")
     text.SetNDC()
     text.SetTextSize(gStyle.GetTextSize())
     text.SetTextFont(42)
