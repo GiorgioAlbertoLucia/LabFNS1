@@ -6,7 +6,7 @@ import yaml
 from ROOT import TH1D, TCanvas, kAzure, kRed, kGreen, kSpring, TLegend, TLatex, gStyle, TFile
 
 from Python.utils.StyleFormatter import SetGlobalStyle, SetObjectStyle
-SetGlobalStyle(padleftmargin=0.12, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1.2, titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
+SetGlobalStyle(padleftmargin=0.15, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1.5, titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
 
 
 
