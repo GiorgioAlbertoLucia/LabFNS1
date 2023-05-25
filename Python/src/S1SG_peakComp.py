@@ -123,6 +123,10 @@ if __name__ == '__main__':
     addTH2(df, rootFile, '2249W_-_adc__ch10', '2249W_-_adc__ch11', scatSpec, 'S1_and_SG')
     addTH2(dfPU, rootFile, '2249W_-_adc__ch10', '2249W_-_adc__ch11', scatSpec, 'S1_and_SG_PUselections')
 
+    dfNotPU = df.query('`V259N_-_multi-hit_patter_unit__ch0` == 0', inplace=False)
+    addHist(dfNotPU, rootFile, '2249W_-_adc__ch10', plotSpec, 'S1_NotPUselections')
+    addHist(dfNotPU, rootFile, '2249W_-_adc__ch11', plotSpec, 'SG_NotPUselections')
+
     # KS test
     histSpec = [732, 254, 986]
     performHistTest(df['2249W_-_adc__ch10'], dfSgPeak['2249W_-_adc__ch10'], histSpec, rootFile)

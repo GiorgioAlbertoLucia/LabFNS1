@@ -1,47 +1,47 @@
 #canvas options
 canvas:
-  name:           'ADCprojS1'
-  title:          'S1 comparison; Energy (chn);Counts (a.u.)'
+  name:           'S1'
+  title:          'ADC TDC comparison for SG; #DeltaT (ns); Energy (chn)'
   height:         1500
   width:          1500
   
-  xmin:           0
-  xmax:           2048
-  ymin:           0.000
-  ymax:           0.003
+  xmin:           00
+  xmax:           800
+  ymin:           200
+  ymax:           1900
 
   logx:           false
   logy:           false
   logz:           true
 
 legend:
-  pos:            [0.5, 0.69, 0.85, 0.8]
+  pos:            [0.48, 0.69, 0.85, 0.8]
   font:           42
   fillstyle:      0
 
 latex:
-  lines:          ['ADC S1 comparison', 'Acquisition time: 236985 s']
-  linePos:        [[0.505, 0.64], [0.505, 0.58], [0.505, 0.52]] # xmin, ymin
+  lines:          []
+  linePos:        [[0.485, 0.64], [0.485, 0.58], [0.485, 0.52]] # xmin, ymin
   box:            false        # whether the text should be put in a box
   boxPos:         [0.1, 0.1, 0.9, 0.9] # xmin, ymin, xmax, ymax
 
 # options for the TH2 version
 th2:
   inputRootPath:  'data/output/ADC_TDC_Comparison.root'
-  inputHistName:  'tdc_vs_adc'
+  inputHistName:  'tdc_vs_adc_ch11'
   outputPath:     'data/output/ADC_TDC_comparison.pdf'
 
   palette:        53
 
 # options for the TH1 version
 th1:
-  inputRootPaths: ['data/output/S1SG_peakComparison.root', 'data/output/S1SG_peakComparison.root', 'data/output/ADC_TDC_Comparison.root']
-  inputHistNames: ['SG', 'SG_PUselections']
-  outputPath:     'data/output/SG_PUcomp.pdf'
+  inputRootPaths: ['data/output/ADC_TDC_Comparison.root','data/output/ADC_TDC_Comparison.root', 'data/output/ADC_TDC_Comparison.root']
+  inputHistNames: ['ADCproj_3_3_ch11', 'ADCproj_4_4_ch11']
+  outputPath:     'data/output/ADCprojecton.pdf'
 
   colors:         [863, 797, 418]
-  fillalphas:     [0.5, 0.9, 0.5]
-  linewidths:     [2, 2, 2]
+  fillalphas:     [0.5, 0.9, 0.]
+  linewidths:     [3, 3, 3]
   normalize:      true
 
-  legCaptions:    ['ADC S_{G} signal: trigger without S_{2} coincidence', 'ADC S_{G} signal: trigger with S_{2} coincidence', 'TDC: 1521 < ADC (S_{G} signal) < 1540 chn']
+  legCaptions:    ['ADC SG signal: 40 < #DeltaT < 60 ns', 'ADC SG signal: 60 < #DeltaT < 80 ns', 'ADC S1 signal: 40 < #DeltaT < 60 ns' ]
