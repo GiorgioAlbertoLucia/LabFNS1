@@ -2,17 +2,20 @@ import sys
 sys.path.append('Python/utils')
 
 from ReadMCA import CreateHist
-from ROOT import TCanvas, TPad, kAzure, kOrange, kRed
+from ROOT import TCanvas, TPad, TFile, kAzure, kOrange, kRed
 from StyleFormatter import SetObjectStyle, SetGlobalStyle 
 
 SetGlobalStyle(padleftmargin=0.1, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1., titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
 
 if __name__ == '__main__':
 
-    InfileLead = 'data/input/Diamonds/Monday/-30lun1.mca'
-    InfileNoLead = 'data/input/Diamonds/Monday/-30lun2.mca'
+    InfileLead = 'data/input/Gamma/Merc/SodioWithPb.mca'
+    InfileNoLead = 'data/input/Gamma/Merc/SodioNoPb.mca'
     rebin = 8
     SizeLittlePad = 0.3   # size in %
+    xmax = 1024
+    ymax = 6.e4
+    ymaxDifference = 5.e3
 
     ###########################################
 
@@ -29,7 +32,7 @@ if __name__ == '__main__':
     padDiff.Draw()
 
     pad.cd()
-    hFrame = pad.DrawFrame(0,0.1,2048,320,"MCA counts distribution;Channel;Counts")
+    hFrame = pad.DrawFrame(0,0.1,xmax,ymax,"MCA counts distribution;Channel;Counts")
     histoLead = CreateHist(InfileLead,0)
     SetObjectStyle(histoLead, color = kAzure+3, fillalpha=0.5)
     histoLead.Draw("hist,same")
@@ -40,9 +43,11 @@ if __name__ == '__main__':
     histoNoLead.Rebin(rebin)
 
     padDiff.cd()
-    hFrameDiff = pad.DrawFrame(0,0,2048,29.9,";Channel;Difference")
+    hFrameDiff = pad.DrawFrame(0,0,xmax,ymaxDifference,";Channel;Difference")
     histo = histoLead.Clone()
     histo.Add(histoNoLead,-1.)      # Performs subtraction
+    for idx in range(histo.GetNbinsX()):
+        histo.SetBinContent(idx,abs(histo.GetBinContent(idx)))
     SetObjectStyle(histo, color = kRed, fillalpha=0.5)
 
     hFrameDiff.GetYaxis().SetTitleSize(0.12)
@@ -62,6 +67,10 @@ if __name__ == '__main__':
     canvas.Update()
 
     canvas.SaveAs('data/output/Figures/GammaCoincidence/LeadDifference.pdf')
+    
+    outfile = TFile('data/output/Figures/GammaCoincidence/LeadDifference.root','recreate')
+    canvas.Write()
+    outfile.Close()
 
 
 
