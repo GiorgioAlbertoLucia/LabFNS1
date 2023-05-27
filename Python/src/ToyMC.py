@@ -1,5 +1,5 @@
 from ROOT import TRandom3, gRandom, TH1D, TFile
-from math import acos, atan, cos, sin, sqrt, radians
+from math import acos, atan, cos, sin, tan, sqrt, radians
 import ctypes
 
 def GenerateDecay(TgTheta):
@@ -14,14 +14,14 @@ def GenerateDecay(TgTheta):
 
 
 if __name__ == '__main__':
-    kNEvents = 100000
+    kNEvents = 10000
     kRadius = 2.54
     kDistance = 10
     kTan = kRadius/kDistance
     gRandom = TRandom3()
     gRandom.SetSeed(42)
     angles = list(range(-32,32,4))
-    histo = TH1D("toyMC","toy MC", 17,-32,32)
+    histo = TH1D("toyMC","toy MC", 17,-34,34)
     for alpha in angles:
         for i in range(kNEvents):
             if i%10000 == 0:
@@ -32,7 +32,8 @@ if __name__ == '__main__':
             x = x.value
             y = y.value
             z = z.value
-            time = (x*centre[0]+y*centre[1]+z*centre[2])
+            #time = (x*centre[0]+y*centre[1]+z*centre[2])
+            time = (kDistance*cos(radians(alpha))+kDistance*sin(radians(alpha))*tan(radians(alpha)))/(z+tan(radians(alpha))*x)
             #print(time)
             distance = sqrt((x*time-centre[0])*(x*time-centre[0]) + (y*time-centre[1])*(y*time-centre[1]) + (z*time-centre[2])*(z*time-centre[2]))
             #print(distance, x, y, z)
@@ -40,6 +41,6 @@ if __name__ == '__main__':
                 #print("here")
                 histo.Fill(alpha)
             #input()
-    outfile = TFile("data/processed/ToyMC.root",'recreate')
+    outfile = TFile("data/output/ToyMC.root",'recreate')
     histo.Write()
     outfile.Close()
