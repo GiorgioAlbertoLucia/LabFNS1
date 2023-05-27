@@ -54,7 +54,7 @@ if __name__ == '__main__':
     
     outfilePath = 'data/output/Diamond/WorkingPoint.root'
     root_file = TFile(outfilePath, 'recreate')
-    filePaths = 'data/input/Diamonds/Monday/HVdiamond.csv'
+    filePaths = 'data/input/HVdiamond.csv'
     diamondsWP(filePaths,root_file)
 
 
