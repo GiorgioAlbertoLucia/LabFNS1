@@ -35,6 +35,7 @@ if __name__ == '__main__':
             #time = (x*centre[0]+y*centre[1]+z*centre[2])
             time = (kDistance*cos(radians(alpha))+kDistance*sin(radians(alpha))*tan(radians(alpha)))/(z+tan(radians(alpha))*x)
             #print(time)
+            #distance = sqrt((x*time-centre[0])*(x*time-centre[0]) + (y*time-centre[1])*(y*time-centre[1]) + (z*time-centre[2])*(z*time-centre[2]))
             distance = sqrt((x*time-centre[0])*(x*time-centre[0]) + (y*time-centre[1])*(y*time-centre[1]) + (z*time-centre[2])*(z*time-centre[2]))
             #print(distance, x, y, z)
             if distance<kRadius:
