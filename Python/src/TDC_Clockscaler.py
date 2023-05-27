@@ -58,13 +58,14 @@ funz2.SetLineColor(kGreen)
 #gStyle.SetOptFit(1)
 
 
-#hTDC.Draw("E")
-hTDCPU.Draw("E")
 
-#hTDC.GetXaxis().SetTitle("Time [ns]")
-#hTDC.GetYaxis().SetTitle("Events")
-hTDCPU.GetXaxis().SetTitle("Time [ns]")
-hTDCPU.GetYaxis().SetTitle("Events")
+hTDC.Draw("E")
+#hTDCPU.Draw("E")
+
+hTDC.GetXaxis().SetTitle("Time [ns]")
+hTDC.GetYaxis().SetTitle("Events")
+#hTDCPU.GetXaxis().SetTitle("Time [ns]")
+#hTDCPU.GetYaxis().SetTitle("Events")
 
 
 

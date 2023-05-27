@@ -3,8 +3,10 @@ import numpy as np
 import sys
 sys.path.append('Python/utils')
 
-from ROOT import TCanvas, TH1D, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta, TFile, TGraphErrors 
+from ROOT import TCanvas, TH1D, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta, TFile, TGraphErrors, kFullCircle 
 from ReadMCA import CreateHist, Centroid, FWHM
+
+from StyleFormatter import SetObjectStyle
 
 def HistoFeatures(infilenames): 
     # returns (centroids, FWHM) of MCA spectra in infilenames array
@@ -20,25 +22,30 @@ def HistoFeatures(infilenames):
     FWHMs = []
     times = []
 
-    for ind in histos:
+    for ind in range(len(histos)):
+
         FWHMs.append(FWHM(histos[ind]))
-        centroids.append(Centroid(histos[ind]))
+        centroids.append(Centroid(histos[ind],1100,1400))
         times.append(5+ind*80)
 
-    return zip(centroids,FWHMs,times)
+    return centroids,FWHMs,times
 
 def FeaturePlot(feature, times, file):
     #print(features)
-    graph = TGraphErrors(len(feature),np.asarray(times),np.asarray(feature),
-                     0.,0.)
+    graph = TGraphErrors(len(feature),np.asarray(times,'d'),np.asarray(feature,'d'),
+                     np.asarray([0.]*len(feature),'d'),np.asarray([2]*len(feature),'d'))
+    graph.SetDrawOption('P')
+    SetObjectStyle(graph,markerstyle=kFullCircle)
     graph.Write()
+
+#def ResolutionPlot(centroids, fwhms, file):
 
 
 if __name__ == "__main__":
 
     infilename30 = ['data/input/Diamonds/Monday/30lun1.mca','data/input/Diamonds/Monday/30lun2.mca',
                    'data/input/Diamonds/Monday/30lun3.mca']
-    infilename60 = ['data/input/Diamonds/Monday/60lun1.mca','data/input/Monday60lun2.mca',
+    infilename60 = ['data/input/Diamonds/Monday/60lun1.mca','data/input/Diamonds/Monday/60lun2.mca',
                    'data/input/Diamonds/Monday/60lun3.mca']
     #infilename90 = ['data/input/Diamonds/Monday/90lun1.mca','data/input/Diamonds/Monday/90lun2.mca',
     #               'data/input/Diamonds/Monday/90lun3.mca','data/input/Diamonds/Monday/90lun4.mca',
@@ -58,7 +65,17 @@ if __name__ == "__main__":
     #               'data/input/Diamonds/Monday/-90lun7.mca']
     dict = {'+30': infilename30, '+60': infilename60, '-30': infilenameMinus30}
 
+    for i in dict:
+        outfile = TFile("data/input/Diamonds/Monday/"+i+".root", 'recreate')
+        
+
+    FWHMBoundaries30 = []
+    FWHMBoundaries60 = []
+    FWHMBoundaries90 = []
+    FWHMBoundaries30 = []
+
     Features = [HistoFeatures(dict[x]) for x in dict]
+    print(Features)
     #Features.append(HistoFeatures(infilename30))
     #Features.append(HistoFeatures(infilename60))
     #Features.append(HistoFeatures(infilename90))
@@ -71,14 +88,11 @@ if __name__ == "__main__":
 
     fileFWHM = TFile(outfilepathFWHM,'recreate')
     for dataset in Features:
-        FeaturePlot(Features[dataset][1],Features[dataset][3],fileFWHM)
+        FeaturePlot(dataset[1],dataset[2],fileFWHM)
     fileFWHM.Close()
 
     fileCentroid = TFile(outfilepathCentroids,'recreate')
     for dataset in Features:
-        FeaturePlot(Features[dataset][0],Features[dataset][3],fileCentroid)
+        FeaturePlot(dataset[0],dataset[2],fileCentroid)
     fileCentroid.Close()
     
-
-
-

@@ -7,30 +7,31 @@ from StyleFormatter import SetObjectStyle
 from ROOT import TH1D, TCanvas, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta
 
 def CreateHist(infile,number):
-    df = pd.read_csv(infile, '\n', skiprows=14, header = None, skipfooter=44, engine='python')
+    df = pd.read_csv(infile, '\n', header = None, engine='python')
+    df = df.iloc[df.index[df[0] == '<<DATA>>'].tolist()[0] + 1: df.index[df[0] == '<<END>>'].tolist()[0] , :]
+    df = df.reset_index()
     #df = pd.read_csv(infile, '\n', header=None, skiprows=14, nrows=2048)
     #df = pd.read_csv(infile,'\n',skiprows=14,header=None,skipfooter=44, engine='python')
     hist = TH1D("Hist"+str(number),"Hist"+str(number),len(df),0,len(df))
-    hist.FillN(len(df),np.array(list(range(len(df))),'d'),np.asarray(df,'d'))
+    hist.FillN(len(df),np.asarray(list(range(len(df))),'d'),np.asarray(df[0],'d'))
     return hist
 
 
 def Centroid(histo, lowerbound, upperbound):
-    lowbound = histo.GetBinCenter(lowerbound)
-    upbound = histo.GetBinCenter(upperbound)
-    ROIinterval = upbound-lowbound
+    ROIinterval = upperbound-lowerbound
     centroid = 0
     weight = 0
     for bin in range(ROIinterval):
-        centroid += histo.GetBinContent(lowbound+bin)*histo.GetBinCenter(lowbound+bin)
-        weight += histo.GetBinContent(lowbound+bin)
+        centroid += histo.GetBinContent(lowerbound+bin)*histo.GetBinCenter(lowerbound+bin)
+        weight += histo.GetBinContent(lowerbound+bin)
     return centroid/weight
 
 
 def FWHM(histo):
     maximum = histo.GetBinContent(histo.GetMaximumBin())
-    leftbound = histo.GetBinCenter(histo.GetBinCenter(histo.FindFirstBinAbove(maximum/2,1,1,histo.GetMaximumBin())-1))
-    rightbound = histo.GetBinCenter(histo.GetBinCenter(histo.FindLastBinAbove(maximum/2,1,histo.GetMaximumBin(),-1)-1))
+    print(histo.FindFirstBinAbove(maximum/2,1,1,histo.GetMaximumBin())-1)
+    leftbound = histo.GetBinCenter(histo.GetBin(histo.FindFirstBinAbove(maximum/2,1,1,histo.GetMaximumBin())-1))
+    rightbound = histo.GetBinCenter(histo.GetBin(histo.FindLastBinAbove(maximum/2,1,histo.GetMaximumBin(),-1)-1))
     return rightbound-leftbound
 
 if __name__ == '__main__':
