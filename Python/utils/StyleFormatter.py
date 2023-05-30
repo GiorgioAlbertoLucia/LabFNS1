@@ -33,7 +33,7 @@ def SetGlobalStyle(**kwargs):
 
     - titleoffset (float), default = 1.2
     - titleoffsetx (float), default = 1.2
-    - titleoffsey (float), default = 1.2
+    - titleoffsety (float), default = 1.2
     - titleoffsetz (float), default = 1.2
 
     - opttitle (int), default = 0
