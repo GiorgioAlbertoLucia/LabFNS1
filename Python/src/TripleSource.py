@@ -6,10 +6,9 @@ import sys
 sys.path.append('Python/utils')
 
 from StyleFormatter import SetObjectStyle
-from ROOT import TH1D, TCanvas, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta, TF1, gStyle, TPaveStats, gPad,TGraphErrors, TLatex
+from ROOT import TH1D, TCanvas, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta, TF1, gStyle, TPaveStats, gPad,TGraphErrors, TLatex,TFile
 
-def CreateHist(infile):
-    data = []
+def CreateHist(infile,data):
 
     with open(infile, 'r', errors='ignore') as file:#with chiude i automatico il file
 
@@ -28,17 +27,25 @@ def CreateHist(infile):
         hist.SetBinError(i,np.sqrt(x))
     return hist 
 
-if __name__ == '__main__':
+def HistoFromCtoE(data,aa,bb,nbin):
+    histE = TH1D("HistE","HistE",nbin,0,nbin)
+    
+    df = pd.DataFrame(data, columns=['Value'])
+    
+    for i, x in enumerate(df["Value"]): 
+        histE.Fill(i*aa+bb, x)
+        histE.SetBinError(i,np.sqrt(x))
+    return histE 
 
-    #parser = argparse.ArgumentParser(description='Arguments')
-    #parser.add_argument('infilename', metavar='text')
-    #args = parser.parse_args()
-    # infilename -> args.infilename 
-   # python3 Python/src/TripleSouce.py data/input/...
+
+if __name__ == '__main__':
+    data = []
+    outfilePath = 'data/output/Diamond/TripleSorce.root'
+    root_file = TFile(outfilePath, 'recreate')
 
     infilename='data/input/Diamonds/Tuesday/sorgente_tripla.mca'
     c = TCanvas('c','c',1000,1000)
-    histo=CreateHist(infilename)
+    histo=CreateHist(infilename,data)
     histo.Draw("E")
 
     gStyle.SetOptFit(1111)
@@ -87,6 +94,7 @@ if __name__ == '__main__':
     c.Update()
     histo.Fit(Neptunio,"RM")
     
+    
     Americio.SetLineColor(kGreen)
     Curio.SetLineColor(kBlue+3)
     Neptunio1.SetLineColor(kRed)
@@ -119,7 +127,10 @@ if __name__ == '__main__':
         stat.Draw('same');
     c.Modified()
     c.Update()
+    root_file.cd()
+    c.Write()
     gPad.Update()
+
     c1 = TCanvas('c1','c1',1000,1000)
     c1.cd()
     points=[1710,1810,1485 ]
@@ -152,18 +163,20 @@ if __name__ == '__main__':
     text3.SetTextSize(gStyle.GetTextSize()*0.7)
     text3.SetTextFont(42)
     text3.Draw()
-    text4 =TLatex(0.30, 0.48,"a=(-47 #pm 7) keV^{-1}")
+    text4 =TLatex(0.30, 0.48,"a=(0.3206 #pm 0.0014) keV^{-1}")
     text4.SetNDC()
     text4.SetTextSize(gStyle.GetTextSize()*0.7)
     text4.SetTextFont(42)
     text4.Draw()
-    text5 =TLatex(0.30, 0.40,"b=0.3206 #pm 0.0014")
+    text5 =TLatex(0.30, 0.40,"b= -47 #pm 7")
     text5.SetNDC()
     text5.SetTextSize(gStyle.GetTextSize()*0.7)
     text5.SetTextFont(42)
     text5.Draw()
     c1.Modified()
     c1.Update()
+    root_file.cd()
+    c1.Write()
 
     c2 = TCanvas('c2','c2',1000,1000)
     c2.cd()
@@ -177,6 +190,14 @@ if __name__ == '__main__':
     histo.Fit(Neptunio2picchi,"RM")
     histo.Draw("E")
     Neptunio2picchi.Draw("same")
+    root_file.cd()
+    c2.Write()
+
+    c3 = TCanvas('c3','c3',1000,1000)
+    c3.cd()
+    histE =HistoFromCtoE(data,retta.GetParameter(1),retta.GetParameter(0),histo.GetNbinsX())
+    histE.Draw("hist")
+
     input()
     
 
