@@ -2,7 +2,7 @@ import sys
 sys.path.append('Python/utils')
 
 from ReadMCA import CreateHist
-from ROOT import TCanvas, TPad, TFile, kAzure, kOrange, kRed
+from ROOT import TCanvas, TPad, TFile, TLegend, TLatex, kAzure, kOrange, kRed, gStyle
 from StyleFormatter import SetObjectStyle, SetGlobalStyle 
 
 SetGlobalStyle(padleftmargin=0.1, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1., titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
@@ -33,17 +33,33 @@ if __name__ == '__main__':
 
     pad.cd()
     hFrame = pad.DrawFrame(0,0.1,xmax,ymax,"MCA counts distribution;Channel;Counts")
+    hFrame.GetYaxis().SetMaxDigits(3)
     histoLead = CreateHist(InfileLead,0)
     SetObjectStyle(histoLead, color = kAzure+3, fillalpha=0.5)
-    histoLead.Draw("hist,same")
     histoLead.Rebin(rebin)
+    histoLead.Draw("hist,same")
     histoNoLead = CreateHist(InfileNoLead,0)
     SetObjectStyle(histoNoLead, color = kOrange-3, fillalpha=0.5)
-    histoNoLead.Draw("hist,same")
     histoNoLead.Rebin(rebin)
+    histoNoLead.Draw("hist,same")
+
+    leg = TLegend(0.525,0.7,0.9,0.5)
+    leg.AddEntry(histoLead, "Spectrum with Pb", "f")
+    leg.AddEntry(histoNoLead, "Spectrum without Pb", "f")
+    leg.Draw("same")
+    Title =TLatex(0.51, 0.72,"^{22}Na spectrum")
+    Title.SetNDC()
+    Title.SetTextSize(gStyle.GetTextSize()*1.3)
+    Title.SetTextFont(42)
+    Title.Draw()
+    text =TLatex(0.55, 0.44,"Acquisition time: 100 s")
+    text.SetNDC()
+    text.SetTextSize(gStyle.GetTextSize())
+    text.SetTextFont(42)
+    text.Draw()
 
     padDiff.cd()
-    hFrameDiff = pad.DrawFrame(0,0,xmax,ymaxDifference,";Channel;Difference")
+    hFrameDiff = pad.DrawFrame(0,0,xmax,ymaxDifference,";Channel;|Difference|")
     histo = histoLead.Clone()
     histo.Add(histoNoLead,-1.)      # Performs subtraction
     for idx in range(histo.GetNbinsX()):
