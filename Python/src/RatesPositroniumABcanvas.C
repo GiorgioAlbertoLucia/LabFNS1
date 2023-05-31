@@ -4,7 +4,7 @@
 void RatesPositroniumABcanvas()
 {
 //=========Macro generated from canvas: scalerRate-Angle/Rates for scintillators A and B; Angle (deg); Rate (Hz)
-//=========  (Sat May 27 15:36:57 2023) by ROOT version 6.26/10
+//=========  (Tue May 30 17:41:40 2023) by ROOT version 6.26/10
    TCanvas *scalerRate-Angle = new TCanvas("scalerRate-Angle", "Rates for scintillators A and B; Angle (deg); Rate (Hz)",50,53,700,500);
    scalerRate-Angle->SetHighLightColor(2);
    scalerRate-Angle->Range(-128,-125,1152,1125);
@@ -107,7 +107,7 @@ void RatesPositroniumABcanvas()
    Graph_RatesmIAnglemIscalerB1001->GetXaxis()->SetLabelFont(42);
    Graph_RatesmIAnglemIscalerB1001->GetXaxis()->SetTitleOffset(1);
    Graph_RatesmIAnglemIscalerB1001->GetXaxis()->SetTitleFont(42);
-   Graph_RatesmIAnglemIscalerB1001->GetYaxis()->SetTitle(" Rate [Hz]");
+   Graph_RatesmIAnglemIscalerB1001->GetYaxis()->SetTitle(" Rate (Hz)");
    Graph_RatesmIAnglemIscalerB1001->GetYaxis()->SetLabelFont(42);
    Graph_RatesmIAnglemIscalerB1001->GetYaxis()->SetTitleFont(42);
    Graph_RatesmIAnglemIscalerB1001->GetZaxis()->SetLabelFont(42);
