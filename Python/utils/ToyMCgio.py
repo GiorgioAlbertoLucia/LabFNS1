@@ -112,11 +112,9 @@ def fitMC(outfile):
     #print(f'#chi^2 / NDF = {fitMC2.GetChisquare():#.2f} / {fitMC2.GetNDF()}')
 
     # geom func
-    fitMCg = TF1('fitMCg', '[0]*(2/(pi*[2])*acos([1]*sin(x/2)/[2]) - 2*[1]/(pi*[2]*[2])*sqrt([2]*[2] - [1]*[1]*sin(x/2)*sin(x/2)))', -28, 28)
+    fitMCg = TF1('fitMCg', '[0]*( 2/pi*acos([1]*sin(abs(x/2))/[2]) - 2*[1]*sin(abs(x/2))/(pi*[2]*[2])* sqrt( [2]*[2] - [1]*[1]*sin(abs(x/2))*sin(abs(x/2)) ) )', -28, 28)
     fitMCg.SetParNames('Norm','R', 'r')
     fitMCg.SetParameters(10000, 10, 2.54)
-    fitMCg.FixParameter(1, 10)
-    fitMCg.FixParameter(2, 2.54)
 
     histMC.Fit(fitMCg, 'b', '', -28, -28)
     print('Left fit results:')
