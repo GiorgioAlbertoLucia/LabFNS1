@@ -179,23 +179,29 @@ if __name__ == "__main__":
     TitleCanvaFWHMs = 'FWHM comparison'
     PathCanvaFWHMs = 'data/output/Diamond/TimeFWHMs.pdf'
     LegendCoordinates = [0.65,0.65,0.85,0.85]
-    TitleAxisLabelsFWHMs = "FWHM comparison;t[s];F"
+    TitleAxisLabelsFWHMs = "FWHM comparison;t[s];FWHM"
     TimeEvolutionCharacterization.cd(0)
     (FeaturePlot(FWHMs, errFWHMs, Times, Legend, LegendCoordinates, LegendName, TitleCanvaFWHMs, PathCanvaFWHMs, TitleAxisLabelsFWHMs)).Draw('ALP')
+    TimeEvolutionCharacterization.Modified()
+    TimeEvolutionCharacterization.Update()
 ##
     TitleCanvaCentroids = 'Centroids comparison'
     PathCanvaCentroids = 'data/output/Diamond/TimeCentroids.pdf'
     LegendCoordinates = [0.6,0.5,0.8,0.3]
-    TitleAxisLabelsCentroids = "Centroid comparison;t[s];C"
+    TitleAxisLabelsCentroids = "Centroid comparison;t[s];Centroid"
     TimeEvolutionCharacterization.cd(1)
     (FeaturePlot(Centroids, errCentroids, Times, Legend, LegendCoordinates, LegendName, TitleCanvaCentroids, PathCanvaCentroids, TitleAxisLabelsCentroids)).Draw('ALP')
+    TimeEvolutionCharacterization.Modified()
+    TimeEvolutionCharacterization.Update()
 ##
     TitleCanvaResolution = 'Resolution comparison'
     PathCanvaResolution = 'data/output/Diamond/TimeResolutions.pdf'
-    TitleAxisLabelsResolution = "Resolution comparison;t[s];R"
+    TitleAxisLabelsResolution = "Resolution comparison;t[s];Resolution"
     LegendCoordinates = [0.65,0.65,0.85,0.85]
     TimeEvolutionCharacterization.cd(1)
     (FeaturePlot(Resolutions, errResolutions, Times, Legend, LegendCoordinates, LegendName, TitleCanvaResolution, PathCanvaResolution, TitleAxisLabelsResolution)).Draw('ALP')
+    TimeEvolutionCharacterization.Modified()
+    TimeEvolutionCharacterization.Update()
 
     TimeEvolutionCharacterization.SaveAs('data/output/Diamond/TimeEvolutionCharacterization.pdf')
 
