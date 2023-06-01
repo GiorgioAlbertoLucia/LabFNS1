@@ -20,7 +20,6 @@ def GetEnergyFromChnA(Channel):
     Eerr = berr*berr/((Channel - b)*(Channel - b))
     Eerr += aerr*aerr/a/a
     Eerr -= 2*cov/a/(Channel-b)
-    print(Eerr)
     Eerr = E * sqrt(Eerr)
     return E, Eerr
 
