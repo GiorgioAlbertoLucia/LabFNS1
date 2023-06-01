@@ -7,11 +7,16 @@ sys.path.append('Python/utils')
 from StyleFormatter import SetObjectStyle
 from ROOT import TH1D, TCanvas, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta, kViolet
 
-def CreateHist(infile,number,histtitle="",energyscale="chn"):
-    #print(infile)
+def GetPandas(infile):
     df = pd.read_csv(infile, '\n', header = None, engine='python')
     df = df.iloc[df.index[df[0] == '<<DATA>>'].tolist()[0] + 1: df.index[df[0] == '<<END>>'].tolist()[0] , :]
     df = df.reset_index()
+    return df
+
+
+def CreateHist(infile,number,histtitle="",energyscale="chn"):
+    #print(infile)
+    df = GetPandas(infile)
     #df = pd.read_csv(infile, '\n', header=None, skiprows=14, nrows=2048)
     #df = pd.read_csv(infile,'\n',skiprows=14,header=None,skipfooter=44, engine='python')
     title = "Hist"+str(number)
