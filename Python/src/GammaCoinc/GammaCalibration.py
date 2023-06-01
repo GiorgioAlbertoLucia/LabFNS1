@@ -17,9 +17,10 @@ def GetEnergyFromChnA(Channel):
     cov = -0.34
 
     E = (Channel - b)/a
-    Eerr = berr*berr/(Channel*Channel)
+    Eerr = berr*berr/((Channel - b)*(Channel - b))
     Eerr += aerr*aerr/a/a
-    Eerr += 2*cov/a/(Channel-b)
+    Eerr -= 2*cov/a/(Channel-b)
+    print(Eerr)
     Eerr = E * sqrt(Eerr)
     return E, Eerr
 
@@ -31,11 +32,23 @@ def GetEnergyFromChnB(Channel):
     cov = -0.4
 
     E = (Channel - b)/a
-    Eerr = berr*berr/(Channel*Channel)
+    Eerr = berr*berr/((Channel - b)*(Channel - b))
     Eerr += aerr*aerr/a/a
-    Eerr += 2*cov/a/(Channel-b)
+    Eerr -= 2*cov/a/(Channel-b)
     Eerr = E * sqrt(Eerr)
     return E, Eerr
+
+def GetResolutionFromChnA(Channel):
+    A = 0.79
+    B = -0.0108
+    E, _ = GetEnergyFromChnA(Channel)
+    return A*sqrt(E) + B*E
+
+def GetResolutionFromChnB(Channel):
+    A = 0.95
+    B = -0.0142
+    E, _ = GetEnergyFromChnB(Channel)
+    return A*sqrt(E) + B*E
 
 def GetCalibrationFitA(mus,sigmas):
     #mu = [channel(Soudium 511keV), channel(Sodium 1275keV), channel(Cobalt 1173keV), channel(Cobalt 1333keV)]    
@@ -125,13 +138,14 @@ def GetCalibrationFitB(mus,sigmas):
 
     canvas.SaveAs("data/output/Figures/GammaCoincidence/CalibrationFitB.pdf")
 
-def GetResolutionFitA(sigmas, errsigmas):
+def GetResolutionFitA(decayenergies, errdecays, sigmas, errsigmas):
     #sigmas = [width(Soudium 511keV), width(Sodium 1275keV), width(Cobalt 1173keV), width(Cobalt 1333keV)]    
-    decayenergies=[510.998950,1275,1173.2,1332.5]
-    errdecays = np.asarray([1.e-6,1,0.1,0.1],'d')
+    #decayenergies=[510.998950,1275,1173.2,1332.5]
+    #errdecays = np.asarray([1.e-6,1,0.1,0.1],'d')
     sigmas = np.asarray(sigmas,'d')
     decayenergies = np.asarray(decayenergies,'d')
-    Res = sigmas/decayenergies * 2.355
+    errdecays = np.asarray(errdecays,'d')
+    Res = sigmas/decayenergies 
     errsigmas = np.asarray(errsigmas,'d')
     print(errdecays)
     errRes = Res * np.sqrt(np.square(errdecays/decayenergies) + np.square(errsigmas/sigmas))
@@ -141,19 +155,19 @@ def GetResolutionFitA(sigmas, errsigmas):
     graph.Fit(resolutionfit)
     canvas = TCanvas("ResolutionFitA","ResolutionFitA",1200,1500)
     canvas.SetLeftMargin(0.12)
-    hFrame = canvas.DrawFrame(450,0,1500,0.05*2.355,"Resolution Fit;E [keV];Resolution")
+    hFrame = canvas.DrawFrame(450,0,1500,0.05,"Resolution Fit;E [keV];Resolution")
     hFrame.GetYaxis().SetTitleOffset(1.1)
     hFrame.GetYaxis().SetMaxDigits(2)
     SetObjectStyle(graph,color=kAzure+3,markerstyle=kFullCircle,markersize = 2)
     resolutionfit.Draw("same")
-    graph.Draw("P,same")
+    graph.Draw("PZ,same")
 
     text = TLatex(0.35, 0.80,"Resolution fit scintillator A")
     text.SetNDC()
     text.SetTextSize(gStyle.GetTextSize())
     text.SetTextFont(42)
     text.Draw("same")
-    text2 =TLatex(0.35, 0.72,"#frac{FWHM}{E} = #frac{A}{#sqrt{E (keV)}} + B")
+    text2 =TLatex(0.35, 0.72,"#frac{#sigma_{E}}{E} = #frac{A}{#sqrt{E (keV)}} + B")
     text2.SetNDC()
     text2.SetTextSize(gStyle.GetTextSize()*0.8)
     text2.SetTextFont(42)
@@ -171,14 +185,14 @@ def GetResolutionFitA(sigmas, errsigmas):
 
     canvas.SaveAs("data/output/Figures/GammaCoincidence/ResolutionFitA.pdf")
 
-
-def GetResolutionFitB(sigmas, errsigmas):
+def GetResolutionFitB(decayenergies, errdecays, sigmas, errsigmas):
     #sigmas = [width(Soudium 511keV), width(Sodium 1275keV), width(Cobalt 1173keV), width(Cobalt 1333keV)]    
-    decayenergies=[510.998950,1275,1173.2,1332.5]
-    errdecays = np.asarray([1.e-6,1,0.1,0.1],'d')
+    #decayenergies=[510.998950,1275,1173.2,1332.5]
+    #errdecays = np.asarray([1.e-6,1,0.1,0.1],'d')
     sigmas = np.asarray(sigmas,'d')
     decayenergies = np.asarray(decayenergies,'d')
-    Res = sigmas/decayenergies * 2.355
+    errdecays = np.asarray(errdecays,'d')
+    Res = sigmas/decayenergies 
     errsigmas = np.asarray(errsigmas,'d')
     print(errdecays)
     errRes = Res * np.sqrt(np.square(errdecays/decayenergies) + np.square(errsigmas/sigmas))
@@ -188,19 +202,19 @@ def GetResolutionFitB(sigmas, errsigmas):
     graph.Fit(resolutionfit)
     canvas = TCanvas("ResolutionFitB","ResolutionFitB",1200,1500)
     canvas.SetLeftMargin(0.12)
-    hFrame = canvas.DrawFrame(450,0,1500,0.05*2.355,"Resolution Fit;E [keV];Resolution")
+    hFrame = canvas.DrawFrame(450,0,1500,0.05,"Resolution Fit;E [keV];Resolution")
     hFrame.GetYaxis().SetTitleOffset(1.1)
     hFrame.GetYaxis().SetMaxDigits(2)
     SetObjectStyle(graph,color=kAzure+3,markerstyle=kFullCircle,markersize = 2)
     resolutionfit.Draw("same")
-    graph.Draw("P,same")
+    graph.Draw("PZ,same")
 
     text = TLatex(0.35, 0.80,"Resolution fit scintillator B")
     text.SetNDC()
     text.SetTextSize(gStyle.GetTextSize())
     text.SetTextFont(42)
     text.Draw("same")
-    text2 =TLatex(0.35, 0.72,"#frac{FWHM}{E} = #frac{A}{#sqrt{E (keV)}} + B")
+    text2 =TLatex(0.35, 0.72,"#frac{#sigma_{E}}{E} = #frac{A}{#sqrt{E (keV)}} + B")
     text2.SetNDC()
     text2.SetTextSize(gStyle.GetTextSize()*0.8)
     text2.SetTextFont(42)
@@ -254,10 +268,15 @@ def CalibrateA(inFileCobaltA, inFileSodiumA):
     canvasA.SaveAs("data/output/Figures/GammaCoincidence/CalibrationA.pdf")
     GetCalibrationFitA([fSodiumA.GetParameter(2),fSodiumA.GetParameter(5),fCobaltA.GetParameter(2),fCobaltA.GetParameter(5)],
                        [fSodiumA.GetParameter(3),fSodiumA.GetParameter(6),fCobaltA.GetParameter(3),fCobaltA.GetParameter(6)])
-    GetResolutionFitA([fSodiumA.GetParameter(3),fSodiumA.GetParameter(6),fCobaltA.GetParameter(3),fCobaltA.GetParameter(6)],
-                       [fSodiumA.GetParError(3),fSodiumA.GetParError(6),fCobaltA.GetParError(3),fCobaltA.GetParError(6)])
+    E511, sigma511 = GetEnergyFromChnA(fSodiumA.GetParameter(2))
+    E1275, sigma1275 = GetEnergyFromChnA(fSodiumA.GetParameter(5))
+    E1173, sigma1173 = GetEnergyFromChnA(fCobaltA.GetParameter(2))
+    E1332, sigma1332 = GetEnergyFromChnA(fCobaltA.GetParameter(5))
+    GetResolutionFitA([E511, E1275, E1173, E1332],
+                      [sigma511,sigma1275,sigma1173,sigma1332],
+                      [fSodiumA.GetParameter(3),fSodiumA.GetParameter(6),fCobaltA.GetParameter(3),fCobaltA.GetParameter(6)],
+                      [fSodiumA.GetParError(3),fSodiumA.GetParError(6),fCobaltA.GetParError(3),fCobaltA.GetParError(6)])
     
-
 def CalibrateB(inFileCobaltB, inFileSodiumB):
     histoCobaltB = CreateHist(inFileCobaltB,0)
     histoCobaltB.SetName("histoCobaltB")
@@ -294,10 +313,14 @@ def CalibrateB(inFileCobaltB, inFileSodiumB):
     canvasB.SaveAs("data/output/Figures/GammaCoincidence/CalibrationB.pdf")
     GetCalibrationFitB([fSodiumB.GetParameter(2),fSodiumB.GetParameter(5),fCobaltB.GetParameter(2),fCobaltB.GetParameter(5)],
                        [fSodiumB.GetParameter(3),fSodiumB.GetParameter(6),fCobaltB.GetParameter(3),fCobaltB.GetParameter(6)])
-    GetResolutionFitB([fSodiumB.GetParameter(3),fSodiumB.GetParameter(6),fCobaltB.GetParameter(3),fCobaltB.GetParameter(6)],
+    E511, sigma511 = GetEnergyFromChnB(fSodiumB.GetParameter(2))
+    E1275, sigma1275 = GetEnergyFromChnB(fSodiumB.GetParameter(5))
+    E1173, sigma1173 = GetEnergyFromChnB(fCobaltB.GetParameter(2))
+    E1332, sigma1332 = GetEnergyFromChnB(fCobaltB.GetParameter(5))
+    GetResolutionFitB([E511, E1275, E1173, E1332],
+                      [sigma511,sigma1275,sigma1173,sigma1332],
+        [fSodiumB.GetParameter(3),fSodiumB.GetParameter(6),fCobaltB.GetParameter(3),fCobaltB.GetParameter(6)],
                        [fSodiumB.GetParError(3),fSodiumB.GetParError(6),fCobaltB.GetParError(3),fCobaltB.GetParError(6)])
-
-
 
 if __name__ == '__main__':
 
