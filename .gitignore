@@ -13,6 +13,7 @@ data/input/overnight
 data/input/pedestals_files
 data/input/pedestals_trees
 data/thursday
+data/input/Diamond
 
 settings.json
 __pycache__

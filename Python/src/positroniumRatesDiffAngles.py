@@ -1,18 +1,19 @@
 import numpy as np
 import pandas as pd
 
-from ROOT import TGraphErrors, TGraph, TCanvas, TFile, TH1D, gStyle, TLegend
+from ROOT import TGraphErrors, TGraph, TCanvas, TFile, TH1D, gStyle, TLegend, TF1
 from ROOT import kOrange, kAzure, kGreen, kRed, kMagenta, kViolet, kBlue, kYellow
 
 colorList = [kOrange-3, kMagenta-4, kAzure-3, kGreen-3, kRed-4, kViolet-6, kBlue-4, kYellow-7]
 
-def readMCAoutput(infile):
+def readMCAoutput(infile, ROI=[0, -1]):
     '''
     Reads a .mca file and returns the rate and a histogram of data
 
     Parameters
     ----------
         infile (str): path to the input file
+        ROI (list[int]): edges (in chn) between which a region of interest (ROI) is defined. The rate is calculated with counts in the ROI
 
     Returns
     -------
@@ -21,7 +22,7 @@ def readMCAoutput(infile):
         hist (TH1D): histogram of data
     '''
 
-    hist = TH1D('hist', 'hist', 2048, 0, 2048)
+    hist = TH1D('hist', 'hist', 1024, 0, 1024)
     data = []
     live_time = 0
 
@@ -42,9 +43,10 @@ def readMCAoutput(infile):
                 data.append(value) 
 
     tot_counts = 0
-    for i, x in enumerate(data):  
+    for i, x in enumerate(data):    
         hist.Fill(i, x)
-        tot_counts += x
+        hist.SetBinError(i, np.sqrt(x))
+    for x in data[ROI[0]:ROI[1]]:   tot_counts += x
 
     rate = tot_counts/live_time
     rate_err = np.sqrt(tot_counts)/live_time
@@ -64,10 +66,11 @@ def multihist(hists, labels, outFile, canvasTitle=''):
     '''
 
     canvas = TCanvas('c', canvasTitle, 1500, 1500)
+    canvas.DrawFrame(0, 0, 1024, 1200)
 
-    leg = TLegend(0.50, 0.71, 0.85, 0.59)
+    leg = TLegend(0.50, 0.41, 0.85, 0.79)
     leg.SetTextFont(42)
-    leg.SetTextSize(gStyle.GetTextSize()*0.7)
+    leg.SetTextSize(gStyle.GetTextSize()*0.9)
     leg.SetFillStyle(0)
 
     for i, hist in enumerate(hists):
@@ -93,6 +96,28 @@ def rateGraph(x, y, ey, outFile):
 
     outFile.cd()
     graph.Write()
+
+    return graph
+
+def rateGraphPDF(graph, outFile, canvasPath):
+    '''
+    Fit the rate TGraph and draw it on canvas. The canvas will be saved on a .root file as well as on a .pdf
+    '''
+
+    canvas = TCanvas('Rates-Angle-Canvas', 'Rates of #gamma-#gamma coincidences; Angle (deg); Rate (Hz)')
+    canvas.DrawFrame(0, 0, 1024, 600, 'Rates of #gamma-#gamma coincidences; Angle (deg); Rate (Hz)')
+
+
+    graph.SetMarkerStyle(8)
+    graph.SetMarkerSize(.8)
+    graph.SetMarkerColor(kOrange-3)
+
+    canvas.cd()
+    graph.Draw('ap')
+    canvas.SaveAs(canvasPath)
+
+    outFile.cd()
+    canvas.Write()
 
 def scalerRateGraph(scalerDf, outFile):
 
@@ -144,7 +169,7 @@ def scalerRateGraph(scalerDf, outFile):
 if __name__ == '__main__':
 
     ### data from mca
-    angles = [31, 27, 23, 19, 15, 11, 7, 3, -1, -5, -9, -13, -17, -21, -25]
+    angles = [32, 28, 24, 20, 16, 12, 8, 4, 0, -4, -8, -12, -16, -20, -24, -28, -32]
     inputFiles =   ['data/input/Gamma/PositroniumDecays/pos10min31deg.mca',
                     'data/input/Gamma/PositroniumDecays/pos9min27deg.mca',
                     'data/input/Gamma/PositroniumDecays/pos8min23deg.mca',
@@ -160,35 +185,40 @@ if __name__ == '__main__':
                     'data/input/Gamma/PositroniumDecays/pos6min-17deg.mca',
                     'data/input/Gamma/PositroniumDecays/pos7min-21deg.mca',
                     'data/input/Gamma/PositroniumDecays/pos8min-25deg.mca',
-                    #'data/input/Gamma/PositroniumDecays/pos9min-29deg.mca',
-                    #'data/input/Gamma/PositroniumDecays/pos10min-33deg.mca',
+                    'data/input/Gamma/PositroniumDecays/pos560s-29deg.mca',
+                    'data/input/Gamma/PositroniumDecays/pos10min-33deg.mca',
                     ]
 
     rates = []
     rate_errs = []
     hists = []
-    labels = ['Angle: 31#circ, Acq. time: 10 min',
-              'Angle: 27#circ, Acq. time: 9 min',
-              'Angle: 23#circ, Acq. time: 8 min',
-              'Angle: 19#circ, Acq. time: 7 min',
-              'Angle: 15#circ, Acq. time: 6 min',
-              'Angle: 11#circ, Acq. time: 5 min',
-              'Angle: 7#circ, Acq. time: 4 min',
-              'Angle: 3#circ, Acq. time: 3 min',
-              'Angle: -1#circ, Acq. time: 2 min',
-              'Angle: -5#circ, Acq. time: 3 min',
-              'Angle: -9#circ, Acq. time: 4 min',
-              'Angle: -13#circ, Acq. time: 5 min',
-              'Angle: -17#circ, Acq. time: 6 min',
-              'Angle: -21#circ, Acq. time: 7 min',
-              'Angle: -25#circ, Acq. time: 8 min',
-              #'Angle: -29#circ, Acq. time: 9 min',
-              #'Angle: -33#circ, Acq. time: 10 min',
+    ROIs = [[506, 528], [507, 528], [503, 539], [500, 536], [499, 533], [485, 529], [493, 531], [491, 531],
+            [491, 526], [491, 525], [493, 529], [493, 533], [491, 530], [493, 530], [500, 527], 
+            [501, 531], [501, 524]]
+    labels = ['Angle: 32°, Acq. time: 10 min',
+              'Angle: 28°, Acq. time: 9 min',
+              'Angle: 24°, Acq. time: 8 min',
+              'Angle: 20°, Acq. time: 7 min',
+              'Angle: 16°, Acq. time: 6 min',
+              'Angle: 12°, Acq. time: 5 min',
+              'Angle: 8°, Acq. time: 4 min',
+              'Angle: 4°, Acq. time: 3 min',
+              'Angle: 0°, Acq. time: 2 min',
+              'Angle: -4°, Acq. time: 3 min',
+              'Angle: -8°, Acq. time: 4 min',
+              'Angle: -12°, Acq. time: 5 min',
+              'Angle: -16°, Acq. time: 6 min',
+              'Angle: -20°, Acq. time: 7 min',
+              'Angle: -24°, Acq. time: 8 min',
+              'Angle: -28°, Acq. time: 9 min',
+              'Angle: -32°, Acq. time: 10 min',
              ]
     
-    for angle, infile in zip(angles, inputFiles):
+    for angle, infile, ROI in zip(angles, inputFiles, ROIs):
         hist = TH1D()
-        rate, rate_err, hist = readMCAoutput(infile)
+        rate, rate_err, hist = readMCAoutput(infile, ROI)
+        hist.SetName(f'TACcounts_angle_{angle}')
+        hist.SetTitle(f'TAC counts, angle = {angle} #circ; Energy (chn); Counts (a. u.)')
         
         rates.append(rate)
         rate_errs.append(rate_err)
@@ -196,8 +226,10 @@ if __name__ == '__main__':
         del hist
 
     outfile = TFile('data/output/Gamma/positroniumRatesDiffAngles.root', 'recreate')
-    multihist(hists, labels, outfile, 'TAC counts; Energy (chn); Counts (a. u.)')   # tac hists
-    rateGraph(angles, rates, rate_errs, outfile)
+    for hist in hists:  hist.Write()
+    multihist(hists, labels, outfile, 'TAC counts; Time (chn); Counts (a. u.)')   # tac hists
+    rate_graph = rateGraph(angles, rates, rate_errs, outfile)
+    rateGraphPDF(rate_graph, outfile, 'data/output/Figures/GammaCoincidence/rateGraph.pdf')
 
     # data from caen scaler
     scalerDf = pd.read_csv(r'data/input/Gamma/positroniumCoincidence.csv')

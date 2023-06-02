@@ -7,10 +7,16 @@ sys.path.append('Python/utils')
 from StyleFormatter import SetObjectStyle
 from ROOT import TH1D, TCanvas, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kMagenta, kViolet
 
-def CreateHist(infile,number,histtitle="",energyscale="chn"):
+def GetPandas(infile):
     df = pd.read_csv(infile, '\n', header = None, engine='python')
     df = df.iloc[df.index[df[0] == '<<DATA>>'].tolist()[0] + 1: df.index[df[0] == '<<END>>'].tolist()[0] , :]
     df = df.reset_index()
+    return df
+
+
+def CreateHist(infile,number,histtitle="",energyscale="chn"):
+    #print(infile)
+    df = GetPandas(infile)
     #df = pd.read_csv(infile, '\n', header=None, skiprows=14, nrows=2048)
     #df = pd.read_csv(infile,'\n',skiprows=14,header=None,skipfooter=44, engine='python')
     title = "Hist"+str(number)
@@ -21,38 +27,49 @@ def CreateHist(infile,number,histtitle="",energyscale="chn"):
         hist.FillN(len(df),np.asarray(list(range(len(df))),'d'),np.asarray(df[0],'d'))
         #print(hist.Integral())
     if(energyscale == "en200"):
-        #print("ciao")
+        #print("ciao200")
         return EnergyHisto(hist,df[0],1)
     if(energyscale == "en1000"):
-        #print("ciao")
+        #print("ciao1000")
         return EnergyHisto(hist,df[0],5)
     return hist
 
 def EnergyHisto(histo, dataarray, gain):
     a = 0.3206
-    Erra = 0.0014
+    sa = 0.0014
     b = -47
-    Errb = 7
+    sb = 7
     EnHist = TH1D(histo.GetTitle(),histo.GetTitle(),len(dataarray),ChEnConv(0,a,b,gain),ChEnConv(len(dataarray),a,b,gain))
     EnbinEntries = [ChEnConv(bin,a,b,gain) for bin in range(histo.GetNbinsX())]
     EnHist.FillN(len(dataarray),np.asarray(EnbinEntries,'d'),np.asarray(dataarray,'d'))
-    print(EnHist.Integral())
+    CalErr = CalEnergyErr(a,sa,b,sb,gain)
+    for binnumber in range(EnHist.GetNbinsX()):
+        EnHist.SetBinError(binnumber,np.sqrt(EnHist.GetBinContent(binnumber) + CalErr*CalErr)) 
+    #print(EnHist.Integral())
     return EnHist
 
 def ChEnConv(chn,a,b,gain):
     return (chn-b)/(a*gain)
 
+def CalEnergyErr(a,sa,b,sb,gain):
+    sEn = np.sqrt( (sb*sb)/(a*a*gain*gain) + (b*b*sa*sa)/(a*a*a*a*gain*gain) + 2*sa*sb*( (b)/(a*a*a*gain) ) )
+    return sEn
+
 def HistoComparison(histos, legend, canvatags, boundaries, canvapath, rebins=[], colors = [], alphas = []):
+    histoscopy = []
+    for histo in histos:
+        histoscopy.append(histo)
     canva = TCanvas('c', 'c', 1700,1200)
     hFrame = canva.DrawFrame(boundaries[0], boundaries[1], boundaries[2], boundaries[3], canvatags)
     for idx in range(len(histos)):
         if(rebins != []):
-            histos[idx].Rebin(rebins[idx])
-        histos[idx].Scale(1/histos[idx].GetMaximum())
-        SetObjectStyle(histos[idx],color=colors[idx],fillalpha=alphas[idx],linewidth=1)
-        histos[idx].Draw("hist,same")
+            histoscopy[idx].Rebin(rebins[idx])
+        histoscopy[idx].Scale(1/histoscopy[idx].GetMaximum())
+        SetObjectStyle(histoscopy[idx],color=colors[idx],fillalpha=alphas[idx],linewidth=1)
+        histoscopy[idx].Draw("hist,same")
     legend.Draw("same")
     canva.SaveAs(canvapath)
+
 
 def DictHistos(dict, histofile, rebin=0):
     colors = [kBlue, kRed, kGreen, kOrange, kBlack, kViolet]
@@ -60,21 +77,25 @@ def DictHistos(dict, histofile, rebin=0):
     dictkeys = list(dict.keys()) 
     for idx, (dictkey, color) in enumerate(zip(dictkeys,colors)):
         #if(dictkey == 'Gain 200'): 
-        #    dict[dictkey] = [dict[dictkey],CreateHist(dict[dictkey],idx,dictkeys[idx],"en200")]
-        #    print(0)
-        #    print(dictkey)
+        #print(idx)
+        dict[dictkey] = [dict[dictkey],CreateHist(dict[dictkey][0],idx,dictkeys[idx],dict[dictkey][1])]
+        if(rebin != 0):
+            print(rebin)
+            dict[dictkey][1].Rebin(rebin)
+            #print(0)
+            #print(dictkey)
         #if(dictkey != 'Gain 200'):
         #    dict[dictkey] = [dict[dictkey],CreateHist(dict[dictkey],idx,dictkeys[idx],"en1000")]
-        #    print(1)
-        #    print(dictkey)
+        #    #print(1)
+        #    #print(dictkey)
         #if(dictkey == 'Stronzio'):
-        dict[dictkey] = [dict[dictkey],CreateHist(dict[dictkey],idx,dictkeys[idx],"en1000")]
-        print(1)
-        print(dictkey)
-        if(rebin != 0):
-            dict[dictkey][1].Rebin(rebin)
+        #    dict[dictkey] = [dict[dictkey],CreateHist(dict[dictkey],idx,dictkeys[idx],"en1000")]
+        ##print(1)
+        ##print(dictkey)
         #canva = TCanvas('c'+str(idx),'c'+str(idx), 1700, 1200)
         #dict[dictkey][1].SetLineStyle(1)
+        #print(dict[dictkey])
+        print(dict[dictkey][0][1])
         SetObjectStyle(dict[dictkey][1], color=color, fillalpha=1, linewidth=1)
         #dict[dictkey][1].Draw("HIST L")
         dict[dictkey][1].SetDrawOption("E")
@@ -96,7 +117,6 @@ def Centroid(histo, lowerbound, upperbound):
     #print(sum(weight))
     #print('Centroid: ', sum(tuple(centroid))/sum(tuple(weight)))
     return sum(centroid)/sum(weight),math.sqrt(sum(errcentroid))
-
 
 def FWHM(histo):
     errFWHM = 0
