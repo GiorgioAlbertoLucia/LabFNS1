@@ -111,6 +111,7 @@ def calibration(x, y, ey, outFile, name='graph', title='', canvasPath=''):
 
     fitFunc = TF1('fitFunc', 'pol1')
     fitFunc.SetParNames('q', 'm')
+    fitFunc.SetParameter(1, 0)
     fitFunc.SetLineColor(kAzure-3)
     graph.Fit(fitFunc)   
     
@@ -126,7 +127,7 @@ def calibration(x, y, ey, outFile, name='graph', title='', canvasPath=''):
     gStyle.SetOptStat(0)
     text1 = TLatex(0.185, 0.70, 'Fit results (Time = m * Delay + q):')
     text2 = TLatex(0.185, 0.66, f'q = {q:#.0f} #pm {eq:#.0f}')
-    text3 = TLatex(0.185, 0.62, f'm = ({m:#.3f} #pm {em:#.3f}) ns^{-1}')
+    text3 = TLatex(0.185, 0.62, f'm = ({m:#.3f} #pm {em:#.3f})'+' ns^{-1}')
     text4 = TLatex(0.185, 0.58, f'#chi^2 / NDF = {fitFunc.GetChisquare():#.2f} / {fitFunc.GetNDF()}')
     for text in [text1, text2, text3, text4]:   
         text.SetNDC()
@@ -149,8 +150,70 @@ def calibration(x, y, ey, outFile, name='graph', title='', canvasPath=''):
 
     return q, m, eq, em
 
-def resolution(time, timeSigma):
-    pass
+def resolution(delays, sigmas, sigmaErrs, outFile, name='graph', title='', canvasPath=''):
+    '''
+    Creates a TGraphError and performs a linear fit on data. Fit parameters will be returned
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+        q, m (float): parameters of the fit (y = mx + q)
+        eq, em (float): errors to the parameters of the fit
+    '''
+
+    entries = len(delays)
+    ex = np.zeros((entries,))
+
+    graph = TGraphErrors(entries, np.asarray(delays, 'd'), np.asarray(sigmas, 'd'), ex, np.asarray(sigmaErrs, 'd'))
+    graph.SetDrawOption('ap')
+    graph.SetName(name)
+    graph.SetTitle(title)
+    graph.SetMarkerStyle(8)
+    graph.SetMarkerSize(.8)
+    graph.SetMarkerColor(kOrange-3)
+    graph.GetXaxis().SetRange(-40, 1040)
+    graph.GetXaxis().SetRange(250, 350)
+
+    fitFunc = TF1('fitFunc', 'pol1')
+    fitFunc.SetParNames('q', 'm')
+    fitFunc.SetLineColor(kAzure-3)
+    graph.Fit(fitFunc)   
+    
+    q = fitFunc.GetParameter(0)
+    eq = fitFunc.GetParError(0)
+    m = fitFunc.GetParameter(1)
+    em = fitFunc.GetParError(1)
+
+    canvas = TCanvas(f'{name}_canvas', title)
+    canvas.DrawFrame(-40, 250, 1040, 350, title)
+    graph.Draw('p')
+    fitFunc.Draw('same')
+
+    gStyle.SetOptStat(0)
+    text1 = TLatex(0.485, 0.74, 'Fit results (TimeRes = m * Delay + q):')
+    text2 = TLatex(0.485, 0.70, f'q = {q:#.0f} #pm {eq:#.0f} ns')
+    text3 = TLatex(0.485, 0.66, f'm = ({m:#.3f} #pm {em:#.3f})')
+    text4 = TLatex(0.485, 0.62, f'#chi^2 / NDF = {fitFunc.GetChisquare():#.3f} / {fitFunc.GetNDF()}')
+    for text in [text1, text2, text3, text4]:   
+        text.SetNDC()
+        text.SetTextSize(gStyle.GetTextSize()*0.7)
+        text.SetTextFont(42)
+        text.Draw()
+
+    leg = TLegend(0.135, 0.66, 0.44, 0.78)
+    leg.SetTextFont(42)
+    leg.SetTextSize(gStyle.GetTextSize()*0.7)
+    leg.SetFillStyle(0)
+    leg.AddEntry(graph, 'MCA time resolution')
+    leg.AddEntry(fitFunc, 'Fit line')
+    leg.Draw()
+
+    outFile.cd()
+    graph.Write()
+    canvas.Write()
+    canvas.SaveAs(canvasPath)
 
 def scalerRateGraph(scalerDf, outFile):
 
@@ -245,6 +308,14 @@ if __name__ == '__main__':
     print('\n##########Time calibration#########\n')
     q, m, eq, em = calibration(delays, peakCenter, peakSigma, outfile, 'timeCalibrationMCA', 'Time Calibration for the MCA; Delay (ns); Time (chn)', 'data/output/Figures/GammaCoincidence/timeCalibrationMCA.pdf')
     print('\nFit params (y = mx + q):\nq = ', q, ' +- ', eq, '\nm = ', m, ' +- ', em)
+
+    print('\n##########Time resolution#########\n')
+    sigmaCal = []
+    sigmaErrCal = []
+    for sigma, sigmaErr in zip(peakSigma, peakSigmaErr):
+        sigmaCal.append(q + m*sigma)
+        sigmaErrCal.append(np.sqrt(eq**2 + (sigma*em)**2 + (sigmaErr*m)**2))
+    resolution(delays, sigmaCal, sigmaErrCal, outfile, 'timeResolutionMCA', 'Time resolution of the MCA; Delay (ns); Time Resolution (ns)', 'data/output/Figures/GammaCoincidence/timeResolutionMCA.pdf')
 
     outfile.Close()
     

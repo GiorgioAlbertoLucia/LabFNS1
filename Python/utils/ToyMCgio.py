@@ -1,7 +1,7 @@
 import numpy as np
 import ctypes
 
-from ROOT import TRandom3, gRandom, TH1D, TFile, TF1, TCanvas
+from ROOT import TRandom3, gRandom, TH1D, TFile, TF1, TCanvas, TLatex, gStyle, TLegend
 
 from math import acos, atan, cos, sin, tan, sqrt, radians
 
@@ -88,56 +88,54 @@ def generateMC(kNEvents, kRadius, kDistance, outfile, seed=42):
 
 def fitMC(outfile):
     '''
+    Fit the MC distribution with a function derived from geometrical considerations and save it on canvas on a .root file
     '''
 
     MCinfile = TFile('data/output/ToyMCgio.root')
     histMC = MCinfile.Get('toyMC')
-    canvas = TCanvas('toyMC', 'toyMC; Angles (deg); Counts (a. u.)')
+    histMC.SetFillColorAlpha(863, 0.4)
+    histMC.SetTitle('Monte Carlo; Angles (deg); Counts (a. u.)')
+    canvas = TCanvas('toyMC', 'Monte Carlo; Angles (deg); Counts (a. u.)', 1500, 1500)
+    canvas.DrawFrame(-34, 0, 34, 12000, 'Monte Carlo; Angles (deg); Counts (a. u.)')
     
-    # pol3
-    #fitMC1 = TF1('fitMC1', '([0] + [1]*x + [2]*x*x + [3]*x*x*x)', 0, 28)
-    #fitMC1.SetParNames('p0', 'p1', 'p2', 'p3')
-    #fitMC1.SetParameters(9900, -400, -4.9, 0.23)
-#
-    #histMC.Fit(fitMC1, 'b', '', 0, 28)
-    #print('Right fit results:')
-    #print(f'#chi^2 / NDF = {fitMC1.GetChisquare():#.2f} / {fitMC1.GetNDF()}')
-#
-    #fitMC2 = TF1('fitMC2', '([0] + [1]*x + [2]*x*x + [3]*x*x*x)', -28, 0)
-    #fitMC2.SetParNames('p0', 'p1', 'p2', 'p3')
-    #fitMC2.SetParameters(-9900, 400, 4.9, -0.23)
-#
-    #histMC.Fit(fitMC2, 'b', '', -28, 0)
-    #print('Left fit results:')
-    #print(f'#chi^2 / NDF = {fitMC2.GetChisquare():#.2f} / {fitMC2.GetNDF()}')
-
     # geom func
     fitMCg = TF1('fitMCg', '[0]*( 2/pi*acos([1]/[2]*sin(abs(pi*x/180)/2)) - 2*[1]*sin(abs(pi*x/180)/2)/(pi*[2]*[2])* sqrt( [2]*[2] - [1]*[1]*sin(abs(pi*x/180)/2)*sin(abs(pi*x/180)/2) ) )', -28, 28)
     fitMCg.SetParNames('Norm','R', 'r')
     fitMCg.SetParameters(10000, 10, 2.54)
+    fitMCg.SetLineColor(797)
 
     histMC.Fit(fitMCg, 'b', '', -28, -28)
-    print('Left fit results:')
+    print('Fit results:')
     print(f'#chi^2 / NDF = {fitMCg.GetChisquare():#.2f} / {fitMCg.GetNDF()}')
 
-    #gaus fit
-    #fitMCg = TF1('fitMCg', 'gaus(0)', -28, 28)
-    #fitMCg.SetParNames('Norm','#mu', '#sigma')
-    #fitMCg.SetParameters(10000, 0, 20)
-#
-    #histMC.Fit(fitMCg, 'b', '', -28, -28)
-    #print('Left fit results:')
-    #print(f'#chi^2 / NDF = {fitMCg.GetChisquare():#.2f} / {fitMCg.GetNDF()}')
+    leg = TLegend(0.15, 0.65, 0.4, 0.85)
+    leg.SetTextFont(42)
+    leg.SetTextSize(gStyle.GetTextSize()*0.9)
+    leg.SetFillStyle(0)
+    leg.AddEntry(histMC, 'Monte Carlo', 'lf')
+    leg.AddEntry(fitMCg, 'Fit function', 'lf')
 
+    gStyle.SetOptStat(0)
+    text1 = TLatex(0.65, 0.70, 'Fit results:')
+    text2 = TLatex(0.65, 0.66, f'[Norm] = {fitMCg.GetParameter(0):#.0f} #pm {fitMCg.GetParError(0):#.0f}')
+    text3 = TLatex(0.65, 0.62, f'[R] = ({fitMCg.GetParameter(1):#.0f} #pm {fitMCg.GetParError(1):#.0f}) cm')
+    text4 = TLatex(0.65, 0.58, f'[r] = ({fitMCg.GetParameter(2):#.1f} #pm {fitMCg.GetParError(2):#.1f}) cm')
+    text5 = TLatex(0.65, 0.54, f'#chi^2 / NDF = {fitMCg.GetChisquare():#.0f} / {fitMCg.GetNDF()}')
 
     histMC.Draw('hist')
-    #fitMC1.Draw('same')
-    #fitMC2.Draw('same')
     fitMCg.Draw('same')
+    leg.Draw('same')
+
+    for text in [text1, text2, text3, text4, text5]:   
+        text.SetNDC()
+        text.SetTextSize(gStyle.GetTextSize()*0.8)
+        text.SetTextFont(42)
+        text.Draw()
 
     outfile.cd()
     histMC.Write()
     canvas.Write()
+    canvas.SaveAs('data/output/Figures/GammaCoincidence/MCfit.pdf')
 
 if __name__ == '__main__':
    
