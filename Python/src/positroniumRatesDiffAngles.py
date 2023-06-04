@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ROOT import TGraphErrors, TGraph, TCanvas, TFile, TH1D, gStyle, TLegend, TF1
+from ROOT import TGraphErrors, TGraph, TCanvas, TFile, TH1D, gStyle, TLegend, TF1, TLatex
 from ROOT import kOrange, kAzure, kGreen, kRed, kMagenta, kViolet, kBlue, kYellow
 
 colorList = [kOrange-3, kMagenta-4, kAzure-3, kGreen-3, kRed-4, kViolet-6, kBlue-4, kYellow-7]
@@ -88,14 +88,67 @@ def rateGraph(x, y, ey, outFile):
     entries = len(x)
     ex = np.ones((entries,))
 
+    canvas = TCanvas('rateGraph_canvas', '', 1500, 1500)
+    canvas.DrawFrame(-34, 0, 34, 80, 'Rates of #gamma-#gamma coincidences; Angles (deg); Rate (Hz)')
+
     graph = TGraphErrors(entries, np.asarray(x, 'd'), np.asarray(y, 'd'), ex, np.asarray(ey, 'd'))
     graph.SetDrawOption('ap')
     graph.SetName('Rates-Angle')
     graph.SetTitle('Rates of #gamma-#gamma coincidences; Angle (deg); Rate (Hz)')
-    graph.SetMarkerColor(kAzure-4)
+    graph.SetMarkerColor(kAzure-3)
+
+    fitRate = TF1('fitRate', '[0]*( 2/pi*acos([1]/[2]*sin((pi*abs(x-[3])/180)/2)) - 2*[1]*sin((pi*abs(x-[3])/180)/2)/(pi*[2]*[2])* sqrt( [2]*[2] - [1]*[1]*sin((pi*abs(x-[3])/180)/2)*sin((pi*abs(x-[3])/180)/2) ) )',-24, 24)
+    fitRate.SetParNames('Norm','R', 'r', '#alpha')
+    fitRate.SetParameters(80, 10, 2.26, -2)
+    fitRate.SetParLimits(0, 75, 85)
+    fitRate.SetParLimits(1, 8, 12)
+    fitRate.SetParLimits(2, 2, 2.54)
+    fitRate.SetParLimits(3, -5, 3)
+    fitRate.FixParameter(1, 10)
+    #fitRate.FixParameter(2, 2.54)
+    
+    #fitRate = TF1('fitRate', '[0]*( 2/pi*acos(10/2.54*sin((pi*abs(x+[1])/180)/2)) - 2*[1]*sin((pi*abs(x+[1])/180)/2)/(pi*2.54*2.54)* sqrt( 2.54*2.54 - 10*10*sin((pi*abs(x+[1])/180)/2)*sin((pi*abs(x+[1])/180)/2) ) )', -28, 28)
+    #fitRate.SetParNames('Norm', '#alpha', 'Bkg')
+    #fitRate.SetParameters(70, 0)
+    #fitRate.SetParLimits(0, 60, 100)
+    #fitRate.SetParLimits(1, -10, 10)
+    #fitRate.SetParLimits(2, 0, 1000)
+    
+    fitRate.SetLineColor(797)
+    
+    graph.Fit(fitRate, 'rm', '', -24, 24)
+    print(f'#chi^2 / NDF = {fitRate.GetChisquare():#.2f} / {fitRate.GetNDF()}')
+
+    leg = TLegend(0.15, 0.65, 0.4, 0.85)
+    leg.SetTextFont(42)
+    leg.SetTextSize(gStyle.GetTextSize()*0.7)
+    leg.SetFillStyle(0)
+    leg.AddEntry(graph, 'Rates of coincidence', 'lf')
+    leg.AddEntry(fitRate, 'Fit function', 'lf')
+
+    gStyle.SetOptStat(0)
+    text1 = TLatex(0.65, 0.80, 'Fit results:')
+    text2 = TLatex(0.65, 0.76, f'[Norm] = {fitRate.GetParameter(0):#.0f} #pm {fitRate.GetParError(0):#.0f}')
+    text3 = TLatex(0.65, 0.72, f'[R] = ({fitRate.GetParameter(1):#.0f} #pm {fitRate.GetParError(1):#.0f}) cm')
+    text4 = TLatex(0.65, 0.68, f'[r] = ({fitRate.GetParameter(2):#.2f} #pm {fitRate.GetParError(2):#.2f}) cm')
+    text5 = TLatex(0.65, 0.64, f'[#alpha] = ({fitRate.GetParameter(3):#.1f} #pm {fitRate.GetParError(3):#.1f}) deg')
+    text6 = TLatex(0.65, 0.60, f'#chi^2 / NDF = {fitRate.GetChisquare():#.0f} / {fitRate.GetNDF()}')
+
+    graph.Draw('ap')
+    fitRate.Draw('same')
+    leg.Draw('same')
+
+    for text in [text1, text2, text3, text4, text5, text6]:   
+        text.SetNDC()
+        text.SetTextSize(gStyle.GetTextSize()*0.8)
+        text.SetTextFont(42)
+        text.Draw()
 
     outFile.cd()
+    canvas.Write()
     graph.Write()
+
+    canvas.SaveAs('data/output/Figures/GammaCoincidence/rateGraph.pdf')
 
     return graph
 
@@ -106,7 +159,6 @@ def rateGraphPDF(graph, outFile, canvasPath):
 
     canvas = TCanvas('Rates-Angle-Canvas', 'Rates of #gamma-#gamma coincidences; Angle (deg); Rate (Hz)')
     canvas.DrawFrame(0, 0, 1024, 600, 'Rates of #gamma-#gamma coincidences; Angle (deg); Rate (Hz)')
-
 
     graph.SetMarkerStyle(8)
     graph.SetMarkerSize(.8)
@@ -159,12 +211,63 @@ def scalerRateGraph(scalerDf, outFile):
     graphB.Draw('ap')
     leg.Draw('same')
 
-
     outFile.cd()
     canvas.Write()
     canvas.SaveSource('Python/src/RatesPositroniumABcanvas.C')
     graphA.Write()
     graphB.Write()
+
+def posDiffusionAngle(energy):
+    '''
+    Evaluate the diffusion angle in lab reference frame between two photons emitted back-to-back in the c.m. reference frame from the
+    decay of a positronium of given energy (2 body decay)
+
+    Parameters
+    ----------
+        energy (float): kinetic energy of the positronium (in keV)
+
+    Returns
+    -------
+        phi (float): diffusion angle (in degrees)
+    '''
+
+    me = 511    # electron mass in keV
+    theta = np.arccos(np.sqrt(energy*(energy + 4*me))/(energy + 2*me))
+    phi = 2 * theta
+    return 180*phi/np.pi
+
+def posDiffusionAngleGraph(energies, outFile):
+
+    entries = len(energies)
+    emisAngles = []
+    for energy in energies: emisAngles.append(posDiffusionAngle(energy))
+
+    canvas = TCanvas('rateGraph_canvas', '', 1500, 1500)
+    canvas.DrawFrame(-0.002, 179.3, 0.012, 180.3, 'Emission angles of photons produced in a positronium decay; Kinetic energy (keV); Angles (deg)')
+
+    graph = TGraph(entries, np.asarray(energies, 'd'), np.asarray(emisAngles, 'd'))
+    graph.SetDrawOption('apl')
+    graph.SetName('Energy-Angle')
+    graph.SetTitle('Emission angles of photons produced in a positronium decay; Energy (keV); Angles (deg)')
+    graph.SetMarkerColor(kAzure-3)
+    graph.SetLineColor(kOrange-3)
+
+    leg = TLegend(0.4, 0.65, 0.75, 0.85)
+    leg.SetTextFont(42)
+    leg.SetTextSize(gStyle.GetTextSize()*0.7)
+    leg.SetFillStyle(0)
+    leg.AddEntry(graph, '#splitline{Emission angle of photons}{in a positronium decay}', 'lf')
+
+    graph.Draw('pl')
+    leg.Draw('same')
+
+    outFile.cd()
+    canvas.Write()
+    graph.Write()
+
+    canvas.SaveAs('data/output/Figures/GammaCoincidence/emisAngles.pdf')
+
+
 
 if __name__ == '__main__':
 
@@ -229,7 +332,10 @@ if __name__ == '__main__':
     for hist in hists:  hist.Write()
     multihist(hists, labels, outfile, 'TAC counts; Time (chn); Counts (a. u.)')   # tac hists
     rate_graph = rateGraph(angles, rates, rate_errs, outfile)
-    rateGraphPDF(rate_graph, outfile, 'data/output/Figures/GammaCoincidence/rateGraph.pdf')
+    #rateGraphPDF(rate_graph, outfile, 'data/output/Figures/GammaCoincidence/rateGraph.pdf')
+
+    energies = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
+    posDiffusionAngleGraph(energies, outfile)
 
     # data from caen scaler
     scalerDf = pd.read_csv(r'data/input/Gamma/positroniumCoincidence.csv')
