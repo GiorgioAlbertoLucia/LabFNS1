@@ -37,6 +37,32 @@ def GetEnergyFromChnB(Channel):
     Eerr = E * sqrt(Eerr)
     return E, Eerr
 
+def GetChnFromEnergyA(E):
+    a = 0.61
+    b = 25.8
+
+    Channel = a*E + b
+    return Channel
+
+def GetChnFromEnergyB(E):
+    a = 0.68
+    b = 23.01
+
+    Channel = a*E + b
+    return Channel
+
+def GetParametersA():
+    return 0.61, 25.8
+
+def GetParametersErrorA():
+    return 0.02, 19.49
+
+def GetParametersErrorB():
+    return 0.02, 21.31
+
+def GetParametersB():
+    return 0.68, 23.01
+
 def GetResolutionFromChnA(Channel):
     A = 0.79
     B = -0.0108
@@ -240,20 +266,21 @@ def CalibrateA(inFileCobaltA, inFileSodiumA):
     fCobaltA = TF1("fCobaltA","[0]+gaus(1)+gaus(4)",650,950)
     fSodiumA.SetNpx(1000)
     fCobaltA.SetNpx(1000)
-    fSodiumA.SetParameters(100,3000,400,20,500,800,20)
-    fCobaltA.SetParameters(20,200,750,20,200,850,20)
+    fSodiumA.SetParameters(1.e-4,0.009,400,20,0.0009,800,15)
+    fCobaltA.SetParameters(1.e-4,0.002,750,10,0.002,850,10)
     SetObjectStyle(histoSodiumA, color = kOrange-3, fillalpha = 0.5)
     SetObjectStyle(fSodiumA, color = kRed, linewidth=3)
     SetObjectStyle(histoCobaltA, color = kAzure+3, fillalpha = 0.5)
     SetObjectStyle(fCobaltA, color = kGreen, linewidth=3)
+    canvasA = TCanvas("canvasA","canvasA",1000,1000)
+    canvasA.SetLeftMargin(0.11)
+    hFrameA = canvasA.DrawFrame(0,0,1024,0.01,"Calibration scintillator A;Channel;Counts [a.u.]")
+    hFrameA.SetTitleOffset(1.,"Y")
+    hFrameA.GetYaxis().SetMaxDigits(2)
+    histoSodiumA = histoSodiumA.DrawNormalized('hist,same')
+    histoCobaltA = histoCobaltA.DrawNormalized('hist,same')
     histoSodiumA.Fit(fSodiumA,'LR')
     histoCobaltA.Fit(fCobaltA,'LR')
-    canvasA = TCanvas("canvasA","canvasA",1000,1000)
-    canvasA.SetLeftMargin(0.14)
-    hFrameA = canvasA.DrawFrame(0,0,1024,3.5e3,"Calibration scintillator A;Channel;Counts")
-    hFrameA.SetTitleOffset(1.45,"Y")
-    histoSodiumA.Draw('hist,same')
-    histoCobaltA.Draw('hist,same')
     fSodiumA.Draw('same')
     fCobaltA.Draw('same')
     leg = TLegend(0.565, 0.80, 0.85, 0.68)
@@ -283,22 +310,25 @@ def CalibrateB(inFileCobaltB, inFileSodiumB):
     histoSodiumB.SetName("histoSodiumB")
     fSodiumB = TF1("fSodiumB","[0]+gaus(1)+gaus(4)",250,1024)
     fCobaltB = TF1("fCobaltB","[0]+gaus(1)+gaus(4)",750,1024)
-    fSodiumB.SetParameters(500,3000,400,15,500,900,15)
-    fCobaltB.SetParameters(20,200,825,15,200,900,15)
+    fSodiumB.SetParameters(5.e-4,0.009,400,15,0.0009,900,15)
+    fCobaltB.SetParameters(5.e-4,0.002,825,15,0.002,900,15)
+    #fSodiumB.SetParameters(500,3000,400,15,500,900,15)
+    #fCobaltB.SetParameters(20,200,825,15,200,900,15)
     fSodiumB.SetNpx(1000)
     fCobaltB.SetNpx(1000)
     SetObjectStyle(histoSodiumB, color = kOrange-3, fillalpha = 0.5)
     SetObjectStyle(fSodiumB, color = kRed, linewidth=3)
     SetObjectStyle(histoCobaltB, color = kAzure+3, fillalpha = 0.5)
     SetObjectStyle(fCobaltB, color = kGreen, linewidth=3)
+    canvasB = TCanvas("canvasB","canvasB",1000,1000)
+    canvasB.SetLeftMargin(0.11)
+    hFrameB = canvasB.DrawFrame(0,0,1024,0.01,"Calibration scintillator B;Channel;Counts [a.u.]")
+    hFrameB.SetTitleOffset(1.,"Y")
+    hFrameB.GetYaxis().SetMaxDigits(2)
+    histoSodiumB = histoSodiumB.DrawNormalized('hist,same')
+    histoCobaltB = histoCobaltB.DrawNormalized('hist,same')
     histoSodiumB.Fit(fSodiumB,'LR')
     histoCobaltB.Fit(fCobaltB,'LR')
-    canvasB = TCanvas("canvasB","canvasB",1000,1000)
-    canvasB.SetLeftMargin(0.14)
-    hFrameB = canvasB.DrawFrame(0,0,1024,3.5e3,"Calibration scintillator B;Channel;Counts")
-    hFrameB.SetTitleOffset(1.45,"Y")
-    histoSodiumB.Draw('hist,same')
-    histoCobaltB.Draw('hist,same')
     fSodiumB.Draw('same')
     fCobaltB.Draw('same')
     leg = TLegend(0.565, 0.80, 0.85, 0.68)
