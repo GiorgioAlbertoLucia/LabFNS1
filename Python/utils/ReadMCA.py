@@ -55,10 +55,11 @@ def ChEnConv(chn,a,b,gain):
 def CalEnergyErr(a,sa,b,sb,gain,cov,en,sen):
     #+ 2*sa*sb*( (b)/(a*a*a*gain) )
     ch = (0.3176)*gain*en - 33.26
+    sch = (0.3176)*gain*sen
     print('CANALEEEEEEEEEEEEEEEEE')
     print(ch)
     print('\n\n\n\n\n')
-    sch = np.sqrt( (0.3176*0.3176*gain*gain*sen*sen) + (en*en*gain*gain*sa*sa) + sb*sb)
+    #sch = np.sqrt( (0.3176*0.3176*gain*gain*sen*sen) + (en*en*gain*gain*sa*sa) + sb*sb)
     sEn = np.sqrt( (sb*sb)/(a*a*gain*gain) + ((ch-b)*(ch-b)*sa*sa)/(a*a*a*a*gain*gain) + 2*cov*( (ch-b)/(a*a*a*gain*gain) ) + ((sch*sch)/(a*a*gain*gain)) )
     return sEn
 
