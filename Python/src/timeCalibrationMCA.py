@@ -38,6 +38,70 @@ def readMCAoutput(infile):
 
     return hist
 
+def fitPeak(hist, fitRange, xRange, outFile, delay):
+    '''
+    Fits a histogram with a gaussian, returns parameters and draws it on canvas that will be saved on file
+
+    Parameters
+    ----------
+        hist (TH1): histogram to fit
+        fitRange ([float, float]): range to fit within
+        xRange ([float, float]): x axis range to draw
+        outFile (TFile); file to write the canvas to
+        delay (int): delay set in data acquisition
+
+    Returns
+    -------
+        mean, meanErr, sigma, sigmaErr (float): from fit parameters
+    '''
+
+    canvas = TCanvas(f'TACcountsCanvas_{delay}ns', '', 1500, 1500)
+
+    hist.Fit('gaus', '', '', fitRange[0], fitRange[1]) 
+    fitFunc = hist.GetFunction('gaus')   
+
+    hist.GetXaxis().SetRangeUser(xRange[0], xRange[1])
+    fitFunc.SetLineColor(kBlue-4)
+
+    mean = fitFunc.GetParameter(1)
+    meanErr = fitFunc.GetParError(1)
+    sigma = fitFunc.GetParameter(2)
+    sigmaErr = fitFunc.GetParError(2)
+
+    leg = TLegend(0.125, 0.65, 0.45, 0.85)
+    leg.SetTextFont(42)
+    leg.SetTextSize(gStyle.GetTextSize()*0.7)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+    leg.AddEntry(hist, f'TCA counts, delay = {delay} ns', 'lf')
+    leg.AddEntry(fitFunc, 'Gaussian fit', 'lf')
+
+    gStyle.SetOptStat(0)
+
+    text0 = TLatex(0.55, 0.84, 'Acquisition time = 100 s')
+    text1 = TLatex(0.55, 0.80, 'Fit results:')
+    text2 = TLatex(0.55, 0.76, f'[Norm] = {fitFunc.GetParameter(0):#.0f} #pm {fitFunc.GetParError(0):#.0f}')
+    text3 = TLatex(0.55, 0.72, f'[#mu] = ({fitFunc.GetParameter(1):#.2f} #pm {fitFunc.GetParError(1):#.2f}) chn')
+    text4 = TLatex(0.55, 0.68, f'[#sigma] = ({fitFunc.GetParameter(2):#.2f} #pm {fitFunc.GetParError(2):#.2f}) chn')
+    text5 = TLatex(0.55, 0.60, f'#chi^2 / NDF = {fitFunc.GetChisquare():#.0f} / {fitFunc.GetNDF()}')
+
+    hist.Draw('hist')
+    fitFunc.Draw('same')
+    leg.Draw('same')
+
+    for text in [text0, text1, text2, text3, text4, text5]:   
+        text.SetNDC()
+        text.SetTextSize(gStyle.GetTextSize()*0.8)
+        text.SetTextFont(42)
+        text.Draw()
+
+    outFile.cd()
+    hist.Write()
+    canvas.Write()
+    canvas.SaveAs(f'data/output/Figures/GammaCoincidence/TCAcounts{delay}ns.pdf')
+
+    return mean, meanErr, sigma, sigmaErr
+
 def multihist(hists, labels, outFile, canvasTitle='', canvasPath=''):
     '''
     Draw multiple histograms on canvas and save them to a root file
@@ -58,11 +122,18 @@ def multihist(hists, labels, outFile, canvasTitle='', canvasPath=''):
     leg.SetTextFont(42)
     leg.SetTextSize(gStyle.GetTextSize()*0.9)
     leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
 
-    text = TLatex() #acquisition time
+    text = TLatex(0.65, 0.80, 'Acquisition time = 100 s')
+    text.SetNDC()
+    text.SetTextSize(gStyle.GetTextSize()*0.8)
+    text.SetTextFont(42)
+    text.Draw()
 
     for i, hist in enumerate(hists):
+        #hist.Rebin()
         hist.SetLineColor(colorList[i%len(colorList)])
+        hist.SetFillColorAlpha(colorList[i%len(colorList)], 0.4)
         hist.Draw('hist same')
         leg.AddEntry(hist, labels[i], 'lf')
 
@@ -126,8 +197,8 @@ def calibration(x, y, ey, outFile, name='graph', title='', canvasPath=''):
 
     gStyle.SetOptStat(0)
     text1 = TLatex(0.185, 0.70, 'Fit results (Time = m * Delay + q):')
-    text2 = TLatex(0.185, 0.66, f'q = {q:#.0f} #pm {eq:#.0f}')
-    text3 = TLatex(0.185, 0.62, f'm = ({m:#.3f} #pm {em:#.3f})'+' ns^{-1}')
+    text2 = TLatex(0.185, 0.66, f'[q] = {q:#.0f} #pm {eq:#.0f}')
+    text3 = TLatex(0.185, 0.62, f'[m] = ({m:#.3f} #pm {em:#.3f})'+' ns^{-1}')
     text4 = TLatex(0.185, 0.58, f'#chi^2 / NDF = {fitFunc.GetChisquare():#.2f} / {fitFunc.GetNDF()}')
     for text in [text1, text2, text3, text4]:   
         text.SetNDC()
@@ -139,6 +210,7 @@ def calibration(x, y, ey, outFile, name='graph', title='', canvasPath=''):
     leg.SetTextFont(42)
     leg.SetTextSize(gStyle.GetTextSize()*0.9)
     leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
     leg.AddEntry(graph, 'TCA peak position')
     leg.AddEntry(fitFunc, 'Fit line')
     leg.Draw()
@@ -193,8 +265,8 @@ def resolution(delays, sigmas, sigmaErrs, outFile, name='graph', title='', canva
 
     gStyle.SetOptStat(0)
     text1 = TLatex(0.485, 0.74, 'Fit results (TimeRes = m * Delay + q):')
-    text2 = TLatex(0.485, 0.70, f'q = {q:#.0f} #pm {eq:#.0f} ns')
-    text3 = TLatex(0.485, 0.66, f'm = ({m:#.3f} #pm {em:#.3f})')
+    text2 = TLatex(0.485, 0.70, f'[q] = {q:#.0f} #pm {eq:#.0f} ns')
+    text3 = TLatex(0.485, 0.66, f'[m] = ({m:#.3f} #pm {em:#.3f})')
     text4 = TLatex(0.485, 0.62, f'#chi^2 / NDF = {fitFunc.GetChisquare():#.3f} / {fitFunc.GetNDF()}')
     for text in [text1, text2, text3, text4]:   
         text.SetNDC()
@@ -206,6 +278,7 @@ def resolution(delays, sigmas, sigmaErrs, outFile, name='graph', title='', canva
     leg.SetTextFont(42)
     leg.SetTextSize(gStyle.GetTextSize()*0.7)
     leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
     leg.AddEntry(graph, 'MCA time resolution')
     leg.AddEntry(fitFunc, 'Fit line')
     leg.Draw()
@@ -294,15 +367,15 @@ if __name__ == '__main__':
     
     multihist(hists, labels, outfile, 'TAC counts; Time (chn); Counts (a. u.)', 'data/output/Figures/GammaCoincidence/timeDistribution.pdf')     # tac hists
 
-    fitRanges = [[269, 307], [373, 411], [470, 508], [573, 605], [675, 712], [772, 805]]
-    for hist, fitRange in zip(hists, fitRanges):                                                              # fit single hist
-        hist.Fit('gaus', '', '', fitRange[0], fitRange[1]) 
-        fitFunc = hist.GetFunction('gaus')   
-        peakCenter.append(fitFunc.GetParameter(1))
-        peakCenterErr.append(fitFunc.GetParError(1))
-        peakSigma.append(fitFunc.GetParameter(2))
-        peakSigmaErr.append(fitFunc.GetParError(2))
-        hist.Write()
+    fitRanges = [[273, 303], [379, 405], [474, 504], [578, 599], [681, 706], [776, 801]]
+    xRanges = [[200, 400], [300, 500], [400, 600], [500, 700], [600, 800], [700, 900]]
+    for hist, fitRange, xRange, delay in zip(hists, fitRanges, xRanges, delays): 
+        mean, meanErr, sigma, sigmaErr = fitPeak(hist, fitRange, xRange, outfile, delay)                           # fit single hist
+          
+        peakCenter.append(mean)
+        peakCenterErr.append(meanErr)
+        peakSigma.append(sigma)
+        peakSigmaErr.append(sigmaErr)
 
 
     print('\n##########Time calibration#########\n')

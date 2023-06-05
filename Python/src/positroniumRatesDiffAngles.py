@@ -30,7 +30,6 @@ def readMCAoutput(infile, ROI=[0, -1]):
 
         for line in file:
             if line.startswith('LIVE_TIME'):
-                #live_time = line
                 live_time = float(line.split('-')[-1].strip())
                 break
 
@@ -250,6 +249,8 @@ def posDiffusionAngleGraph(energies, outFile):
     graph.SetName('Energy-Angle')
     graph.SetTitle('Emission angles of photons produced in a positronium decay; Energy (keV); Angles (deg)')
     graph.SetMarkerColor(kAzure-3)
+    graph.SetMarkerStyle(20)
+    graph.SetMarkerSize(1)
     graph.SetLineColor(kOrange-3)
 
     leg = TLegend(0.4, 0.65, 0.75, 0.85)
@@ -334,7 +335,8 @@ if __name__ == '__main__':
     rate_graph = rateGraph(angles, rates, rate_errs, outfile)
     #rateGraphPDF(rate_graph, outfile, 'data/output/Figures/GammaCoincidence/rateGraph.pdf')
 
-    energies = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
+    #energies = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
+    energies = np.linspace(0, 0.01, 10)
     posDiffusionAngleGraph(energies, outfile)
 
     # data from caen scaler

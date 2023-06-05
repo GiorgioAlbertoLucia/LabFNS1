@@ -37,6 +37,32 @@ def GetEnergyFromChnB(Channel):
     Eerr = E * sqrt(Eerr)
     return E, Eerr
 
+def GetChnFromEnergyA(E):
+    a = 0.61
+    b = 25.8
+
+    Channel = a*E + b
+    return Channel
+
+def GetChnFromEnergyB(E):
+    a = 0.68
+    b = 23.01
+
+    Channel = a*E + b
+    return Channel
+
+def GetParametersA():
+    return 0.61, 25.8
+
+def GetParametersErrorA():
+    return 0.02, 19.49
+
+def GetParametersErrorB():
+    return 0.02, 21.31
+
+def GetParametersB():
+    return 0.68, 23.01
+
 def GetResolutionFromChnA(Channel):
     A = 0.79
     B = -0.0108
@@ -59,35 +85,31 @@ def GetCalibrationFitA(mus,sigmas):
     covMatrix.Print()
     canvas = TCanvas("CalibrationFitA","CalibrationFitA",1300,1500)
     canvas.SetLeftMargin(0.13)
-    hFrame = canvas.DrawFrame(400,250,1500,1000,"Calibration Fit;E [keV];Channel")
+    hFrame = canvas.DrawFrame(400,250,1500,1000,"Calibration fit scintillator A;E [keV];Channel")
     hFrame.GetYaxis().SetTitleOffset(1.2)
     SetObjectStyle(graph,color=kAzure+3,markerstyle=kFullCircle)
     graph.Draw("P,same")
     calibrationfit.Draw("same")
 
-    text = TLatex(0.2, 0.80,"Calibration fit scintillator A")
-    text.SetNDC()
-    text.SetTextSize(gStyle.GetTextSize())
-    text.SetTextFont(42)
-    text.Draw("same")
-    text2 =TLatex(0.2, 0.74,"Channel = E (keV) #times a + b")
+
+    text2 =TLatex(0.2, 0.8,"Channel = E (keV) #times a + b")
     text2.SetNDC()
-    text2.SetTextSize(gStyle.GetTextSize()*0.8)
+    text2.SetTextSize(gStyle.GetTextSize())
     text2.SetTextFont(42)
     text2.Draw("same")
-    text3 =TLatex(0.2, 0.68,"a = ({0:.2f} #pm {1:.2f}) keV".format(calibrationfit.GetParameter(1),calibrationfit.GetParError(1))+"^{#font[122]{-}1}")
+    text3 =TLatex(0.2, 0.72,"a = ({0:.2f} #pm {1:.2f}) keV".format(calibrationfit.GetParameter(1),calibrationfit.GetParError(1))+"^{#font[122]{-}1}")
     text3.SetNDC()
-    text3.SetTextSize(gStyle.GetTextSize()*0.7)
+    text3.SetTextSize(gStyle.GetTextSize())
     text3.SetTextFont(42)
     text3.Draw("same")
-    text4 =TLatex(0.2, 0.62,f"b = {calibrationfit.GetParameter(0):.2f} #pm {calibrationfit.GetParError(0):.2f}")
+    text4 =TLatex(0.2, 0.64,f"b = ({round(calibrationfit.GetParameter(0)/10):1d} #pm {round(calibrationfit.GetParError(0)/10):d})"+" #upoint 10^{1}")
     text4.SetNDC()
-    text4.SetTextSize(gStyle.GetTextSize()*0.7)
+    text4.SetTextSize(gStyle.GetTextSize())
     text4.SetTextFont(42)
     text4.Draw("same")
     text5 =TLatex(0.2, 0.56,f"cov(a,b) = {covMatrix[0][1]:.2f}")
     text5.SetNDC()
-    text5.SetTextSize(gStyle.GetTextSize()*0.7)
+    text5.SetTextSize(gStyle.GetTextSize())
     text5.SetTextFont(42)
     text5.Draw("same")
 
@@ -103,35 +125,30 @@ def GetCalibrationFitB(mus,sigmas):
     covMatrix.Print()
     canvas = TCanvas("CalibrationFitB","CalibrationFitB",1300,1500)
     canvas.SetLeftMargin(0.13)
-    hFrame = canvas.DrawFrame(400,250,1500,1000,"Calibration Fit;E [keV];Channel")
+    hFrame = canvas.DrawFrame(400,250,1500,1000,"Calibration fit scintillator B;E [keV];Channel")
     hFrame.GetYaxis().SetTitleOffset(1.2)
     SetObjectStyle(graph,color=kAzure+3,markerstyle=kFullCircle)
     graph.Draw("P,same")
     calibrationfit.Draw("same")
 
-    text = TLatex(0.2, 0.80,"Calibration fit scintillator B")
-    text.SetNDC()
-    text.SetTextSize(gStyle.GetTextSize())
-    text.SetTextFont(42)
-    text.Draw("same")
-    text2 =TLatex(0.2, 0.74,"Channel = E (keV) #times a + b")
+    text2 =TLatex(0.2, 0.8,"Channel = E (keV) #times a + b")
     text2.SetNDC()
-    text2.SetTextSize(gStyle.GetTextSize()*0.8)
+    text2.SetTextSize(gStyle.GetTextSize())
     text2.SetTextFont(42)
     text2.Draw("same")
-    text3 =TLatex(0.2, 0.68,"a = ({0:.2f} #pm {1:.2f}) keV".format(calibrationfit.GetParameter(1),calibrationfit.GetParError(1))+"^{#font[122]{-}1}")
+    text3 =TLatex(0.2, 0.72,"a = ({0:.2f} #pm {1:.2f}) keV".format(calibrationfit.GetParameter(1),calibrationfit.GetParError(1))+"^{#font[122]{-}1}")
     text3.SetNDC()
-    text3.SetTextSize(gStyle.GetTextSize()*0.7)
+    text3.SetTextSize(gStyle.GetTextSize())
     text3.SetTextFont(42)
     text3.Draw("same")
-    text4 =TLatex(0.2, 0.62,f"b = {calibrationfit.GetParameter(0):.2f} #pm {calibrationfit.GetParError(0):.2f}")
+    text4 =TLatex(0.2, 0.64,f"b = ({round(calibrationfit.GetParameter(0)/10):1d} #pm {round(calibrationfit.GetParError(0)/10):d})"+" #upoint 10^{1}")
     text4.SetNDC()
-    text4.SetTextSize(gStyle.GetTextSize()*0.7)
+    text4.SetTextSize(gStyle.GetTextSize())
     text4.SetTextFont(42)
     text4.Draw("same")
     text5 =TLatex(0.2, 0.56,f"cov(a,b) = {covMatrix[0][1]:.2f}")
     text5.SetNDC()
-    text5.SetTextSize(gStyle.GetTextSize()*0.7)
+    text5.SetTextSize(gStyle.GetTextSize())
     text5.SetTextFont(42)
     text5.Draw("same")
 
@@ -240,20 +257,21 @@ def CalibrateA(inFileCobaltA, inFileSodiumA):
     fCobaltA = TF1("fCobaltA","[0]+gaus(1)+gaus(4)",650,950)
     fSodiumA.SetNpx(1000)
     fCobaltA.SetNpx(1000)
-    fSodiumA.SetParameters(100,3000,400,20,500,800,20)
-    fCobaltA.SetParameters(20,200,750,20,200,850,20)
+    fSodiumA.SetParameters(1.e-4,0.009,400,20,0.0009,800,15)
+    fCobaltA.SetParameters(1.e-4,0.002,750,10,0.002,850,10)
     SetObjectStyle(histoSodiumA, color = kOrange-3, fillalpha = 0.5)
     SetObjectStyle(fSodiumA, color = kRed, linewidth=3)
     SetObjectStyle(histoCobaltA, color = kAzure+3, fillalpha = 0.5)
     SetObjectStyle(fCobaltA, color = kGreen, linewidth=3)
+    canvasA = TCanvas("canvasA","canvasA",1000,1000)
+    canvasA.SetLeftMargin(0.11)
+    hFrameA = canvasA.DrawFrame(0,0,1024,0.01,"Calibration scintillator A;Channel;Counts [a.u.]")
+    hFrameA.SetTitleOffset(1.,"Y")
+    hFrameA.GetYaxis().SetMaxDigits(2)
+    histoSodiumA = histoSodiumA.DrawNormalized('hist,same')
+    histoCobaltA = histoCobaltA.DrawNormalized('hist,same')
     histoSodiumA.Fit(fSodiumA,'LR')
     histoCobaltA.Fit(fCobaltA,'LR')
-    canvasA = TCanvas("canvasA","canvasA",1000,1000)
-    canvasA.SetLeftMargin(0.14)
-    hFrameA = canvasA.DrawFrame(0,0,1024,3.5e3,"Calibration scintillator A;Channel;Counts")
-    hFrameA.SetTitleOffset(1.45,"Y")
-    histoSodiumA.Draw('hist,same')
-    histoCobaltA.Draw('hist,same')
     fSodiumA.Draw('same')
     fCobaltA.Draw('same')
     leg = TLegend(0.565, 0.80, 0.85, 0.68)
@@ -283,22 +301,25 @@ def CalibrateB(inFileCobaltB, inFileSodiumB):
     histoSodiumB.SetName("histoSodiumB")
     fSodiumB = TF1("fSodiumB","[0]+gaus(1)+gaus(4)",250,1024)
     fCobaltB = TF1("fCobaltB","[0]+gaus(1)+gaus(4)",750,1024)
-    fSodiumB.SetParameters(500,3000,400,15,500,900,15)
-    fCobaltB.SetParameters(20,200,825,15,200,900,15)
+    fSodiumB.SetParameters(5.e-4,0.009,400,15,0.0009,900,15)
+    fCobaltB.SetParameters(5.e-4,0.002,825,15,0.002,900,15)
+    #fSodiumB.SetParameters(500,3000,400,15,500,900,15)
+    #fCobaltB.SetParameters(20,200,825,15,200,900,15)
     fSodiumB.SetNpx(1000)
     fCobaltB.SetNpx(1000)
     SetObjectStyle(histoSodiumB, color = kOrange-3, fillalpha = 0.5)
     SetObjectStyle(fSodiumB, color = kRed, linewidth=3)
     SetObjectStyle(histoCobaltB, color = kAzure+3, fillalpha = 0.5)
     SetObjectStyle(fCobaltB, color = kGreen, linewidth=3)
+    canvasB = TCanvas("canvasB","canvasB",1000,1000)
+    canvasB.SetLeftMargin(0.11)
+    hFrameB = canvasB.DrawFrame(0,0,1024,0.01,"Calibration scintillator B;Channel;Counts [a.u.]")
+    hFrameB.SetTitleOffset(1.,"Y")
+    hFrameB.GetYaxis().SetMaxDigits(2)
+    histoSodiumB = histoSodiumB.DrawNormalized('hist,same')
+    histoCobaltB = histoCobaltB.DrawNormalized('hist,same')
     histoSodiumB.Fit(fSodiumB,'LR')
     histoCobaltB.Fit(fCobaltB,'LR')
-    canvasB = TCanvas("canvasB","canvasB",1000,1000)
-    canvasB.SetLeftMargin(0.14)
-    hFrameB = canvasB.DrawFrame(0,0,1024,3.5e3,"Calibration scintillator B;Channel;Counts")
-    hFrameB.SetTitleOffset(1.45,"Y")
-    histoSodiumB.Draw('hist,same')
-    histoCobaltB.Draw('hist,same')
     fSodiumB.Draw('same')
     fCobaltB.Draw('same')
     leg = TLegend(0.565, 0.80, 0.85, 0.68)
