@@ -115,12 +115,10 @@ def BetaQValueFit(histoBeta, outfilename, calerr, color):
     sa2 = BetaCurveFunction.GetParError(2)
     sa3 = ConstFunction.GetParError(0)
     QValueEstimate = a2-(np.log(a3-a0)/a1)
-    print(sa2*sa2)
-    print(((np.log(a3-a0)*np.log(a3-a0))/(a1*a1*a1*a1))*sa1*sa1)
-    print((sa3*sa3)*(1/(a1*a1*(a3-a0)*(a3-a0))))
-    print((sa0*sa0)*(1/(a1*a1*(a3-a0)*(a3-a0))))
     QValueEstimateError = np.sqrt(sa2*sa2 + ((np.log(a3-a0)*np.log(a3-a0))/(a1*a1*a1*a1))*sa1*sa1 + (sa0*sa0+sa3*sa3)*(1/(a1*a1*(a3-a0)*(a3-a0))) )
-    TotalError = np.sqrt(QValueEstimateError + calerr*calerr)
+    print(QValueEstimateError)
+    print(calerr)
+    TotalError = np.sqrt(QValueEstimateError*QValueEstimateError + calerr*calerr)
     result = str(QValueEstimate) + ' ' + u"\u00B1" + ' ' + str(TotalError) + ' keV'
     return result
     #return (QValueEstimate,QValueEstimateError)
@@ -136,4 +134,5 @@ if __name__ == "__main__":
     color = kAzure-7
     DictHistos(dict, histofile, color, 8)
 
-    print(BetaQValueFit(dict['Elettroni'][1],'BetaQValuesSodium',24.682567936394918,color))
+    CalerrVecchio = 24.6825679363949188
+    print(BetaQValueFit(dict['Elettroni'][1],'BetaQValuesSodium',0,color))

@@ -13,7 +13,11 @@ data/input/overnight
 data/input/pedestals_files
 data/input/pedestals_trees
 data/thursday
-data/input/Diamond
+data/input/Diamond/HV
+data/input/Diamond/Sodio
+data/input/Diamond/Stronzio
+data/input/Diamond/TimeEv
+data/input/Diamond/TimeEvHistos
 
 settings.json
 __pycache__

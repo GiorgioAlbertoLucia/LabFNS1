@@ -168,6 +168,12 @@ if __name__ == '__main__':
     retcal.GetXaxis().SetTitle("Energy [keV]")
     retcal.GetYaxis().SetTitle("Channels")
     retcal.Fit(retta,"RM")
+    fitResults = retcal.Fit(retta, 'S')
+    covMatrix = fitResults.GetCovarianceMatrix()
+    cov = covMatrix[0][1]
+    print('COVARIANZA')
+    print(cov)
+    print('\n\n\n\n')
     retcal.Draw("AP")
     retcal.SetMarkerStyle(8)
     retcal.SetMarkerSize(1.2)

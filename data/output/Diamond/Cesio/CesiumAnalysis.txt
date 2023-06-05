@@ -1,8 +1,8 @@
-Compton edge estimate: 134.82006482582742 ± nan keV
+Compton edge estimate: 491.7202142612702 ± 1.1238066303190064 keV
 
-Internal conversion peak estimate: 99.8589434869681 ± nan keV 
+Internal conversion peak estimate: 650.3265094518807 ± 1.0769725347994568 keV 
 
-Polymide Thickness: 2.237840494402949e-09 ± nan m
+Polymide Thickness: 4.6471271857734835e-11 ± 4.287345181090043e-12 m
 
-Beta Q value estimate: 521.4160052204788 ± 18.002090920361287 keV
+Beta Q value estimate: 521.4160052204788 ± 324.0752775049542 keV
 
