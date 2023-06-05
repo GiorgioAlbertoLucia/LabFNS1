@@ -124,13 +124,13 @@ if __name__ == '__main__':
     stat = Americio.FindObject("stats")
     stat1 = Curio.FindObject("stats")
     if(stat and stat1):
-        stat.SetTextColor(kBlue+3);
-        stat1.SetTextColor(kOrange-3);
-        height = stat1.GetY2NDC() - stat1.GetY1NDC();
-        stat1.SetY1NDC(stat.GetY1NDC() - height);
-        stat1.SetY2NDC(stat.GetY1NDC() );
-        stat1.Draw('same');
-        stat.Draw('same');
+        stat.SetTextColor(kBlue+3)
+        stat1.SetTextColor(kOrange-3)
+        height = stat1.GetY2NDC() - stat1.GetY1NDC()
+        stat1.SetY1NDC(stat.GetY1NDC() - height)
+        stat1.SetY2NDC(stat.GetY1NDC() )
+        stat1.Draw('same')
+        stat.Draw('same')
     leg.AddEntry(histo, "Data from triple source", 'lf')
     leg.AddEntry(Neptunio, "Gauss: fit on ^{237}Np", 'lf')
     leg.AddEntry(Americio, "Gauss: fit on ^{241}Am", 'lf')
@@ -233,7 +233,7 @@ if __name__ == '__main__':
 
     c3 = TCanvas('c3','c3',1000,1000)
     c3.cd()
-    histE =HistoFromCtoE(data,retta.GetParameter(1),retta.GetParameter(0),histo.GetNbinsX())
+    histE = HistoFromCtoE(data,retta.GetParameter(1),retta.GetParameter(0),histo.GetNbinsX())
 
     histE.GetXaxis().SetTitle("Energy [keV]")
     histE.GetYaxis().SetTitle("Counts")

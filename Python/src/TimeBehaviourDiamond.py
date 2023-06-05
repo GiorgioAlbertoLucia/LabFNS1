@@ -11,7 +11,7 @@ from StyleFormatter import SetObjectStyle, SetGlobalStyle
 
 SetGlobalStyle(padleftmargin=0.12, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1., titleoffsetx=0.9, titleoffset= 0.6, opttitle=1)
 
-def WriteHisto(infilenames, histofile): 
+def WriteHisto(infilenames, histofile,rebin=1): 
     # returns (centroids, FWHM) of MCA spectra in infilenames array
     colors = [kBlue, kRed, kGreen, kOrange, kBlack, kViolet, kAzure]
     #print('ciao')
@@ -24,6 +24,7 @@ def WriteHisto(infilenames, histofile):
         SetObjectStyle(histos[idx], color=color, fillalpha=1, linewidth=1)
         #histos[idx].Rebin(2)
         #histos[idx].Draw("HIST L")
+        histos[idx].Rebin(rebin)
         histos[idx].SetDrawOption("E")
         #histos[idx].Draw("E")
         histos[idx].Write()
@@ -53,6 +54,7 @@ def HistosFeaturesGaus(histos, fitbound):
         errResolutions.append(math.sqrt((FWHMs[-1]*FWHMs[-1]*errCentroids[-1]*errCentroids[-1])/(Centroids[-1]*Centroids[-1]*Centroids[-1]*Centroids[-1]) + 
                                          (errFWHMs[-1]*errFWHMs[-1])/(Centroids[-1]*Centroids[-1])))
         times.append(5+ind*80)
+    print(errFWHMs)
     return Centroids,errCentroids,FWHMs,errFWHMs,Resolutions,errResolutions,times
 
 
@@ -140,19 +142,16 @@ if __name__ == "__main__":
             '-60': [infilenameMinus60, histofileMinus60, CentroidBoundariesMinus60], '-90': [infilenameMinus90, histofileMinus90, CentroidBoundariesMinus90]}
 
     for key in dict.keys():
-        dict[key] = [dict[key],WriteHisto(dict[key][0], dict[key][1])]
+        dict[key] = [dict[key],WriteHisto(dict[key][0], dict[key][1],8)]
     #print(dict['+30'][0][2])
     #print(dict['+30'])
     #Features = [HistosFeatures(dict[x][1], dict[x][0][2]) for x in dict.keys()]
     
     Features = []
     for key in dict.keys():
-        #print(key)
         Features.append(HistosFeaturesGaus(dict[key][1], dict[key][0][2]))
 
-    #print(Features)
     Legend = list(dict.keys())
-    #print(Legend)
     LegendName = 'Applied voltage'
     Centroids = [i[0] for i in Features]
     errCentroids = [i[1] for i in Features]
@@ -161,8 +160,7 @@ if __name__ == "__main__":
     Resolutions = [i[4] for i in Features]
     errResolutions = [i[5] for i in Features]
     Times = [i[6] for i in Features]
-    #print(FWHMs, '\n')
-    #print(Centroids, '\n')
+
     #Resolutions = []
     #errResolutions = []
     #for F,eF,C,eC in zip(FWHMs,errFWHMs,Centroids,errCentroids):
@@ -173,52 +171,52 @@ if __name__ == "__main__":
     
     #print(Resolutions, '\n')
 
-    TimeEvolutionCharacterization = TCanvas("Detector's performance time evolution","Detector's performance time evolution",2200,1200)
-    TimeEvolutionCharacterization.Divide(3,1)
-
+    #TimeEvolutionCharacterization = TCanvas("Detector's performance time evolution","Detector's performance time evolution",2200,1200)
+    #TimeEvolutionCharacterization.Divide(3,1)
+#
     TitleCanvaFWHMs = 'FWHM comparison'
     PathCanvaFWHMs = 'data/output/Diamond/TimeFWHMs.pdf'
     LegendCoordinates = [0.65,0.65,0.85,0.85]
     TitleAxisLabelsFWHMs = "FWHM comparison;t[s];FWHM"
-    TimeEvolutionCharacterization.cd(0)
-    (FeaturePlot(FWHMs, errFWHMs, Times, Legend, LegendCoordinates, LegendName, TitleCanvaFWHMs, PathCanvaFWHMs, TitleAxisLabelsFWHMs)).Draw('ALP')
-    TimeEvolutionCharacterization.Modified()
-    TimeEvolutionCharacterization.Update()
-##
+    #TimeEvolutionCharacterization.cd(0)
+    FeaturePlot(FWHMs, errFWHMs, Times, Legend, LegendCoordinates, LegendName, TitleCanvaFWHMs, PathCanvaFWHMs, TitleAxisLabelsFWHMs)
+    #TimeEvolutionCharacterization.Modified()
+    #TimeEvolutionCharacterization.Update()
+###
     TitleCanvaCentroids = 'Centroids comparison'
     PathCanvaCentroids = 'data/output/Diamond/TimeCentroids.pdf'
     LegendCoordinates = [0.6,0.5,0.8,0.3]
     TitleAxisLabelsCentroids = "Centroid comparison;t[s];Centroid"
-    TimeEvolutionCharacterization.cd(1)
-    (FeaturePlot(Centroids, errCentroids, Times, Legend, LegendCoordinates, LegendName, TitleCanvaCentroids, PathCanvaCentroids, TitleAxisLabelsCentroids)).Draw('ALP')
-    TimeEvolutionCharacterization.Modified()
-    TimeEvolutionCharacterization.Update()
-##
-    TitleCanvaResolution = 'Resolution comparison'
-    PathCanvaResolution = 'data/output/Diamond/TimeResolutions.pdf'
-    TitleAxisLabelsResolution = "Resolution comparison;t[s];Resolution"
-    LegendCoordinates = [0.65,0.65,0.85,0.85]
-    TimeEvolutionCharacterization.cd(1)
-    (FeaturePlot(Resolutions, errResolutions, Times, Legend, LegendCoordinates, LegendName, TitleCanvaResolution, PathCanvaResolution, TitleAxisLabelsResolution)).Draw('ALP')
-    TimeEvolutionCharacterization.Modified()
-    TimeEvolutionCharacterization.Update()
+    #TimeEvolutionCharacterization.cd(1)
+    FeaturePlot(Centroids, errCentroids, Times, Legend, LegendCoordinates, LegendName, TitleCanvaCentroids, PathCanvaCentroids, TitleAxisLabelsCentroids)
+    #TimeEvolutionCharacterization.Modified()
+    #TimeEvolutionCharacterization.Update()
+###
+    #TitleCanvaResolution = 'Resolution comparison'
+    #PathCanvaResolution = 'data/output/Diamond/TimeResolutions.pdf'
+    #TitleAxisLabelsResolution = "Resolution comparison;t[s];Resolution"
+    #LegendCoordinates = [0.65,0.65,0.85,0.85]
+    #TimeEvolutionCharacterization.cd(1)
+    #(FeaturePlot(Resolutions, errResolutions, Times, Legend, LegendCoordinates, LegendName, TitleCanvaResolution, PathCanvaResolution, TitleAxisLabelsResolution)).Draw('ALP')
+    #TimeEvolutionCharacterization.Modified()
+    #TimeEvolutionCharacterization.Update()
+#
+    #TimeEvolutionCharacterization.SaveAs('data/output/Diamond/TimeEvolutionCharacterization.pdf')
 
-    TimeEvolutionCharacterization.SaveAs('data/output/Diamond/TimeEvolutionCharacterization.pdf')
-
-    #ResCompLegend = TLegend(0.77,0.67,0.92,0.82)
-    #ResCompLegend.SetHeader('Start Time')
-    #dict['+60'][1][0].Scale(1/dict['+60'][1][0].GetMaximum())
-    #dict['+60'][1][1].Scale(1/dict['+60'][1][1].GetMaximum())
-    #dict['+60'][1][2].Scale(1/dict['+60'][1][2].GetMaximum())
-    #ResCompLegend.AddEntry(dict['+60'][1][0],'5s','lf')
-    #ResCompLegend.AddEntry(dict['+60'][1][1],'85s','lf')
-    #ResCompLegend.AddEntry(dict['+60'][1][2],'165s','lf')
-    #ResCompLegend.SetTextFont(42)
-    #ResCompLegend.SetTextSize(gStyle.GetTextSize()*0.7)
-    #ResCompLegend.SetFillStyle(0)
-    #ResCompboundaries = [1080,0.,1400.,1.1]
-    #ResCompCanva = 'MCA distributions HV=+60V;Channel;N/N_{MAX}'
-    #HistoComparison([dict['+60'][1][0],dict['+60'][1][1],dict['+60'][1][2]], ResCompLegend, ResCompCanva,
-    #                ResCompboundaries, 'data/output/Diamond/ResComp.pdf',[4,4,4],[kBlue-4,kRed-4,kGreen+1],[0.9,0.6,0.5])
+    ResCompLegend = TLegend(0.77,0.67,0.92,0.82)
+    ResCompLegend.SetHeader('Start Time')
+    dict['+60'][1][0].Scale(1/dict['+60'][1][0].GetMaximum())
+    dict['+60'][1][1].Scale(1/dict['+60'][1][1].GetMaximum())
+    dict['+60'][1][2].Scale(1/dict['+60'][1][2].GetMaximum())
+    ResCompLegend.AddEntry(dict['+60'][1][0],'5s','lf')
+    ResCompLegend.AddEntry(dict['+60'][1][1],'85s','lf')
+    ResCompLegend.AddEntry(dict['+60'][1][2],'165s','lf')
+    ResCompLegend.SetTextFont(42)
+    ResCompLegend.SetTextSize(gStyle.GetTextSize()*0.7)
+    ResCompLegend.SetFillStyle(0)
+    ResCompboundaries = [1000,0.,1500.,1.1]
+    ResCompCanva = 'MCA normalised count distributions HV=+60V;Channel;Counts [a.u]'
+    HistoComparison([dict['+60'][1][0],dict['+60'][1][1],dict['+60'][1][2]], ResCompLegend, ResCompCanva,
+                    ResCompboundaries, 'data/output/Diamond/ResComp.pdf',[1,1,1],[kRed,kAzure+3,kOrange-3],[0.9,0.7,0.6])
 
 

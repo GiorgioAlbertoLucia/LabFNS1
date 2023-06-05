@@ -4,31 +4,67 @@ import sys
 sys.path.append('Python/utils')
 
 from ROOT import TCanvas, kBlue, kGreen, kRed, kBlue, kOrange, kBlack, kAzure, kViolet, TFile, TLegend, gStyle, TF1, Math, TPad, kYellow, TLine, kGray, gPad 
-from ReadMCA import DictHistos, HistoComparison
+from ReadMCA import DictHistos, HistoComparison, CalEnergyErr, FitStats
 
 from StyleFormatter import SetObjectStyle, SetGlobalStyle
 
 SetGlobalStyle(padleftmargin=0.14, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.11, titleoffsety=1.2, titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
 
-def InternalConversionPeakFit(histoPeak):
+def InternalConversionPeakFit(histoPeak,calerr,color):
     
     # FIT PICCO CONVERSIONE INTERNA GUADAGNO 1000 - NO BETA ELECTRONS
-    FileFitIntConvPeak = TFile('data/output/Diamond/Cesio/InternalConvPeak.root', 'recreate')
-    FitLowBound = 640
-    FitUppBound = 680
-    ComptonEdgeFit = TCanvas('Compton Edge Fit', 'Compton Edge Fit',1280,760)
-    hFrame = ComptonEdgeFit.DrawFrame(FitLowBound-FitLowBound*0.05,0.,FitUppBound + FitUppBound*0.05,450,"Internal conversion peak; E[KeV]; Counts")
+    InternalConversionPeakFit = TCanvas('Internal conversion peak fit', 'Internal conversion peak fit',1280,760)
+    FitLowBound = 630
+    FitUppBound = 675
     IntConvPeak = TF1("Internal conversion peak", "gaus(0)", FitLowBound, FitUppBound)
     #IntConvPeak.SetParameter(0,0.9)
     IntConvPeak.SetParameter(1,660)
-    histoPeak.Fit(IntConvPeak,"RM+","",FitLowBound,FitUppBound) # provare 3° opzione func
-    histoPeak.SetMarkerColor(4)
-    histoPeak.Draw("hist,p")
-    histoPeak.Write()
+    histoPeak.Fit(IntConvPeak,"RM+","",FitLowBound,FitUppBound) 
     FitStats(IntConvPeak)
-    FileFitIntConvPeak.Close()
+    fitResults = histoPeak.Fit(IntConvPeak, 'S')
+    covMatrix = fitResults.GetCovarianceMatrix()
+    cov = covMatrix[0][1]
+    print('COVARIANZAAAAAAAAAAAAAAAAAAAA')
+    print(cov)
+    print('\n\n\n\n\n')
+    hFrame = InternalConversionPeakFit.DrawFrame(570,0.,770,1500,"Internal conversion peak fit; E[keV]; Counts")
+    histoPeak.SetLineColor(color)
+    histoPeak.SetMarkerColor(color)
+    histoPeak.Draw("hist,p,e,same")
+    leg = TLegend(0.71, 0.6, 0.85, 0.8)
+    leg.SetTextFont(42)
+    leg.SetTextSize(gStyle.GetTextSize()*0.7)
+    leg.SetFillStyle(0)
+    leg.AddEntry(histoPeak, 'Data', 'lep')
+    leg.AddEntry(IntConvPeak, 'Fit curve', 'lf')
+    leg.Draw("same")
+    IntConvPeak.Draw("same")
+    InternalConversionPeakFit.Modified()
+    InternalConversionPeakFit.Update()
+    InternalConversionPeakFit.SaveAs('data/output/Diamond/Cesio/InternalConversionPeakFit.pdf')
+    Calerr = CalEnergyErr(0.318,0.008,-30,40,5,cov,IntConvPeak.GetParameter(1),IntConvPeak.GetParError(1))
+    print(Calerr)
+    print('\n\n\n\n\n\n') 
+    TotalError = np.sqrt(IntConvPeak.GetParError(1)*IntConvPeak.GetParError(1) + Calerr*Calerr)
+    Polymide = PolymideThickness(IntConvPeak.GetParameter(1),TotalError)
+    result = str(IntConvPeak.GetParameter(1)) + ' ' + u"\u00B1" + ' ' + str(TotalError) + ' keV ' + "\n\n" + "Polymide Thickness: " + Polymide
+    return result
+    #return (IntConvPeak.GetParameter(1),IntConvPeak.GetParError(1))
 
-def ComptonEdgeFit(histoCompton):
+def PolymideThickness(IntConvPeak, IntConvPeakErr):
+    # StopPowerPolyElectronsNIST = 1.769 (MeV*cm2)/(g)
+    StopPowerPolyElectronsNIST = 0.1769 # (keV*m2)/(g)
+    # SpecificRhoPoly = 1.420 (g/cm3)
+    SpecificRhoPoly = 1420000 # g/m3
+    # AmbTempRhoWater = 1000 kg/m3
+    AmbTempRhoWater = 1000000 # g/m3
+    RhoPoly = AmbTempRhoWater*SpecificRhoPoly
+    PolyThickness = (662-IntConvPeak)/(RhoPoly*StopPowerPolyElectronsNIST)
+    PolyThicknessErr = IntConvPeakErr/(RhoPoly*StopPowerPolyElectronsNIST)
+    result = str(PolyThickness) + ' ' + u"\u00B1" + ' ' + str(PolyThicknessErr) + ' m'
+    return result
+
+def ComptonEdgeFit(histoCompton,calerr,color):
     #CHI2 SUPERATO
     #FitLowBound = 475
     #FitUppBound = 530
@@ -60,83 +96,126 @@ def ComptonEdgeFit(histoCompton):
     ComptonEdgeFunction.SetParameter(3,2.)
     histoCompton.Fit(ComptonEdgeFunction,"L","",FitLowBound,FitUppBound) # provare 3° opzione func
     FitStats(ComptonEdgeFunction)
-    hFrame = ComptonEdgeFit.DrawFrame(450,0.,545,140,"Compton Edge scatterless source with plastic; E[KeV]; Counts")
-    histoCompton.SetMarkerColor(4)
-    histoCompton.Draw("hist,p,same")
+    fitResults = histoCompton.Fit(ComptonEdgeFunction, 'SL')
+    covMatrix = fitResults.GetCovarianceMatrix()
+    cov = covMatrix[0][1]
+    print('COVARIANZAAAAAAAAAAAAAAAAAAAA')
+    print(cov)
+    print('\n\n\n\n\n')
+    hFrame = ComptonEdgeFit.DrawFrame(400,0.,600,220,"Compton Edge Fit; E[keV]; Counts")
+    histoCompton.SetLineColor(color)
+    histoCompton.SetMarkerColor(color)
+    histoCompton.Draw("hist,p,e,same")
     #histoCompton.Write()
-    leg = TLegend(0.62, 0.65, 0.82, 0.85)
+    leg = TLegend(0.65, 0.40, 0.85, 0.60)
     leg.SetTextFont(42)
     leg.SetTextSize(gStyle.GetTextSize()*0.7)
     leg.SetFillStyle(0)
     #leg.SetHeader("TDC Normalised counts")
-    leg.AddEntry(histoCompton, 'Data', 'lf')
+    leg.AddEntry(histoCompton, 'Data', 'lep')
     leg.AddEntry(ComptonEdgeFunction, 'Fit curve', 'lf')
     leg.Draw("same")
     ComptonEdgeFunction.Draw("same")
     ComptonEdgeFit.Modified()
     ComptonEdgeFit.Update()
     ComptonEdgeFit.SaveAs('data/output/Diamond/Cesio/ComptonEdgeFit.pdf')
+    Calerr = CalEnergyErr(0.318,0.008,-30,40,5,cov,ComptonEdgeFunction.GetParameter(1),ComptonEdgeFunction.GetParError(1))
+    print(Calerr)
+    print('\n\n\n\n\n\n') 
+    TotalError = np.sqrt(ComptonEdgeFunction.GetParError(1)*ComptonEdgeFunction.GetParError(1) + Calerr*Calerr)
+    result = str(ComptonEdgeFunction.GetParameter(1)) + ' ' + u"\u00B1" + ' ' + str(TotalError) + ' keV'
+    return result
+    #return (ComptonEdgeFunction.GetParameter(1),ComptonEdgeFunction.GetParError(1),0,0)
     #FileFitEdge.Close()
 
-def BetaQValueFit(histoBeta, outfilename):
+def BetaQValueFit(histoBeta, outfilename, calerr, color):
 
     BetaQValueFitFile = TFile('data/output/Diamond/Cesio/BetaEdgeFit.root','recreate')
     BetaQValueFit = TCanvas("Beta Q Value Fit", "Beta Q Value Fit", 1280, 760)
 
-    # FIT AND DRAWING BOUNDARIES
-    #FitLowBound1 = 385
-    FitLowBound1 = 405
-    FitUppBound1 = 490
-    FitLowBound2 = 540
-    FitUppBound2 = 633
-    BoundDrawBetaCurve = 600
-    BoundDrawConstCurve = 490
-    CanvaYAxisBottomBound = 0.
-    CanvaYAxisTopBound = 0.
+    # FIT AND DRAWING BOUNDARIES REBIN 4
+    #FitLowBound1 = 405
+    #FitUppBound1 = 490
+    #FitLowBound2 = 540
+    #FitUppBound2 = 633
+    #BoundDrawBetaCurve = 600
+    #BoundDrawConstCurve = 490
+    #CanvaYAxisBottomBound = 0.
+    #CanvaYAxisTopBound = 550.
+#
+    #BetaCurveFunction = TF1("Beta Curve", "[0] + TMath::Exp(-[1]*(x-[2]) )", FitLowBound1, BoundDrawBetaCurve)
+    #BetaCurveFunction.SetParameter(0,40)
+    #BetaCurveFunction.SetParameter(1,0.0109)
+    #BetaCurveFunction.SetParameter(2,910)
+#
+    #ConstFunction = TF1("Compton Plateau", "[0]", BoundDrawConstCurve, FitUppBound2)
+    #ConstFunction.SetParameter(1,50)
+#
+    #histoBeta.Fit(BetaCurveFunction,"L","",FitLowBound1,FitUppBound1)
+    #histoBeta.Fit(ConstFunction,"L","",FitLowBound2,FitUppBound2)
 
-    BetaCurveFunction = TF1("Beta Curve", "[0] + TMath::Exp(-[1]*(x-[2]) )", FitLowBound1, BoundDrawBetaCurve)
+    # FIT AND DRAWING BOUNDARIES REBIN 8
+
+    FitLowBound1 = 400
+    FitUppBound1 = 485
+    FitLowBound2 = 525
+    FitUppBound2 = 630
+    BoundDrawBetaCurve = 580
+    BoundDrawConstCurve = 500
+    CanvaYAxisBottomBound = 0.
+    CanvaYAxisTopBound = 1500.
+
+    BetaCurveFunction = TF1("Beta Curve", "[0] + TMath::Exp(-[1]*(x-[2]) )", 380, BoundDrawBetaCurve)
     BetaCurveFunction.SetParameter(0,40)
     BetaCurveFunction.SetParameter(1,0.0109)
     BetaCurveFunction.SetParameter(2,910)
 
-    ConstFunction = TF1("Compton Plateau", "[0]", BoundDrawConstCurve, FitUppBound2)
+    ConstFunction = TF1("Compton Plateau", "[0]", BoundDrawConstCurve, 640)
     ConstFunction.SetParameter(1,50)
 
     histoBeta.Fit(BetaCurveFunction,"L","",FitLowBound1,FitUppBound1)
+    print('\n\n\n\n\n\n\n')
     histoBeta.Fit(ConstFunction,"L","",FitLowBound2,FitUppBound2)
 
     FitStats(ConstFunction)
     FitStats(BetaCurveFunction)
 
     # DRAW THE GRAPH
-    hFrame = BetaQValueFit.DrawFrame(FitLowBound1-FitLowBound1*0.1,CanvaYAxisBottomBound,FitUppBound2+FitUppBound2*0.13,CanvaYAxisTopBound,"Q value Beta Decay Fit; E[KeV]; Counts")
-    histoBeta.SetMarkerColor(4)
-    histoBeta.Draw("hist,p,same")
+    hFrame = BetaQValueFit.DrawFrame(300,CanvaYAxisBottomBound,700,CanvaYAxisTopBound,"Q value Beta Decay Fit; E[keV]; Counts")
+    #histoBeta.SetMarkerColor(4)
+    histoBeta.SetLineColor(color)
+    histoBeta.SetMarkerColor(color)
+    histoBeta.Draw("hist,p,e,same")
     BetaCurveFunction.Draw("same")
     BetaCurveFunction.SetLineColor(kGreen) 
+    BetaCurveFunction.SetLineWidth(2) 
     ConstFunction.Draw("same")
     ConstFunction.SetLineColor(kViolet)
-    BetaCurveFitLowBound = TLine(FitLowBound1,gPad.GetUymax(),FitLowBound1,gPad.GetUymin())
-    BetaCurveFitUppBound = TLine(FitUppBound1,gPad.GetUymax(),FitUppBound1,gPad.GetUymin())
-    BetaCurveFitLowBound.SetLineColor(kGreen+2)
-    BetaCurveFitUppBound.SetLineColor(kGreen+2)
-    ConstCurveFitLowBound = TLine(FitLowBound2,gPad.GetUymax(),FitLowBound2,gPad.GetUymin())
-    ConstCurveFitUppBound = TLine(FitUppBound2,gPad.GetUymax(),FitUppBound2,gPad.GetUymin())
-    ConstCurveFitLowBound.SetLineColor(kViolet+2)
-    ConstCurveFitUppBound.SetLineColor(kViolet+2)
+    ConstFunction.SetLineWidth(2)
+    BetaCurveFitLowBound = TLine(FitLowBound1,0.7*gPad.GetUymax(),FitLowBound1,0.17*gPad.GetUymax())
+    BetaCurveFitUppBound = TLine(FitUppBound1,0.4*gPad.GetUymax(),FitUppBound1,0.05*gPad.GetUymax())
+    BetaCurveFitLowBound.SetLineColor(kRed)
+    BetaCurveFitLowBound.SetLineWidth(2)
+    BetaCurveFitUppBound.SetLineColor(kRed)
+    BetaCurveFitUppBound.SetLineWidth(2)
+    ConstCurveFitLowBound = TLine(FitLowBound2,0.25*gPad.GetUymax(),FitLowBound2,gPad.GetUymin())
+    ConstCurveFitUppBound = TLine(FitUppBound2,0.25*gPad.GetUymax(),FitUppBound2,gPad.GetUymin())
+    ConstCurveFitLowBound.SetLineColor(kRed)
+    ConstCurveFitLowBound.SetLineWidth(2)
+    ConstCurveFitUppBound.SetLineColor(kRed)
+    ConstCurveFitUppBound.SetLineWidth(2)
     BetaCurveFitLowBound.Draw("same")
     BetaCurveFitUppBound.Draw("same")
     ConstCurveFitLowBound.Draw("same")
     ConstCurveFitUppBound.Draw("same")
-    legend = TLegend(0.5,0.6,0.75,0.8)
+    legend = TLegend(0.58,0.53,0.83,0.73)
     legend.SetTextFont(42)
     legend.SetTextSize(gStyle.GetTextSize()*0.7)
     legend.SetFillStyle(0)
-    legend.AddEntry(histoBeta, 'Data', 'lf')
+    legend.AddEntry(histoBeta, 'Data', 'lep')
     legend.AddEntry(BetaCurveFunction, 'Beta Curve Fit', 'lf')
-    legend.AddEntry(BetaCurveFitLowBound,'Beta curve fit range', 'lf')
     legend.AddEntry(ConstFunction, 'Plateau Fit', 'lf')
-    legend.AddEntry(ConstCurveFitLowBound, 'Plateau fit range', 'lf')
+    legend.AddEntry(BetaCurveFitLowBound,'Fit ranges', 'lf')
     legend.Draw("same")
     BetaQValueFit.Modified()
     BetaQValueFit.Update()
@@ -159,7 +238,10 @@ def BetaQValueFit(histoBeta, outfilename):
     print((sa3*sa3)*(1/(a1*a1*(a3-a0)*(a3-a0))))
     print((sa0*sa0)*(1/(a1*a1*(a3-a0)*(a3-a0))))
     QValueEstimateError = np.sqrt(sa2*sa2 + ((np.log(a3-a0)*np.log(a3-a0))/(a1*a1*a1*a1))*sa1*sa1 + (sa0*sa0+sa3*sa3)*(1/(a1*a1*(a3-a0)*(a3-a0))) )
-    print('Q value estimate: ', QValueEstimate, u"\u00B1", QValueEstimateError)
+    TotalError = np.sqrt(QValueEstimateError + calerr*calerr)
+    result = str(QValueEstimate) + ' ' + u"\u00B1" + ' ' + str(TotalError) + ' keV'
+    return result
+    #return (QValueEstimate,QValueEstimateError)
 
 def FitStats(fitfunct):
     Chisquare = fitfunct.GetChisquare()
@@ -183,21 +265,21 @@ def HistoSubtraction(DFbound,diffYbound,histo1,histo2,legend,outfilename):
     padDiff.Draw()
 #
     pad.cd()
-    hFrame = pad.DrawFrame(DFbound[0],DFbound[1],DFbound[2],DFbound[3],"MCA normalised counts distribution;Energy [KeV];Counts")
+    hFrame = pad.DrawFrame(DFbound[0],DFbound[1],DFbound[2],DFbound[3],"MCA normalised counts distribution;Energy [keV];Counts [a.u.]")
     histo1copy.Scale(1/histo1copy.GetMaximum())
-    SetObjectStyle(histo1copy, color = kBlue-4, fillalpha=0.5)
+    SetObjectStyle(histo1copy, color = kAzure+3, fillalpha=0.5)
     histo1copy.Draw("hist,same")
     histo2copy.Scale(1/histo2copy.GetMaximum())
-    SetObjectStyle(histo2copy, color = kYellow-4, fillalpha=0.9)
+    SetObjectStyle(histo2copy, color = kOrange-3, fillalpha=0.7)
     histo2copy.Draw("hist,same")
     legend.Draw("same")
 
     padDiff.cd()
     # DA FARE: SOTTRARRE ISTOGRAMMI NORMALIZZATI ALL'AREA TOTALE
-    hFrameDiff = pad.DrawFrame(DFbound[0],DFbound[1],DFbound[2],diffYbound,";Energy [KeV];Difference")
+    hFrameDiff = pad.DrawFrame(DFbound[0],DFbound[1],DFbound[2],diffYbound,";Energy [keV];|Difference|")
     histo = histo1copy.Clone()
     histo.Add(histo2copy,-1.)      # Performs subtraction
-    SetObjectStyle(histo, color = kGreen-4, fillalpha=0.5)
+    SetObjectStyle(histo, color = kRed, fillalpha=0.5)
 
     hFrameDiff.GetYaxis().SetTitleSize(0.12)
     hFrameDiff.GetXaxis().SetTitleSize(0.12)
@@ -228,21 +310,23 @@ if __name__ == "__main__":
     dict = {'Gain 200': [infilenames[0],"en200"], 'Gain 1000': [infilenames[1],"en1000"], 'Plastica prova': [infilenames[2],"en1000"],
             'Sorgente non scatterless': [infilenames[3],"en1000"], 'Misura notturna con plastica': [infilenames[4],"en1000"]}
     
-    #energyErr = CalEnergyErr(rebin)
-    #print('Energy calibration error: ', energyErr)
-    #print(dict['Gain 1000'][1])
-    DictHistos(dict, histofile, 4)
+    color = kAzure-7
+    DictHistos(dict, histofile, color, 8)
 
-    ComptonEdgeFit(dict['Misura notturna con plastica'][1])
-    InternalConversionPeakFit(dict['Gain 1000'][1])
-    BetaQValueFit(dict['Gain 1000'][1],'BetaQValue')
+    # CalibrationErr = CalEnergyErr(0.318,0.008,-30,40,5)
+    CalibrationErr = 0
+    #print(CalibrationErr)
+    ComptonEdge = ComptonEdgeFit(dict['Misura notturna con plastica'][1],CalibrationErr,color)
+    InternalConversionPeak = InternalConversionPeakFit(dict['Gain 1000'][1],CalibrationErr,color)
+    BetaQValue = BetaQValueFit(dict['Gain 1000'][1],'BetaQValue',CalibrationErr,color)
 
-    rebin = 4
-    for key in dict.keys():
-        print(key)
-        dict[key][1].Rebin(rebin)
-    print(dict['Gain 1000'][1].GetNbinsX())
-    print(dict['Gain 200'][1].GetNbinsX())
+    with open('data/output/Diamond/Cesio/CesiumAnalysis.txt', 'w') as f:
+        Compton = 'Compton edge estimate: ' + ComptonEdge + '\n\n'
+        f.write(Compton)
+        InternalConversion = 'Internal conversion peak estimate: ' + InternalConversionPeak + '\n\n'
+        f.write(InternalConversion)
+        QValue = 'Beta Q value estimate: ' + BetaQValue + '\n\n'
+        f.write(QValue)
 
     #comparison between data taken with different gain
     histofileCh = TFile('data/input/Diamond/Cesio/CesiumHistosCh.root','recreate')
@@ -256,10 +340,10 @@ if __name__ == "__main__":
     GainChLegend.SetTextSize(gStyle.GetTextSize()*0.7)
     GainChLegend.SetFillStyle(0)
     GainChboundaries = [71.74,0.,1200.,1.1]
-    GainChCanva = 'Amplifier Gain Comparison;Channel;Counts'
+    GainChCanva = 'MCA normalised counts distribution;Channel;Counts [a.u.]'
     HistoComparison([dictCh['GainCh 1000'][1], dictCh['GainCh 200'][1]], GainChLegend, GainChCanva, GainChboundaries, 'data/output/Diamond/Cesio/GainChComp.pdf',
-                    [1,1],[kBlue-4,kYellow-4],[0.5,0.9])
-
+                    [1,1],[kAzure+3,kOrange-3],[0.5,0.9])
+#
     #comparison between data taken with plastic source and scatterless source
     ScatterLegend = TLegend(0.6,0.6,0.8,0.8)
     ScatterLegend.SetHeader('Source feature')
@@ -269,10 +353,10 @@ if __name__ == "__main__":
     ScatterLegend.SetTextSize(gStyle.GetTextSize()*0.7)
     ScatterLegend.SetFillStyle(0)
     Scatterboundaries = [71.74,0.,800.,1.1]
-    ScatterCanva = 'Sources Comparison;Energy [KeV];Counts'
+    ScatterCanva = 'Sources Comparison;Energy [keV];Counts'
     HistoComparison([dict['Sorgente non scatterless'][1], dict['Misura notturna con plastica'][1]], ScatterLegend, ScatterCanva,
                     Scatterboundaries, 'data/output/Diamond/Cesio/SourceComp.pdf',[1,1],[kBlue-4,kYellow-4],[0.5,0.9])
-#
+##
     ##comparison between data taken with plastic source and scatterless source
     ScatNonScatLegend = TLegend(0.6,0.6,0.8,0.8)
     ScatNonScatLegend.SetHeader('Source feature')
@@ -282,10 +366,10 @@ if __name__ == "__main__":
     ScatNonScatLegend.SetTextSize(gStyle.GetTextSize()*0.7)
     ScatNonScatLegend.SetFillStyle(0)
     ScatNonScatboundaries = [71.74,0.,1000.,1.1]
-    ScatNonScatCanva = 'Sources Comparison;Energy [KeV];Counts'
+    ScatNonScatCanva = 'Sources Comparison;Energy [keV];Counts'
     HistoComparison([dict['Sorgente non scatterless'][1], dict['Gain 1000'][1]], ScatNonScatLegend, ScatNonScatCanva,
                     ScatNonScatboundaries, 'data/output/Diamond/Cesio/ScatNonScatComp.pdf',[1,1],[kBlue-4,kYellow-4],[0.5,0.9])
-#
+##
     ##comparison between all data
     AllSourcesLegend = TLegend(0.5,0.6,0.85,0.8)
     AllSourcesLegend.SetHeader('Source feature')
@@ -296,10 +380,11 @@ if __name__ == "__main__":
     AllSourcesLegend.SetTextSize(gStyle.GetTextSize()*0.7)
     AllSourcesLegend.SetFillStyle(0)
     AllSourcesboundaries = [71.74,0.,800.,1.1]
-    AllSourcesCanva = 'Sources Comparison;Energy [KeV];Counts'
+    AllSourcesCanva = 'Sources Comparison;Energy [keV];Counts [a.u.]'
     HistoComparison([dict['Sorgente non scatterless'][1], dict['Gain 1000'][1],dict['Misura notturna con plastica'][1]], AllSourcesLegend, AllSourcesCanva,
-                     AllSourcesboundaries, 'data/output/Diamond/Cesio/AllSourcesComp.pdf',[1,1,1],[kBlue-4,kGreen-4,kYellow-4],[0.9,0.7,0.7])
-#
+                     AllSourcesboundaries, 'data/output/Diamond/Cesio/AllSourcesComp.pdf',[1,1,1],[kRed,kAzure+3,kOrange-3],[0.9,0.7,0.6])
+##
+    # HISTOGRAMS COMPARISONS AND SUBTRACTIONS
     legend = TLegend(0.5,0.6,0.85,0.8)
     legend.SetHeader('Source feature')
     legend.AddEntry(dict['Sorgente non scatterless'][1],'Non-scatterless','lf')
@@ -317,4 +402,3 @@ if __name__ == "__main__":
     HistoSubtraction([71.74,0,800,1.1],0.9,dict['Gain 1000'][1],dict['Misura notturna con plastica'][1],legend,'Gain1000VsPlasticaNotte')
 
     #################################
-
