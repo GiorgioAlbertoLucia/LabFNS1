@@ -4,7 +4,7 @@
 void RatesPositroniumABcanvas()
 {
 //=========Macro generated from canvas: scalerRate-Angle/Rates for scintillators A and B; Angle (deg); Rate (Hz)
-//=========  (Fri Jun  2 23:59:26 2023) by ROOT version 6.26/10
+//=========  (Sun Jun  4 11:10:27 2023) by ROOT version 6.26/10
    TCanvas *scalerRate-Angle = new TCanvas("scalerRate-Angle", "Rates for scintillators A and B; Angle (deg); Rate (Hz)",50,53,700,500);
    gStyle->SetOptStat(0);
    scalerRate-Angle->SetHighLightColor(2);
