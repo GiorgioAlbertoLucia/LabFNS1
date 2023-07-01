@@ -97,13 +97,13 @@ def secondPeakSelection(df, outputFile):
     dfSel = df.query('`2249W_-_adc__ch10` > 340', inplace=False)
     canvas10 = TCanvas('adc_PeakSel_ch10', '', 1500, 1500)
 
-    ADChist10 = TH1D('ADChist10', '', 235, 0, 2048)
+    ADChist10 = TH1D('ADChist10', '', 256, 0, 2048)
     ADChist10.SetLineColor(kGray+2)
     ADChist10.SetFillColorAlpha(kGray+2, 0.5)
     ADChist10.SetTitle('ADC data with peak selections (S1); Energy (chn); Counts (a.u.)')
     for x in df['2249W_-_adc__ch10']:    ADChist10.Fill(x)
 
-    ADChistSel10 = TH1D('ADChistSel10', '', 235, 0, 2048)
+    ADChistSel10 = TH1D('ADChistSel10', '', 256, 0, 2048)
     ADChistSel10.SetLineColor(kGreen-3)
     ADChistSel10.SetFillColorAlpha(kGreen-3, 0.3)
     ADChistSel10.SetTitle('ADC data with peak selections (S1); Energy (chn); Counts (a.u.)')
@@ -143,13 +143,13 @@ def secondPeakSelection(df, outputFile):
 
     canvas20 = TCanvas('th2_PeakSel_ch10', '', 1500, 1500)
 
-    hist10 = TH2D('hist10', '', 125, 0, 5000, 235, 0, 2048)
+    hist10 = TH2D('hist10', '', 125, 0, 5000, 256, 0, 2048)
     for x, y in zip(df['tdc_ns'], df['2249W_-_adc__ch10']): hist10.Fill(x, y)
     hist10.SetTitle('ADC and TDC data with peak selections (S1); Time (ns); Energy (chn)')
     hist10.SetMarkerStyle(3)
     hist10.SetMarkerColor(kGray+2)
 
-    hist10Sel = TH2D('hist10Sel', '', 125, 0, 5000, 235, 0, 2048)
+    hist10Sel = TH2D('hist10Sel', '', 125, 0, 5000, 256, 0, 2048)
     for x, y in zip(dfSel['tdc_ns'], dfSel['2249W_-_adc__ch10']): hist10Sel.Fill(x, y)
     hist10Sel.SetTitle('ADC and TDC data with peak selections (S1); Time (ns); Energy (chn)')
     hist10Sel.SetMarkerStyle(3)
@@ -189,13 +189,13 @@ def secondPeakSelection(df, outputFile):
     dfSel = df.query('`2249W_-_adc__ch11` > 584', inplace=False)
     canvas11 = TCanvas('adc_PeakSel_ch11', '', 1500, 1500)
 
-    ADChist11 = TH1D('ADChist11', '', 235, 0, 2048)
+    ADChist11 = TH1D('ADChist11', '', 256, 0, 2048)
     ADChist11.SetLineColor(kGray+2)
     ADChist11.SetFillColorAlpha(kGray+2, 0.5)
     ADChist11.SetTitle('ADC data with peak selections (SG); Energy (chn); Counts (a.u.)')
     for x in df['2249W_-_adc__ch11']:    ADChist11.Fill(x)
 
-    ADChistSel11 = TH1D('ADChistSel11', '', 235, 0, 2048)
+    ADChistSel11 = TH1D('ADChistSel11', '', 256, 0, 2048)
     ADChistSel11.SetLineColor(kGreen-3)
     ADChistSel11.SetFillColorAlpha(kGreen-3, 0.3)
     ADChistSel11.SetTitle('ADC data with peak selections (SG); Energy (chn); Counts (a.u.)')
@@ -235,13 +235,13 @@ def secondPeakSelection(df, outputFile):
 
     canvas21 = TCanvas('th2_PeakSel_ch11', '', 1500, 1500)
 
-    hist11 = TH2D('hist11', '', 125, 0, 5000, 235, 0, 2048)
+    hist11 = TH2D('hist11', '', 125, 0, 5000, 256, 0, 2048)
     for x, y in zip(df['tdc_ns'], df['2249W_-_adc__ch11']): hist11.Fill(x, y)
     hist11.SetTitle('ADC and TDC data with peak selections (SG); Time (ns); Energy (chn)')
     hist11.SetMarkerStyle(3)
     hist11.SetMarkerColor(kGray+2)
 
-    hist11Sel = TH2D('hist11Sel', '', 125, 0, 5000, 235, 0, 2048)
+    hist11Sel = TH2D('hist11Sel', '', 125, 0, 5000, 256, 0, 2048)
     for x, y in zip(dfSel['tdc_ns'], dfSel['2249W_-_adc__ch11']): hist11Sel.Fill(x, y)
     hist11Sel.SetTitle('ADC and TDC data with peak selections (SG); Time (ns); Energy (chn)')
     hist11Sel.SetMarkerStyle(3)
