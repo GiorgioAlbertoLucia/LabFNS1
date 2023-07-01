@@ -101,7 +101,7 @@ if __name__ == '__main__':
     tree = uproot.open("data/processed/data_tree.root")["fTreeData"]
     df = tree.arrays(library='pd')
     df['tdc_ns'] = df['2228A_-_tdc__ch6'] * 2.5
-    dfPU = df.query('`V259N_-_multi-hit_patter_unit__ch0` == 1', inplace=False)
+    dfPU = df.query('`V259N_-_multi-hit_patter_unit__ch0` == 0', inplace=False)
 
     rootFilePath = 'data/output/ADC_TDC_comparison.root'
     rootFile = TFile(rootFilePath, 'recreate')
