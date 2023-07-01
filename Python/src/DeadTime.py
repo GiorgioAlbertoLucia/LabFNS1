@@ -24,8 +24,8 @@ Df=Df[["Module1_0","Module2_0","Module5_0"]]
 print(Df["Module1_0"].max())
 print("Not Inhibited", 2**16*8+Df.iloc[-2]["Module1_0"])
 print("Inhibited", 2**16*8+Df.iloc[-2]["Module2_0"])
-print("Contamination", (len(Df.query("Module5_0==0")))/(2**16*8+Df.iloc[-2]["Module2_0"]))
-print("N_bad_T", len(Df.query("Module5_0==0")))
+print("Contamination", (len(Df.query("Module5_0==1")))/(2**16*8+Df.iloc[-2]["Module2_0"]))
+print("N_bad_T", len(Df.query("Module5_0==1")))
 
 
 events=list(range(len(Df)))

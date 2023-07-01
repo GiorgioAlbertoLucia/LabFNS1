@@ -20,8 +20,8 @@ Tree=uproot.open("data/input/DataFullRun.root")["fTreeData"]
 Df=Tree.arrays(library='pd')
 
 Df=Df[["Module4_10","Module4_11","Module5_0"]]
-DfPassed=Df.query("Module5_0==1")
-DfNotPassed=Df.query("Module5_0==0")
+DfPassed=Df.query("Module5_0==0")
+DfNotPassed=Df.query("Module5_0==1")
 
 cS1 = TCanvas("S1","S1",1500,1500)
 yMincS1 = 0.0001

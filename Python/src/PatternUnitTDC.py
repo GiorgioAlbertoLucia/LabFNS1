@@ -18,8 +18,8 @@ Tree=uproot.open("/home/fabrizio/Documents/Lectures/Lab1/LabFNS1/data/input/Data
 Df=Tree.arrays(library='pd')
 
 Df=Df[["Module3_6","Module5_0"]]
-DfPassed=Df.query("Module5_0==1")
-DfNotPassed=Df.query("Module5_0==0")
+DfPassed=Df.query("Module5_0==0")
+DfNotPassed=Df.query("Module5_0==1")
 
 cTDC = TCanvas("TDC","TDC",1500,1500)
 cTDC.SetLogy()
