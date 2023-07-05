@@ -4,6 +4,7 @@ sys.path.append('Python/utils')
 from ReadMCA import CreateHist
 from ROOT import TCanvas, TPad, TFile, TLegend, TLatex, kAzure, kOrange, kRed, gStyle
 from StyleFormatter import SetObjectStyle, SetGlobalStyle 
+from math import sqrt
 
 SetGlobalStyle(padleftmargin=0.1, padbottommargin=0.12, padrightmargin=0.05, padtopmargin=0.1, titleoffsety=1., titleoffsetx=0.9, titleoffset= 0.7, opttitle=1)
 
@@ -14,8 +15,8 @@ if __name__ == '__main__':
     rebin = 8
     SizeLittlePad = 0.3   # size in %
     xmax = 1024
-    ymax = 6.e4
-    ymaxDifference = 5.e3
+    ymax = 8.e4
+    ymaxDifference = 35.
 
     ###########################################
 
@@ -35,10 +36,14 @@ if __name__ == '__main__':
     hFrame = pad.DrawFrame(0,0.1,xmax,ymax,"MCA counts distribution;Channel;Counts")
     hFrame.GetYaxis().SetMaxDigits(3)
     histoLead = CreateHist(InfileLead,0)
+    for idx in range(histoLead.GetNbinsX()):
+        histoLead.SetBinError(idx, sqrt(histoLead.GetBinContent(idx)))
     SetObjectStyle(histoLead, color = kAzure+3, fillalpha=0.5)
     histoLead.Rebin(rebin)
     histoLead.Draw("hist,same")
     histoNoLead = CreateHist(InfileNoLead,0)
+    for idx in range(histoNoLead.GetNbinsX()):
+        histoNoLead.SetBinError(idx, sqrt(histoNoLead.GetBinContent(idx)))
     SetObjectStyle(histoNoLead, color = kOrange-3, fillalpha=0.5)
     histoNoLead.Rebin(rebin)
     histoNoLead.Draw("hist,same")
@@ -59,11 +64,12 @@ if __name__ == '__main__':
     text.Draw()
 
     padDiff.cd()
-    hFrameDiff = pad.DrawFrame(0,0,xmax,ymaxDifference,";Channel;|Difference|")
+    hFrameDiff = pad.DrawFrame(0,0,xmax,ymaxDifference,";Channel;|Pull distribution|")
     histo = histoLead.Clone()
     histo.Add(histoNoLead,-1.)      # Performs subtraction
     for idx in range(histo.GetNbinsX()):
-        histo.SetBinContent(idx,abs(histo.GetBinContent(idx)))
+        if abs(histo.GetBinContent(idx))>0:
+            histo.SetBinContent(idx,abs(histo.GetBinContent(idx))/sqrt(histoLead.GetBinError(idx)**2+histoNoLead.GetBinError(idx)))
     SetObjectStyle(histo, color = kRed, fillalpha=0.5)
 
     hFrameDiff.GetYaxis().SetTitleSize(0.12)
