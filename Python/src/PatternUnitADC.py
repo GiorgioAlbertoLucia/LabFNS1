@@ -2,7 +2,7 @@ import sys
 import pandas as pd
 import numpy as np
 import uproot
-from ROOT import TH1D, TH2D, TCanvas, kAzure, kRed, kGreen, kSpring, kBlack, kDarkBodyRadiator, TLegend, TLatex, TLine, TText, gStyle, gPad, gROOT
+from ROOT import TH1D, TH2D, TCanvas, kAzure, kRed, kGreen, kSpring, kBlack, kBlue, kDarkBodyRadiator, TLegend, TLatex, TLine, TText, gStyle, gPad, gROOT
 sys.path.append('Python/utils')
 from Pedestal import DrawPedestral
 from StyleFormatter import SetGlobalStyle, SetObjectStyle
@@ -55,7 +55,7 @@ text.SetNDC()
 text.SetTextSize(gStyle.GetTextSize())
 text.SetTextFont(42)
 text.Draw()
-text2 =TLatex(0.45, 0.55,"Using V259 pattern unit #mu")
+text2 =TLatex(0.45, 0.55,"Using V259 pattern unit")
 text2.SetNDC()
 text2.SetTextSize(gStyle.GetTextSize()*0.7)
 text2.SetTextFont(42)
@@ -293,12 +293,12 @@ gPad.Modified()
 gPad.Update()
 
 lineAtPedestal = TLine(300, gPad.GetUymax(), 300, gPad.GetUymin())
-lineAtPedestal.SetLineColor(kBlack)
-lineAtPedestal.SetLineWidth(1)
+lineAtPedestal.SetLineColor(kAzure)
+lineAtPedestal.SetLineWidth(2)
 lineAtPedestal.SetLineStyle(7)
 lineAtPedestal.Draw("same")
 
-pedestal= TText(0.21,0.7,"Pedestal")
+pedestal= TText(0.19,0.7,"Pedestal")
 pedestal.SetNDC()
 pedestal.SetTextSize(gStyle.GetTextSize()*0.7)
 pedestal.SetTextAngle(90)
@@ -306,8 +306,8 @@ pedestal.SetTextFont(42)
 pedestal.Draw("same")
 
 lineAtPedestalSG = TLine(gPad.GetUxmax(), 320 , gPad.GetUxmin(), 320)
-lineAtPedestalSG.SetLineColor(kBlack)
-lineAtPedestalSG.SetLineWidth(1)
+lineAtPedestalSG.SetLineColor(kAzure)
+lineAtPedestalSG.SetLineWidth(2)
 lineAtPedestalSG.SetLineStyle(7)
 lineAtPedestalSG.Draw("same")
 
